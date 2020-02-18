@@ -370,7 +370,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$connect_url = esc_url( $this->client->build_connect_url() );
 								?>
 								<small
-									class="text-muted"><?php _e( "By clicking the <b>Connect Site</b> button, you agree to our <a href='https://wpgeodirectory.com/terms-and-conditions/' target='_blank' class='text-muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd", "ayecode-connect" ); ?></small>
+									class="text-muted"><?php _e( "By clicking the <b>Connect Site</b> button, you agree to our <a href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd", "ayecode-connect" ); ?></small>
 								<p class="mt-4">
 									<a href="<?php echo $connect_url; ?>"
 									   class="btn btn-primary"><?php _e( 'Connect Site', 'ayecode-connect' ); ?></a>
@@ -386,7 +386,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					<div class="ac-footer border-top mt-5">
 						<p class="text-muted h6 mt-4"><?php _e( 'AycCode Ltd are the creators of:', 'ayecode-connect' ); ?>
 							<a href="https://wpgeodirectory.com/">wpgeodirectory.com</a>,
-							<a href="http://wpinvoicing.com/">wpinvoicing.com</a> &
+							<a href="https://wpinvoicing.com/">wpinvoicing.com</a> &
 							<a href="https://userswp.io/">userswp.io</a>
 						</p>
 					</div>

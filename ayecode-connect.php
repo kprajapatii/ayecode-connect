@@ -6,7 +6,7 @@
  * Description: A service plugin letting users connect AyeCode Services to their site.
  * Version: 1.0.0
  * Author: AyeCode
- * Author URI: https://ayecode.io/
+ * Author URI: https://ayecode.io
  * Requires at least: 4.7
  * Tested up to: 5.3
  *
@@ -42,6 +42,8 @@ function ayecode_connect() {
     //Call the init method to register routes. This should be called exactly once per client (Preferably before the init hook).
     $client->init();
 
+    // Load textdomain
+    load_plugin_textdomain( 'ayecode-connect', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 
 /**

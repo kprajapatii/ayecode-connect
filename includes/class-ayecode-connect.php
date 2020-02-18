@@ -84,7 +84,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function init() {
-			add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
+
 			if ( $this->is_active() ) {
 
 				//Connected
@@ -692,7 +692,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$headers = $request->get_header_as_array( 'Authorization' );
 			if ( empty( $headers ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.1', 'ayecode-connect' ), array( 'status' => 401 ) );
+				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
 			$jwt = '';
@@ -708,7 +708,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			//Ensure the jwt auth is set...
 			if ( empty( $jwt ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.2', 'ayecode-connect' ), array( 'status' => 401 ) );
+				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
 			//And is valid
@@ -927,7 +927,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			//Ensure the jwt auth is set...
 			if ( empty( $jwt ) ) {
-				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.3', 'ayecode-connect' ), array( 'status' => 401 ) );
+				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
 			//And is valid
