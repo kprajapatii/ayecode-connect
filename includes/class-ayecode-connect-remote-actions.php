@@ -1,0 +1,421 @@
+<?php
+/**
+ * A class to carryout authenticated remote actions for AyeCode Connect.
+ */
+
+/**
+ * Bail if we are not in WP.
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
+
+	/**
+	 * The remote actions for AyeCode Connect
+	 */
+	class AyeCode_Connect_Remote_Actions {
+		/**
+		 * The title.
+		 *
+		 * @var string
+		 */
+		public $name = 'AyeCode Connect';
+
+		public $prefix = 'ayecode_connect';
+
+		/**
+		 * The relative url to the assets.
+		 *
+		 * @var string
+		 */
+		public $url = '';
+
+		public $client;
+		public $base_url;
+
+		/**
+		 * Holds the settings values.
+		 *
+		 * @var array
+		 */
+		private $settings;
+
+		/**
+		 * AyeCode_UI_Settings instance.
+		 *
+		 * @access private
+		 * @since  1.0.0
+		 * @var    AyeCode_Connect_Remote_Actions There can be only one!
+		 */
+		private static $instance = null;
+
+		/**
+		 * Main AyeCode_Connect_Remote_Actions Instance.
+		 *
+		 * Ensures only one instance of AyeCode_Connect_Remote_Actions is loaded or can be loaded.
+		 *
+		 * @since 1.0.0
+		 * @static
+		 * @return AyeCode_Connect_Remote_Actions - Main instance.
+		 */
+		public static function instance($prefix = '') {
+			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Connect_Remote_Actions ) ) {
+				self::$instance = new AyeCode_Connect_Remote_Actions;
+
+				if($prefix){
+					self::$instance->prefix = $prefix;
+				}
+
+				$remote_actions = array(
+					'install_plugin'  => 'install_plugin',
+					'update_licences' => 'update_licences',
+				);
+
+				/*
+				 * Add any actions in the style of "{$prefix}_remote_action_{$action}"
+				 */
+				foreach ( $remote_actions as $action => $call ) {
+					add_action( $prefix . '_remote_action_' . $action, array( self::$instance, $call ) ); // set settings
+				}
+
+			}
+
+			return self::$instance;
+		}
+
+		/**
+		 * Update licence info.
+		 *
+		 * @return array
+		 */
+		public function update_licences() {
+			$result = array( "success" => false );
+
+			// validate
+			if($this->validate_request()){$result = array( "success" => true, );
+				$installed = !empty($_REQUEST['installed']) ? $_REQUEST['installed'] : array();
+				$all = !empty($_REQUEST['all']) ? $_REQUEST['all'] : array();
+
+				// Update licence keys for installed addons
+				if(!empty($installed) && defined( 'WP_EASY_UPDATES_ACTIVE' )){
+
+					$valid_licences = array();
+					foreach($installed as $plugin => $licence){
+						$maybe_valid = (object) $this->validate_licence($licence);
+						if(!empty($maybe_valid)){
+							$valid_licences[$plugin] = $maybe_valid;
+						}
+					}
+
+					if(!empty($valid_licences)){
+						$wpeu_admin = new External_Updates_Admin( 'ayecode-connect', AYECODE_CONNECT_VERSION );
+						$wpeu_admin->update_keys($valid_licences);
+						$result = array( "success" => true );
+					}
+				}
+
+				// add all licence keys so new addons can be installed with one click.
+				if(!empty($all)  && defined( 'WP_EASY_UPDATES_ACTIVE' )){
+					$valid_licences = array();
+					foreach($all as $domain => $licences){
+						if(!empty($licences)){
+							foreach($licences as $plugin => $licence){
+								$maybe_valid = (object) $this->validate_licence($licence);
+								if(!empty($maybe_valid)){
+									$valid_licences[$domain][$plugin] = $maybe_valid;
+								}
+							}
+						}
+					}
+					if(!empty($valid_licences)){
+						update_option($this->prefix."_licences",$valid_licences);
+					}
+				}elseif(isset($_REQUEST['all'])){
+					update_option($this->prefix."_licences",array());
+				}
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Validate licence info.
+		 *
+		 * @param $licence
+		 *
+		 * @return array
+		 */
+		private function validate_licence($licence){
+			$valid = array();
+
+			if(!empty($licence) && is_array($licence) && !empty($licence['license_key'])){
+				if(isset($licence['license_key'])){$valid['key'] = esc_attr($licence['license_key']);} // key
+				if(isset($licence['status'])){$valid['status'] = esc_attr($licence['status']);} // id
+				if(isset($licence['download_id'])){$valid['download_id'] = absint($licence['download_id']);} // download_id
+				if(isset($licence['price_id'])){$valid['price_id'] = absint($licence['price_id']);} // price_id
+				if(isset($licence['payment_id'])){$valid['payment_id'] = absint($licence['payment_id']);} // payment_id
+				if(isset($licence['expiration'])){$valid['expires'] = esc_attr($licence['expiration']);} // expires
+				if(isset($licence['parent'])){$valid['parent'] = absint($licence['parent']);} // parent
+				if(isset($licence['user_id'])){$valid['user_id'] = absint($licence['user_id']);} // user_id
+			}
+
+			return $valid;
+		}
+
+		/**
+		 * Validate the request origin.
+		 *
+		 * This file is not even loaded unless it passes JWT validation.
+		 *
+		 * @return bool
+		 */
+		private function validate_request(){
+			$result = false;
+
+			if($this->validate_server_ip()==="173.208.153.114"){
+				$result = true;
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Validate the request has come from our server.
+		 *
+		 * @return string
+		 */
+		private function validate_server_ip(){
+
+			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+				//check ip from share internet
+				$ip = $_SERVER['HTTP_CLIENT_IP'];
+			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+				//to check ip is pass from proxy
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			} else {
+				$ip = $_SERVER['REMOTE_ADDR'];
+			}
+
+			return $ip;
+		}
+
+
+		/**
+		 * Validate a download url is from our own server: 173.208.153.114
+		 *
+		 * @param $url
+		 *
+		 * @return bool
+		 */
+		private function validate_download_url( $url ) {
+			$result = false;
+
+			if ( $url ) {
+				$parse = parse_url( $url );
+				if ( ! empty( $parse['host'] ) ) {
+					$ip = gethostbyname( $parse['host'] );
+					if ( $ip === "173.208.153.114" ) {
+						$result = true;
+					}
+				}
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Install plugin.
+		 *
+		 * @param $result
+		 *
+		 * @return mixed
+		 */
+		public function install_plugin( $result ) {
+			// validate
+			if(!$this->validate_request()){
+				array( "success" => false );
+			}
+
+			include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); //for plugins_api..
+
+
+			$plugin_slug = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
+			$plugin      = array(
+				'name'          => isset( $_REQUEST['name'] ) ? esc_attr( $_REQUEST['name'] ) : '',
+				'repo-slug'     => $plugin_slug,
+				'file-slug'     => isset( $_REQUEST['file-slug'] ) ? sanitize_title_for_query( $_REQUEST['file-slug'] ) : '',
+				'download_link' => isset( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '',
+				'activate'      => isset( $_REQUEST['activate'] ) && ! $_REQUEST['activate'] ? false : true,
+			);
+
+			$install = $this->background_installer( $plugin_slug, $plugin );
+
+			if ( $install ) {
+				$result = array( "success" => true );
+			}
+
+//			update_option("blogname","Localhost2");
+
+			return $result;
+		}
+
+
+		/**
+		 * Get slug from path
+		 *
+		 * @param  string $key
+		 *
+		 * @return string
+		 */
+		private function format_plugin_slug( $key ) {
+			$slug = explode( '/', $key );
+			$slug = explode( '.', end( $slug ) );
+
+			return $slug[0];
+		}
+
+		/**
+		 * Install a plugin from .org in the background via a cron job (used by
+		 * installer - opt in).
+		 *
+		 * @param string $plugin_to_install_id
+		 * @param array $plugin_to_install
+		 *
+		 * @since 2.6.0
+		 */
+		public function background_installer( $plugin_to_install_id, $plugin_to_install ) {
+
+			$task_result = false;
+			if ( ! empty( $plugin_to_install['repo-slug'] ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/file.php' );
+				require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+				require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+				require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+				WP_Filesystem();
+
+				$skin              = new Automatic_Upgrader_Skin;
+				$upgrader          = new WP_Upgrader( $skin );
+				$installed_plugins = array_map( array( $this, 'format_plugin_slug' ), array_keys( get_plugins() ) );
+				$plugin_slug       = $plugin_to_install['repo-slug'];
+				$plugin_file_slug  = ! empty( $plugin_to_install['file-slug'] ) ? $plugin_to_install['file-slug'] : $plugin_slug;
+				$plugin            = $plugin_slug . '/' . $plugin_file_slug . '.php';
+				$installed         = false;
+				$activate          = isset( $plugin_to_install['activate'] ) && $plugin_to_install['activate'] ? true : false;
+
+				// See if the plugin is installed already
+				if ( in_array( $plugin_to_install['repo-slug'], $installed_plugins ) ) {
+					$installed = true;
+//					$activate  = ! is_plugin_active( $plugin );
+				}
+
+				// Install this thing!
+				if ( ! $installed ) {
+					// Suppress feedback
+					ob_start();
+
+					try {
+
+						// if a download link is provided then validate it.
+						if ( ! empty( $plugin_to_install['download_link'] ) ) {
+
+							if ( ! $this->validate_download_url( $plugin_to_install['download_link'] ) ) {
+								return new WP_Error( 'download_invalid', __( "Download source not valid.", "ayecode-connect" ) );
+							}
+
+							$plugin_information = (object) array(
+								'name'          => esc_attr( $plugin_to_install['name'] ),
+								'slug'          => esc_attr( $plugin_to_install['repo-slug'] ),
+								'download_link' => esc_url( $plugin_to_install['download_link'] ),
+							);
+						} else {
+							$plugin_information = plugins_api( 'plugin_information', array(
+								'slug'   => $plugin_to_install['repo-slug'],
+								'fields' => array(
+									'short_description' => false,
+									'sections'          => false,
+									'requires'          => false,
+									'rating'            => false,
+									'ratings'           => false,
+									'downloaded'        => false,
+									'last_updated'      => false,
+									'added'             => false,
+									'tags'              => false,
+									'homepage'          => false,
+									'donate_link'       => false,
+									'author_profile'    => false,
+									'author'            => false,
+								),
+							) );
+						}
+						
+						if ( is_wp_error( $plugin_information ) ) {
+							throw new Exception( $plugin_information->get_error_message() );
+						}
+
+						$package  = $plugin_information->download_link;
+						$download = $upgrader->download_package( $package );
+
+						if ( is_wp_error( $download ) ) {
+							throw new Exception( $download->get_error_message() );
+						}
+
+						$working_dir = $upgrader->unpack_package( $download, true );
+
+						if ( is_wp_error( $working_dir ) ) {
+							throw new Exception( $working_dir->get_error_message() );
+						}
+
+
+						$result = $upgrader->install_package( array(
+							'source'                      => $working_dir,
+							'destination'                 => WP_PLUGIN_DIR,
+							'clear_destination'           => false,
+							'abort_if_destination_exists' => false,
+							'clear_working'               => true,
+							'hook_extra'                  => array(
+								'type'   => 'plugin',
+								'action' => 'install',
+							),
+						) );
+						
+						if ( ! is_wp_error( $result ) ) {
+							$task_result = true;
+						}
+
+//						$activate = true;
+
+					} catch ( Exception $e ) {
+//
+					}
+
+					// Discard feedback
+					ob_end_clean();
+				}
+
+				wp_clean_plugins_cache();
+
+				// Activate this thing
+				if ( $activate ) {
+					try {
+						$result = activate_plugin( $plugin );
+
+						if ( ! is_wp_error( $result ) ) {
+							$task_result = true;
+						}
+					} catch ( Exception $e ) {
+						//$task_result = false;
+					}
+				}
+			}
+
+			return $task_result;
+		}
+
+
+	}
+
+}

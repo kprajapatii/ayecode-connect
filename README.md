@@ -1,2 +1,2 @@
-# wp-service-client
-WP Service Client class
+# ayecode-connect
+AyeCode Connect Client class
