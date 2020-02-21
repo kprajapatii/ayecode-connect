@@ -376,6 +376,14 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									   class="btn btn-primary"><?php _e( 'Connect Site', 'ayecode-connect' ); ?></a>
 								</p>
 								<?php
+								// check for local domain
+								$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+								$localhost = $this->client->is_usable_domain($host);
+								if(is_wp_error($localhost)){
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert">';
+									_e("It looks like you might be running on localhost, AyeCode Connect will only work on a live website.","ayecode-connect");
+									echo "</div>";
+								}
 							}
 							?>
 						</div>

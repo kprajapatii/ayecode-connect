@@ -61,11 +61,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @static
 		 * @return AyeCode_Connect_Remote_Actions - Main instance.
 		 */
-		public static function instance($prefix = '') {
+		public static function instance( $prefix = '' ) {
 			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Connect_Remote_Actions ) ) {
 				self::$instance = new AyeCode_Connect_Remote_Actions;
 
-				if($prefix){
+				if ( $prefix ) {
 					self::$instance->prefix = $prefix;
 				}
 
@@ -78,7 +78,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				 * Add any actions in the style of "{$prefix}_remote_action_{$action}"
 				 */
 				foreach ( $remote_actions as $action => $call ) {
-					add_action( $prefix . '_remote_action_' . $action, array( self::$instance, $call ) ); // set settings
+					add_action( $prefix . '_remote_action_' . $action, array(
+						self::$instance,
+						$call
+					) ); // set settings
 				}
 
 			}
@@ -95,46 +98,23 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			$result = array( "success" => false );
 
 			// validate
-			if($this->validate_request()){$result = array( "success" => true, );
-				$installed = !empty($_REQUEST['installed']) ? $_REQUEST['installed'] : array();
-				$all = !empty($_REQUEST['all']) ? $_REQUEST['all'] : array();
+			if ( $this->validate_request() ) {
+				$result    = array( "success" => true, );
+				$installed = ! empty( $_REQUEST['installed'] ) ? $this->sanitize_licences( $_REQUEST['installed'] ) : array();
+				$all       = ! empty( $_REQUEST['all'] ) ? $this->sanitize_licences( $_REQUEST['all'], true ) : array();
 
 				// Update licence keys for installed addons
-				if(!empty($installed) && defined( 'WP_EASY_UPDATES_ACTIVE' )){
-
-					$valid_licences = array();
-					foreach($installed as $plugin => $licence){
-						$maybe_valid = (object) $this->validate_licence($licence);
-						if(!empty($maybe_valid)){
-							$valid_licences[$plugin] = $maybe_valid;
-						}
-					}
-
-					if(!empty($valid_licences)){
-						$wpeu_admin = new External_Updates_Admin( 'ayecode-connect', AYECODE_CONNECT_VERSION );
-						$wpeu_admin->update_keys($valid_licences);
-						$result = array( "success" => true );
-					}
+				if ( ! empty( $installed ) && defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
+					$wpeu_admin = new External_Updates_Admin( 'ayecode-connect', AYECODE_CONNECT_VERSION );
+					$wpeu_admin->update_keys( $installed );
+					$result = array( "success" => true );
 				}
 
 				// add all licence keys so new addons can be installed with one click.
-				if(!empty($all)  && defined( 'WP_EASY_UPDATES_ACTIVE' )){
-					$valid_licences = array();
-					foreach($all as $domain => $licences){
-						if(!empty($licences)){
-							foreach($licences as $plugin => $licence){
-								$maybe_valid = (object) $this->validate_licence($licence);
-								if(!empty($maybe_valid)){
-									$valid_licences[$domain][$plugin] = $maybe_valid;
-								}
-							}
-						}
-					}
-					if(!empty($valid_licences)){
-						update_option($this->prefix."_licences",$valid_licences);
-					}
-				}elseif(isset($_REQUEST['all'])){
-					update_option($this->prefix."_licences",array());
+				if ( ! empty( $all ) && defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
+					update_option( $this->prefix . "_licences", $all );
+				} elseif ( isset( $_REQUEST['all'] ) ) {
+					update_option( $this->prefix . "_licences", array() );
 				}
 			}
 
@@ -142,27 +122,132 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		}
 
 		/**
-		 * Validate licence info.
+		 * Get an array of our valid domains.
+		 *
+		 * @return array
+		 */
+		public function get_valid_domains() {
+			return array(
+				'ayecode.io',
+				'wpgeodirectory.com',
+				'wpinvoicing.com',
+				'userswp.io',
+			);
+		}
+
+		/**
+		 * Sanitize the array of licences.
+		 *
+		 * @param $licences
+		 * @param bool $has_domain This indicates if the licences have another level of array key.
+		 *
+		 * @return array
+		 */
+		private function sanitize_licences( $licences, $has_domain = false ) {
+			$valid_licences = array();
+
+			if ( ! empty( $licences ) ) {
+				if ( $has_domain ) {
+					// get the array of valid domains
+					$valid_domains = $this->get_valid_domains();
+
+					foreach ( $licences as $domain => $domain_licences ) {
+						// Check we have licences and the domain is valid.
+						if ( ! empty( $domain_licences ) && in_array( $domain, $valid_domains ) ) {
+							foreach ( $domain_licences as $plugin => $licence ) {
+								$maybe_valid = (object) $this->validate_licence( $licence );
+								if ( ! empty( $maybe_valid ) ) {
+									$plugin                               = absint( $plugin ); // this is the plugin product id.
+									$valid_licences[ $domain ][ $plugin ] = $maybe_valid;
+								}
+							}
+						}
+					}
+				} else {
+					foreach ( $licences as $plugin => $licence ) {
+						$maybe_valid = (object) $this->validate_licence( $licence );
+						if ( ! empty( $maybe_valid ) ) {
+							$plugin                    = sanitize_text_field( $plugin ); // non domain this is a string
+							$valid_licences[ $plugin ] = $maybe_valid;
+						}
+					}
+				}
+			}
+
+			return $valid_licences;
+		}
+
+		/**
+		 * Validate and sanitize licence info.
 		 *
 		 * @param $licence
 		 *
 		 * @return array
 		 */
-		private function validate_licence($licence){
+		private function validate_licence( $licence ) {
 			$valid = array();
 
-			if(!empty($licence) && is_array($licence) && !empty($licence['license_key'])){
-				if(isset($licence['license_key'])){$valid['key'] = esc_attr($licence['license_key']);} // key
-				if(isset($licence['status'])){$valid['status'] = esc_attr($licence['status']);} // id
-				if(isset($licence['download_id'])){$valid['download_id'] = absint($licence['download_id']);} // download_id
-				if(isset($licence['price_id'])){$valid['price_id'] = absint($licence['price_id']);} // price_id
-				if(isset($licence['payment_id'])){$valid['payment_id'] = absint($licence['payment_id']);} // payment_id
-				if(isset($licence['expiration'])){$valid['expires'] = esc_attr($licence['expiration']);} // expires
-				if(isset($licence['parent'])){$valid['parent'] = absint($licence['parent']);} // parent
-				if(isset($licence['user_id'])){$valid['user_id'] = absint($licence['user_id']);} // user_id
+			if ( ! empty( $licence ) && is_array( $licence ) && ! empty( $licence['license_key'] ) ) {
+				// key
+				if ( isset( $licence['license_key'] ) ) {
+					$valid['key'] = sanitize_key( $licence['license_key'] );
+				}
+				// status
+				if ( isset( $licence['status'] ) ) {
+					$valid['status'] = $this->validate_licence_status( $licence['status'] );
+				}
+				// download_id
+				if ( isset( $licence['download_id'] ) ) {
+					$valid['download_id'] = absint( $licence['download_id'] );
+				}
+				// price_id
+				if ( isset( $licence['price_id'] ) ) {
+					$valid['price_id'] = absint( $licence['price_id'] );
+				}
+				// payment_id
+				if ( isset( $licence['payment_id'] ) ) {
+					$valid['payment_id'] = absint( $licence['payment_id'] );
+				}
+				// expires
+				if ( isset( $licence['expiration'] ) ) {
+					$valid['expires'] = absint( $licence['expiration'] );
+				}
+				// parent
+				if ( isset( $licence['parent'] ) ) {
+					$valid['parent'] = absint( $licence['parent'] );
+				}
+				// user_id
+				if ( isset( $licence['user_id'] ) ) {
+					$valid['user_id'] = absint( $licence['user_id'] );
+				}
 			}
 
 			return $valid;
+		}
+
+		/**
+		 * Validate the licence status.
+		 *
+		 * @param $status
+		 *
+		 * @return string
+		 */
+		public function validate_licence_status( $status ) {
+
+			// possible statuses
+			$valid_statuses = array(
+				'active',
+				'inactive',
+				'expired',
+				'disabled',
+			);
+
+			// set empty if not a valid status
+			if ( ! in_array( $status, $valid_statuses ) ) {
+				$status = '';
+			}
+
+			return $status;
 		}
 
 		/**
@@ -172,10 +257,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 *
 		 * @return bool
 		 */
-		private function validate_request(){
+		private function validate_request() {
 			$result = false;
 
-			if($this->validate_server_ip()==="173.208.153.114"){
+			if ( $this->get_server_ip() === "173.208.153.114" ) {
 				$result = true;
 			}
 
@@ -183,16 +268,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		}
 
 		/**
-		 * Validate the request has come from our server.
+		 * Get the request has come from our server.
 		 *
 		 * @return string
 		 */
-		private function validate_server_ip(){
+		private function get_server_ip() {
 
-			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 				//check ip from share internet
 				$ip = $_SERVER['HTTP_CLIENT_IP'];
-			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 				//to check ip is pass from proxy
 				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 			} else {
@@ -235,7 +320,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function install_plugin( $result ) {
 			// validate
-			if(!$this->validate_request()){
+			if ( ! $this->validate_request() ) {
 				array( "success" => false );
 			}
 
@@ -351,7 +436,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								),
 							) );
 						}
-						
+
 						if ( is_wp_error( $plugin_information ) ) {
 							throw new Exception( $plugin_information->get_error_message() );
 						}
@@ -381,7 +466,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'action' => 'install',
 							),
 						) );
-						
+
 						if ( ! is_wp_error( $result ) ) {
 							$task_result = true;
 						}

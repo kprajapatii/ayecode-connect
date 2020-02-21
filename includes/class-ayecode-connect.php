@@ -279,6 +279,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . '_blog_token' );
 			delete_option( $this->prefix . '_connected_username' );
 			delete_option( $this->prefix . '_licence_sync' );
+			delete_option( $this->prefix . '_licences' );
 			delete_transient( $this->prefix . '_activation_secret' );
 
 		}

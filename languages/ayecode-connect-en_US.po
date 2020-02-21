@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.0.0\n"
+"Project-Id-Version: AyeCode Connect 1.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-18 17:53+0000\n"
-"PO-Revision-Date: 2020-02-18 17:53+0000\n"
+"POT-Creation-Date: 2020-02-21 13:19+0000\n"
+"PO-Revision-Date: 2020-02-21 13:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-ayecode-connect-remote-actions.php:326
+#: includes/class-ayecode-connect-remote-actions.php:411
 msgid "Download source not valid."
 msgstr ""
 
@@ -76,58 +76,64 @@ msgstr ""
 msgid "Connect Site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:387
+#: includes/class-ayecode-connect-settings.php:384
+msgid ""
+"It looks like you might be running on localhost, AyeCode Connect will only "
+"work on a live website."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:395
 msgid "AycCode Ltd are the creators of:"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:297
+#: includes/class-ayecode-connect.php:298
 msgid "Invalid Registration Data"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:301
+#: includes/class-ayecode-connect.php:302
 msgid "Invalid Secret"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:558
+#: includes/class-ayecode-connect.php:559
 #, php-format
 msgid "Domain `%1$s` just failed is_usable_domain check as it is empty."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:588
+#: includes/class-ayecode-connect.php:589
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it is in the forbidden "
 "array."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:603
+#: includes/class-ayecode-connect.php:604
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it uses an invalid top "
 "level domain."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:695
-#: includes/class-ayecode-connect.php:711
-#: includes/class-ayecode-connect.php:930
+#: includes/class-ayecode-connect.php:696
+#: includes/class-ayecode-connect.php:712
+#: includes/class-ayecode-connect.php:931
 msgid "Missing Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:717
-#: includes/class-ayecode-connect.php:936
-#: includes/class-ayecode-connect.php:942
+#: includes/class-ayecode-connect.php:718
+#: includes/class-ayecode-connect.php:937
+#: includes/class-ayecode-connect.php:943
 msgid "Invalid Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:724
+#: includes/class-ayecode-connect.php:725
 msgid "Missing blog token."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:729
-#: includes/class-ayecode-connect.php:950
+#: includes/class-ayecode-connect.php:730
+#: includes/class-ayecode-connect.php:951
 msgid "You are not authorized to do that."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:1001
+#: includes/class-ayecode-connect.php:1002
 msgid "Specify an action"
 msgstr ""
