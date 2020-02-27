@@ -334,6 +334,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				'file-slug'     => isset( $_REQUEST['file-slug'] ) ? sanitize_title_for_query( $_REQUEST['file-slug'] ) : '',
 				'download_link' => isset( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '',
 				'activate'      => isset( $_REQUEST['activate'] ) && ! $_REQUEST['activate'] ? false : true,
+				'network_activate'      => isset( $_REQUEST['network_activate'] ) && ! $_REQUEST['network_activate'] ? false : true,
 			);
 
 			$install = $this->background_installer( $plugin_slug, $plugin );
@@ -390,6 +391,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$plugin            = $plugin_slug . '/' . $plugin_file_slug . '.php';
 				$installed         = false;
 				$activate          = isset( $plugin_to_install['activate'] ) && $plugin_to_install['activate'] ? true : false;
+				$network_activate          = isset( $plugin_to_install['network_activate'] ) && $plugin_to_install['network_activate'] ? true : false;
 
 				// See if the plugin is installed already
 				if ( in_array( $plugin_to_install['repo-slug'], $installed_plugins ) ) {
@@ -486,7 +488,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// Activate this thing
 				if ( $activate ) {
 					try {
-						$result = activate_plugin( $plugin );
+						$result = activate_plugin( $plugin, "", $network_activate );
 
 						if ( ! is_wp_error( $result ) ) {
 							$task_result = true;

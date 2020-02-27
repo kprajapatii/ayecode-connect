@@ -92,6 +92,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ),8 );
 
+				// maybe show connected notice
+				if(is_admin() && isset($_REQUEST['ayecode-connected'])){
+					add_action( 'admin_notices', array( $this, 'connected_notice' ) );
+				}
+
 
 			} else {
 
@@ -102,6 +107,17 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			}
 
+		}
+
+		/**
+		 * A notice to show that the site is now connected.
+		 */
+		public function connected_notice(){
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( '<b>AyeCode Connected!</b> You can now install any addons you have a license for and your license keys will automatically be synced.', 'ayecode-connect' ); ?></p>
+			</div>
+			<?php
 		}
 
 		/**
@@ -380,6 +396,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					'site_icon'         => get_site_icon_url(),
 					'site_lang'         => get_locale(),
 					'site_created'      => $this->get_assumed_site_creation_date(),
+					'multisite'         => is_multisite() ? 1 : 0,
 				)
 			);
 
@@ -577,7 +594,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$forbidden_domains = array(
 				'localhost',
 				'localhost.localdomain',
-				'127.0.0.1'
+				'127.0.0.1',
+				'::1'
 			);
 
 			if ( in_array( $domain, $forbidden_domains, true ) ) {
