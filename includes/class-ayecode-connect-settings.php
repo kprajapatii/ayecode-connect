@@ -202,9 +202,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 				}
 
 				update_option( $this->client->prefix . "_licence_sync", true );
-				if ( ! wp_next_scheduled( $this->client->prefix . "_callback" ) ) {
-					wp_schedule_event( time(), 'daily', $this->client->prefix . "_callback" );
-				}
+				wp_clear_scheduled_hook( $this->client->prefix . "_callback" );
+				wp_schedule_event( time(), 'daily', $this->client->prefix . "_callback" );
+				
 
 				// Sync licences now
 				$this->client->sync_licences();
@@ -330,7 +330,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
-											class="mr-auto"><?php _e( "One click addon installs, no more licence keys", "ayecode-connect" ); ?></span>
+											class="mr-auto"><?php _e( "One click addon installs, no more license keys", "ayecode-connect" ); ?></span>
 										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>

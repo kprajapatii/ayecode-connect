@@ -324,9 +324,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			update_option( $this->prefix . '_licence_sync', true );
 
 			// just in case it was disabled, add it back here
-			if ( ! wp_next_scheduled( $this->prefix . "_callback" ) ) {
-				wp_schedule_event( time(), 'daily', $this->prefix . "_callback" );
-			}
+			wp_clear_scheduled_hook( $this->prefix . "_callback" );
+			wp_schedule_event( time(), 'daily', $this->prefix . "_callback" );
+
+
+			// make the licence sync run on next load
+//			wp_schedule_single_event( time(), $this->prefix . "_callback" );
 
 			return rest_ensure_response( true );
 
@@ -427,6 +430,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			//Then delete local secrets
 			$this->delete_secrets();
+
+			// remove all licences
+			delete_option( 'exup_keys');
+
+			// remove cron
+			wp_clear_scheduled_hook( $this->prefix . "_callback" );
 
 			return $response;
 
