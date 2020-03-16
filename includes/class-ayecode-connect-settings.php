@@ -300,11 +300,6 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 							<h1 class="h5 mx-auto w-50 mb-3"><?php _e( "One click addon installs, live documentation search, support right from your WordPress Dashboard", "ayecode-connect" ); ?></h1>
 
 							<?php
-
-							print_r(get_option('ayecode_connect_licence'));
-							echo '###';
-							print_r(get_option('exup_keys'));
-
 							if ( $this->client->is_registered() ) {
 
 								$connected_username = $this->client->get_connected_username();
