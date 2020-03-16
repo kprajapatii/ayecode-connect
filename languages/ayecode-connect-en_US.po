@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.0.5\n"
+"Project-Id-Version: AyeCode Connect 1.0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-28 17:04+0000\n"
-"PO-Revision-Date: 2020-02-28 17:04+0000\n"
+"POT-Creation-Date: 2020-03-16 13:28+0000\n"
+"PO-Revision-Date: 2020-03-16 13:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -46,48 +46,48 @@ msgid ""
 "WordPress Dashboard"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:308
+#: includes/class-ayecode-connect-settings.php:313
 #, php-format
 msgid "You are connected to AyeCode Connect as user: %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:315
+#: includes/class-ayecode-connect-settings.php:320
 msgid "Plugin and theme update notifications"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:318
-#: includes/class-ayecode-connect-settings.php:336
-#: includes/class-ayecode-connect-settings.php:361
+#: includes/class-ayecode-connect-settings.php:323
+#: includes/class-ayecode-connect-settings.php:341
+#: includes/class-ayecode-connect-settings.php:366
 msgid "Loading..."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:333
+#: includes/class-ayecode-connect-settings.php:338
 msgid "One click addon installs, no more license keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:366
+#: includes/class-ayecode-connect-settings.php:371
 msgid "Disconnect site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:373
+#: includes/class-ayecode-connect-settings.php:378
 msgid ""
 "By clicking the <b>Connect Site</b> button, you agree to our <a "
 "href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-"
 "muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:376
+#: includes/class-ayecode-connect-settings.php:381
 msgid "Connect Site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:384
+#: includes/class-ayecode-connect-settings.php:389
 msgid ""
 "It looks like you might be running on localhost, AyeCode Connect will only "
 "work on a live website."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:395
-msgid "AycCode Ltd are the creators of:"
+#: includes/class-ayecode-connect-settings.php:400
+msgid "AyeCode Ltd are the creators of:"
 msgstr ""
 
 #: includes/class-ayecode-connect.php:118
@@ -104,46 +104,46 @@ msgstr ""
 msgid "Invalid Secret"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:585
+#: includes/class-ayecode-connect.php:595
 #, php-format
 msgid "Domain `%1$s` just failed is_usable_domain check as it is empty."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:616
+#: includes/class-ayecode-connect.php:626
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it is in the forbidden "
 "array."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:631
+#: includes/class-ayecode-connect.php:641
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it uses an invalid top "
 "level domain."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:723
-#: includes/class-ayecode-connect.php:739
-#: includes/class-ayecode-connect.php:958
+#: includes/class-ayecode-connect.php:733
+#: includes/class-ayecode-connect.php:749
+#: includes/class-ayecode-connect.php:968
 msgid "Missing Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:745
-#: includes/class-ayecode-connect.php:964
-#: includes/class-ayecode-connect.php:970
+#: includes/class-ayecode-connect.php:755
+#: includes/class-ayecode-connect.php:974
+#: includes/class-ayecode-connect.php:980
 msgid "Invalid Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:752
+#: includes/class-ayecode-connect.php:762
 msgid "Missing blog token."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:757
-#: includes/class-ayecode-connect.php:978
+#: includes/class-ayecode-connect.php:767
+#: includes/class-ayecode-connect.php:988
 msgid "You are not authorized to do that."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:1029
+#: includes/class-ayecode-connect.php:1039
 msgid "Specify an action"
 msgstr ""

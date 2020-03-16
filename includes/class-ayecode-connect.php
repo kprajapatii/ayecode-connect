@@ -90,10 +90,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				//Connected
 				do_action( $this->prefix . '_connected_to_remote' );
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
-				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ),8 );
+				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
 
 				// maybe show connected notice
-				if(is_admin() && isset($_REQUEST['ayecode-connected'])){
+				if ( is_admin() && isset( $_REQUEST['ayecode-connected'] ) ) {
 					add_action( 'admin_notices', array( $this, 'connected_notice' ) );
 				}
 
@@ -112,7 +112,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		/**
 		 * A notice to show that the site is now connected.
 		 */
-		public function connected_notice(){
+		public function connected_notice() {
 			?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php _e( '<b>AyeCode Connected!</b> You can now install any addons you have a license for and your license keys will automatically be synced.', 'ayecode-connect' ); ?></p>
@@ -127,27 +127,27 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return mixed
 		 */
-		public function edd_api_button_args($button_args){
+		public function edd_api_button_args( $button_args ) {
 
-			if(defined( 'WP_EASY_UPDATES_ACTIVE' )){
+			if ( defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
 
-				if(!empty($button_args['licensing']) && !empty($button_args['update_url']) && !empty($button_args['id']) && empty($button_args['license'])){
-					$update_url = esc_url_raw($button_args['update_url']);
-					$item_id = absint($button_args['id']);
-					$domain = '';
-					if( trailingslashit($update_url) == "https://wpgeodirectory.com/" || trailingslashit($update_url) == "http://wpgeodirectory.com/" ){
+				if ( ! empty( $button_args['licensing'] ) && ! empty( $button_args['update_url'] ) && ! empty( $button_args['id'] ) && empty( $button_args['license'] ) ) {
+					$update_url = esc_url_raw( $button_args['update_url'] );
+					$item_id    = absint( $button_args['id'] );
+					$domain     = '';
+					if ( trailingslashit( $update_url ) == "https://wpgeodirectory.com/" || trailingslashit( $update_url ) == "http://wpgeodirectory.com/" ) {
 						$domain = 'wpgeodirectory.com';
-					}elseif(trailingslashit($update_url) == "https://userswp.io/" || trailingslashit($update_url) == "http://userswp.io/" ){
+					} elseif ( trailingslashit( $update_url ) == "https://userswp.io/" || trailingslashit( $update_url ) == "http://userswp.io/" ) {
 						$domain = 'userswp.io';
-					}elseif(trailingslashit($update_url) == "https://wpinvoicing.com/" || trailingslashit($update_url) == "http://wpinvoicing.com/" ){
+					} elseif ( trailingslashit( $update_url ) == "https://wpinvoicing.com/" || trailingslashit( $update_url ) == "http://wpinvoicing.com/" ) {
 						$domain = 'wwpinvoicing.com';
 					}
 
-					if($domain){
-						$licences = get_option($this->prefix."_licences");
-						if(isset($licences[$domain][$item_id])){
-							$licence = $licences[$domain][$item_id];
-							if(!empty($licence->key)){
+					if ( $domain ) {
+						$licences = get_option( $this->prefix . "_licences" );
+						if ( isset( $licences[ $domain ][ $item_id ] ) ) {
+							$licence = $licences[ $domain ][ $item_id ];
+							if ( ! empty( $licence->key ) ) {
 								$button_args['license'] = $licence->key;
 							}
 						}
@@ -192,7 +192,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return String API URL.
 		 */
-		public function get_api_url( $relative_url) {
+		public function get_api_url( $relative_url ) {
 
 			$api_url = $this->api_url;
 
@@ -432,7 +432,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$this->delete_secrets();
 
 			// remove all licences
-			delete_option( 'exup_keys');
+			delete_option( 'exup_keys' );
 
 			// remove cron
 			wp_clear_scheduled_hook( $this->prefix . "_callback" );
@@ -457,7 +457,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			//Disconnect from remote...
 			$args = array(
-				'url'    => $this->get_api_url( '/licenses'),
+				'url'    => $this->get_api_url( '/licenses' ),
 				'method' => 'GET'
 			);
 
@@ -492,7 +492,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return false;
 			}
 
-			//Disconnect from remote...
+			//Request to remote...
 			$args = array(
 				'url'    => $this->get_api_url( '/activate_licenses' ),
 				'method' => 'POST'
@@ -503,7 +503,17 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			// remove any non AyeCode plugins.
 			foreach ( $plugins as $slug => $plugin ) {
 				if ( empty( $plugin['Update URL'] ) ) {
-					unset( $plugins[ $slug ] );
+					// check if a main plugin
+					if ( isset( $plugin['TextDomain'] ) && in_array( $plugin['TextDomain'], array(
+							"geodirectory",
+							"userswp",
+							"invoicing"
+						) )
+					) {
+						// don't remove
+					} else {
+						unset( $plugins[ $slug ] ); // remove
+					}
 				}
 			}
 
@@ -523,7 +533,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$response = self::remote_request( $args, $body );
 
-			
+
 			//in case the request failed...
 			if ( is_wp_error( $response ) ) {
 				return $response;
@@ -1035,7 +1045,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			 * This is only loaded if authenticated.
 			 */
 			require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';
-			AyeCode_Connect_Remote_Actions::instance($prefix);
+			AyeCode_Connect_Remote_Actions::instance( $prefix );
 
 			$response = apply_filters( "{$prefix}_remote_action_{$action}", array( "success" => false ) );
 

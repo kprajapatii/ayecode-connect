@@ -6,8 +6,8 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.3
-Stable tag: 1.0.5
+Tested up to: 5.4
+Stable tag: 1.0.6
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -26,7 +26,7 @@ You will be able to remotely manage your activated sites and licences all from y
 
 = Minimum Requirements =
 
-* WordPress 4.6 or greater
+* WordPress 4.7 or greater
 * PHP version 5.6 or greater
 * MySQL version 5.0 or greater
 
@@ -56,6 +56,10 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.0.6 =
+* Extensions screen can still request key if no addons installed on first sync - FIXED
+* Small spelling mistakes - FIXED
 
 = 1.0.5 =
 * If switching a connected user account the license keys are not immediately updated - FIXED
