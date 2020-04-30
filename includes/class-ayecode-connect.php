@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This class enables two-way communication between a Client's WordPress website and a remote WordPress website
  *
@@ -7,6 +6,9 @@
  *
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
@@ -91,6 +93,19 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				do_action( $this->prefix . '_connected_to_remote' );
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
+
+				// Support Widget
+				if(is_admin()){
+					require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-support.php';
+					$support_args = array(
+						'prefix'=>$this->prefix,
+						'name'  => $this->get_connected_name(),
+						'email'  => $this->get_connected_email(),
+						'enabled'  => get_option( $this->prefix . '_support', true ),
+						'support_user'  => get_option( $this->prefix . '_support_user', true ),
+					);
+					new AyeCode_Connect_Support($support_args);
+				}
 
 				// maybe show connected notice
 				if ( is_admin() && isset( $_REQUEST['ayecode-connected'] ) ) {
@@ -294,9 +309,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . '_blog_id' );
 			delete_option( $this->prefix . '_blog_token' );
 			delete_option( $this->prefix . '_connected_username' );
+			delete_option( $this->prefix . '_connected_email' );
+			delete_option( $this->prefix . '_connected_name' );
+			delete_option( $this->prefix . '_connected_user_id' );
 			delete_option( $this->prefix . '_licence_sync' );
 			delete_option( $this->prefix . '_licences' );
+			delete_option( $this->prefix . '_support' );
+			delete_option( $this->prefix . '_support_user' );
 			delete_transient( $this->prefix . '_activation_secret' );
+			delete_transient( $this->prefix . '_support_user_key' );
 
 		}
 
@@ -308,7 +329,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|WP_Error|WP_REST_Response
 		 */
 		public function handle_registration( array $registration_data ) {
-			list( $activation_secret, $blog_id, $access_token, $username ) = $registration_data;
+			list( $activation_secret, $blog_id, $access_token, $username,$user_id,$user_email,$user_display_name ) = $registration_data;
 
 			if ( empty( $activation_secret ) || empty( $access_token ) || empty( $blog_id ) ) {
 				return new WP_Error( 'registration_state_invalid', __( 'Invalid Registration Data', 'ayecode-connect' ), 400 );
@@ -318,7 +339,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return new WP_Error( 'invalid_secret', __( 'Invalid Secret', 'ayecode-connect' ), 401 );
 			}
 
+
 			update_option( $this->prefix . '_connected_username', $username );
+			update_option( $this->prefix . '_connected_email', $user_email );
+			update_option( $this->prefix . '_connected_name', $user_display_name);
+			update_option( $this->prefix . '_connected_user_id', $user_id );
 			update_option( $this->prefix . '_blog_id', $blog_id );
 			update_option( $this->prefix . '_blog_token', $access_token );
 			update_option( $this->prefix . '_licence_sync', true );
@@ -673,6 +698,262 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$option_name = $this->prefix . '_connected_username';
 
 			return get_option( $option_name, false );
+		}
+
+		/**
+		 * Get the connected users name.
+		 *
+		 * @return mixed|void
+		 */
+		public function get_connected_name() {
+
+			$option_name = $this->prefix . '_connected_name';
+
+			$value = get_option( $option_name, false );
+			
+			// if no value maybe try and get it.
+			if($value === false){
+				$username = $this->get_connected_username();
+				if($username){
+					$user = $this->get_remote_user_info();
+					if(!empty($user->display_name)){
+						$value = sanitize_text_field($user->display_name);
+						update_option( $option_name, $value );
+					}
+				}
+			}
+			
+			return $value;
+		}
+
+		/**
+		 * Get the connected users email.
+		 *
+		 * @return mixed|void
+		 */
+		public function get_connected_email() {
+
+			$option_name = $this->prefix . '_connected_email';
+
+			$value = get_option( $option_name, false );
+
+			// if no value maybe try and get it.
+			if($value === false){
+				$username = $this->get_connected_username();
+				if($username){
+					$user = $this->get_remote_user_info();
+					if(!empty($user->user_email)){
+						$value = sanitize_text_field($user->user_email);
+						update_option( $option_name, $value );
+					}
+				}
+			}
+
+			return $value;
+		}
+
+		/**
+		 * Get the connected users ID.
+		 *
+		 * @return mixed|void
+		 */
+		public function get_connected_user_id() {
+
+			$option_name = $this->prefix . '_connected_user_id';
+
+			$value = get_option( $option_name, false );
+
+			// if no value maybe try and get it.
+			if($value === false){
+				$username = $this->get_connected_username();
+				if($username){
+					$user = $this->get_remote_user_info();
+					if(!empty($user->ID)){
+						$value = sanitize_text_field($user->ID);
+						update_option( $option_name, $value );
+					}
+				}
+			}
+
+			return $value;
+		}
+
+		/**
+		 * Get the connected users signatures.
+		 *
+		 * @return mixed|void
+		 */
+		public function get_connected_user_signatures($type = '') {
+
+			$option_name = $this->prefix . '_connected_user_signatures';
+
+			$value = get_option( $option_name, false );
+
+			return $value;
+		}
+
+		/**
+		 * Get the connected users signatures.
+		 *
+		 * @return mixed|void
+		 */
+		public function get_connected_user_sites() {
+
+			$option_name = $this->prefix . '_connected_user_sites';
+
+			$value = get_option( $option_name, false );
+			
+			
+			// remove this site
+			if(!empty($value)){
+				$site_id = $this->get_blog_id();
+				//unset($value[$site_id]);
+			}
+			
+
+			return $value;
+		}
+
+		/**
+		 * Get any sync the remote user info.
+		 *
+		 * @return array|mixed|void|WP_Error
+		 */
+		public function get_remote_user_info(){
+			$site_id = $this->get_blog_id();
+
+			//Abort early if it is not connected
+			if ( ! $site_id ) {
+				return;
+			}
+
+			$cache = get_transient( $this->prefix . '_remote_user_info' );
+			if($cache !== false){
+				return $cache;
+			}
+
+			//Disconnect from remote...
+			$args = array(
+				'url'    => $this->get_api_url( sprintf( '/me/%d', $site_id ) ),
+				'method' => 'GET'
+			);
+
+			$response = self::remote_request( $args );
+
+			//in case the request failed...
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			// update user info
+			if(!empty($body->ID)){update_option($this->prefix . '_connected_user_id',absint($body->ID));}
+			if(!empty($body->display_name)){update_option($this->prefix . '_connected_name',sanitize_text_field($body->display_name));}
+			if(!empty($body->user_email)){update_option($this->prefix . '_connected_email',sanitize_email($body->user_email));}
+			if(!empty($body->user_signatures)){update_option($this->prefix . '_connected_user_signatures',array_map('sanitize_text_field',(array) $body->user_signatures) );}
+			if(!empty($body->user_sites)){update_option($this->prefix . '_connected_user_sites',array_map('sanitize_text_field',(array) $body->user_sites) );}
+
+			// cache results for 60 seconds so that we don't run multiple times on once page load
+			set_transient( $this->prefix . '_remote_user_info', $body, 60);
+			
+			return $body;
+		}
+
+		/**
+		 * Get any sync the remote user info.
+		 *
+		 * @return array|mixed|void|WP_Error
+		 */
+		public function set_remote_support_user($enable = false){
+			$site_id = $this->get_blog_id();
+
+			//Abort early if it is not connected
+			if ( ! $site_id ) {
+				return;
+			}
+
+
+			// enable support user
+			if($enable){
+				// Generate a temp key
+				$key = wp_generate_password( 20 );
+				$hash = wp_hash_password( $key  );
+
+				// Valid for seconds
+				$valid_seconds = 3 * DAY_IN_SECONDS;
+				$expires = time() + $valid_seconds;
+				
+				// Set info
+				$args = array(
+					'url'    => $this->get_api_url( sprintf( '/support/%d', $site_id ) ),
+					'method' => 'POST'
+				);
+
+				$body = array(
+					'key' => $key,
+					'expire' => $expires
+				);
+
+				$response = self::remote_request( $args, $body );
+
+				// in case the request failed...
+				if ( is_wp_error( $response ) ) {
+					return $response;
+				}
+
+				$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+
+				// Set a transient
+				set_transient( $this->prefix . "_support_user_key", $hash, $valid_seconds );
+				update_option( $this->prefix . "_support_user", $expires );
+			}
+			// disable support user
+			else{
+
+				// remove info early incase remote request fails
+				delete_transient( $this->prefix . "_support_user_key" );
+				update_option( $this->prefix . "_support_user", false );
+
+				// destroy support user
+				$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
+				if($support_user->ID){
+					$user_id = absint($support_user->ID);
+					// get all sessions for user with ID $user_id
+					$sessions = WP_Session_Tokens::get_instance($user_id);
+					// we have got the sessions, destroy them all!
+					$sessions->destroy_all();
+					$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
+					wp_delete_user( $user_id, $reassign );
+				}
+
+				// Set info
+				$args = array(
+					'url'    => $this->get_api_url( sprintf( '/support/%d', $site_id ) ),
+					'method' => 'POST'
+				);
+
+				$body = array(
+					'key' => '',
+					'expire' => 0
+				);
+
+				$response = self::remote_request( $args, $body );
+
+				// in case the request failed...
+				if ( is_wp_error( $response ) ) {
+					return $response;
+				}
+
+				$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			}
+
+//			print_r($body);exit;
+
+
+			return $body;
 		}
 
 		/**

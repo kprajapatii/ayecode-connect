@@ -124,3 +124,101 @@ function ayecode_connect_licences($input,$state){
         }
     }); // end of ajax
 }
+
+/**
+ * Request to enable/disable support widget.
+ *
+ * @param $input
+ * @param $state
+ */
+function ayecode_connect_support($input,$state){
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'ayecode_connect_support',
+            security: ayecode_connect.nonce,
+            state: $state
+        },
+        beforeSend: function() {
+            jQuery($input).prop('disabled', true);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        },
+        success: function(data, textStatus, xhr) {
+            console.log(data);
+            if(data.success){
+                // yay
+                if($state){
+                    ayecode_connect_init_widget();
+                }else{
+                    window.Beacon('destroy');
+                }
+            }else if(data.data){
+                // oh dear, toggle it back
+                jQuery($input).prop('checked', !$state);
+                alert(data.data);
+            }else{
+                // oh dear, toggle it back
+                jQuery($input).prop('checked', !$state);
+                alert(ayecode_connect.error_msg);
+            }
+            jQuery($input).prop('disabled', false);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(textStatus);
+            jQuery($input).prop('disabled', false);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        }
+    }); // end of ajax
+}
+
+/**
+ * Request to enable/disable support user.
+ *
+ * @param $input
+ * @param $state
+ */
+function ayecode_connect_support_user($input,$state){
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'ayecode_connect_support_user',
+            security: ayecode_connect.nonce,
+            state: $state
+        },
+        beforeSend: function() {
+            jQuery($input).prop('disabled', true);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        },
+        success: function(data, textStatus, xhr) {
+            console.log(data);
+            if(data.success){
+                // yay
+                if($state){
+                    jQuery('.ac-support-user-status').removeClass('d-none').find('span').html(data.data.message);
+                }else{
+                    jQuery('.ac-support-user-status').addClass('d-none').find('span').html('');
+                }
+            }else if(data.data){
+                // oh dear, toggle it back
+                jQuery($input).prop('checked', !$state);
+                alert(data.data);
+            }else{
+                // oh dear, toggle it back
+                jQuery($input).prop('checked', !$state);
+                alert(ayecode_connect.error_msg);
+            }
+            jQuery($input).prop('disabled', false);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(textStatus);
+            jQuery($input).prop('disabled', false);
+            jQuery($input).closest('li').find('.spinner-border').toggleClass('d-none');
+        }
+    }); // end of ajax
+}

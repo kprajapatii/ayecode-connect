@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.0.6\n"
+"Project-Id-Version: AyeCode Connect 1.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 13:28+0000\n"
-"PO-Revision-Date: 2020-03-16 13:28+0000\n"
+"POT-Creation-Date: 2020-04-30 14:12+0100\n"
+"PO-Revision-Date: 2020-04-30 14:12+0100\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -28,122 +28,138 @@ msgstr ""
 msgid "Download source not valid."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:201
+#: includes/class-ayecode-connect-settings.php:208
 msgid "Plugin and theme update notifications must be enabled first"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:261
+#: includes/class-ayecode-connect-settings.php:294
+#: includes/class-ayecode-connect-settings.php:456
+#, php-format
+msgid "Auto expires in %s"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:338
 msgid "Something went wrong, try refreshing the page and trying again."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:262
+#: includes/class-ayecode-connect-settings.php:339
 msgid "Are you sure you with to disconnect your site?"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:300
+#: includes/class-ayecode-connect-settings.php:378
 msgid ""
 "One click addon installs, live documentation search, support right from your "
 "WordPress Dashboard"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:313
+#: includes/class-ayecode-connect-settings.php:386
 #, php-format
 msgid "You are connected to AyeCode Connect as user: %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:320
+#: includes/class-ayecode-connect-settings.php:393
 msgid "Plugin and theme update notifications"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:323
-#: includes/class-ayecode-connect-settings.php:341
-#: includes/class-ayecode-connect-settings.php:366
+#: includes/class-ayecode-connect-settings.php:396
+#: includes/class-ayecode-connect-settings.php:414
+#: includes/class-ayecode-connect-settings.php:432
+#: includes/class-ayecode-connect-settings.php:460
+#: includes/class-ayecode-connect-settings.php:477
 msgid "Loading..."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:338
+#: includes/class-ayecode-connect-settings.php:411
 msgid "One click addon installs, no more license keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:371
+#: includes/class-ayecode-connect-settings.php:429
+msgid "Documentation and Support Widget"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:453
+msgid "Temporary Support User Access"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:482
 msgid "Disconnect site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:378
+#: includes/class-ayecode-connect-settings.php:492
 msgid ""
 "By clicking the <b>Connect Site</b> button, you agree to our <a "
 "href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-"
 "muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:381
+#: includes/class-ayecode-connect-settings.php:495
 msgid "Connect Site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:389
+#: includes/class-ayecode-connect-settings.php:503
 msgid ""
 "It looks like you might be running on localhost, AyeCode Connect will only "
 "work on a live website."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:400
+#: includes/class-ayecode-connect-settings.php:514
 msgid "AyeCode Ltd are the creators of:"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:118
+#: includes/class-ayecode-connect.php:133
 msgid ""
 "<b>AyeCode Connected!</b> You can now install any addons you have a license "
 "for and your license keys will automatically be synced."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:314
+#: includes/class-ayecode-connect.php:335
 msgid "Invalid Registration Data"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:318
+#: includes/class-ayecode-connect.php:339
 msgid "Invalid Secret"
 msgstr ""
 
-#: includes/class-ayecode-connect.php:595
+#: includes/class-ayecode-connect.php:620
 #, php-format
 msgid "Domain `%1$s` just failed is_usable_domain check as it is empty."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:626
+#: includes/class-ayecode-connect.php:651
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it is in the forbidden "
 "array."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:641
+#: includes/class-ayecode-connect.php:666
 #, php-format
 msgid ""
 "Domain `%1$s` just failed is_usable_domain check as it uses an invalid top "
 "level domain."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:733
-#: includes/class-ayecode-connect.php:749
-#: includes/class-ayecode-connect.php:968
+#: includes/class-ayecode-connect.php:1014
+#: includes/class-ayecode-connect.php:1030
+#: includes/class-ayecode-connect.php:1249
 msgid "Missing Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:755
-#: includes/class-ayecode-connect.php:974
-#: includes/class-ayecode-connect.php:980
+#: includes/class-ayecode-connect.php:1036
+#: includes/class-ayecode-connect.php:1255
+#: includes/class-ayecode-connect.php:1261
 msgid "Invalid Authorization Header."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:762
+#: includes/class-ayecode-connect.php:1043
 msgid "Missing blog token."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:767
-#: includes/class-ayecode-connect.php:988
+#: includes/class-ayecode-connect.php:1048
+#: includes/class-ayecode-connect.php:1269
 msgid "You are not authorized to do that."
 msgstr ""
 
-#: includes/class-ayecode-connect.php:1039
+#: includes/class-ayecode-connect.php:1320
 msgid "Specify an action"
 msgstr ""

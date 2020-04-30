@@ -79,6 +79,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					add_action( 'wp_ajax_ayecode_connect_updates', array( self::$instance, 'ajax_toggle_updates' ) );
 					add_action( 'wp_ajax_ayecode_connect_disconnect', array( self::$instance, 'ajax_disconnect_site' ) );
 					add_action( 'wp_ajax_ayecode_connect_licences', array( self::$instance, 'ajax_toggle_licences' ) );
+					add_action( 'wp_ajax_ayecode_connect_support', array( self::$instance, 'ajax_toggle_support' ) );
+					add_action( 'wp_ajax_ayecode_connect_support_user', array( self::$instance, 'ajax_toggle_support_user' ) );
 
 				}
 
@@ -107,6 +109,11 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					// Sync licences now
 					$this->client->sync_licences();
 				}
+			}
+
+			// sync user info
+			if ( $this->client->is_registered() ){
+				$this->client->get_remote_user_info();
 			}
 		}
 
@@ -224,6 +231,76 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			wp_die();
 		}
 
+		/**
+		 * Toggle support widget via ajax call.
+		 */
+		public function ajax_toggle_support() {
+
+			// security
+			check_ajax_referer( 'ayecode-connect', 'security' );
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( - 1 );
+			}
+
+			$success = true;
+			$state   = isset( $_POST['state'] ) && $_POST['state'] ? true : false;
+
+			if ( $state ) { // enable
+				update_option( $this->client->prefix . "_support", true );
+
+				// Sync user info
+				$this->client->get_remote_user_info();
+
+			} else { // disable
+				update_option( $this->client->prefix . "_support", false );
+			}
+
+
+			if ( $success ) {
+				wp_send_json_success();
+			} else {
+				wp_send_json_error();
+			}
+
+			wp_die();
+		}
+
+		/**
+		 * Toggle temp support user via ajax call.
+		 */
+		public function ajax_toggle_support_user() {
+
+			// security
+			check_ajax_referer( 'ayecode-connect', 'security' );
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( - 1 );
+			}
+
+			$success = true;
+			$state   = isset( $_POST['state'] ) && $_POST['state'] ? true : false;
+
+			if ( $state ) { // enable
+				// Sync support user info
+				$this->client->set_remote_support_user(true);
+
+			} else { // disable
+				// Sync support user info
+				$this->client->set_remote_support_user(false);
+			}
+
+
+			if ( $success ) {
+				$data = array(
+					'message' => sprintf( __("Auto expires in %s","ayecode-connect"), human_time_diff( time(), time() + 3 * DAY_IN_SECONDS ) )
+				);
+				wp_send_json_success( $data );
+			} else {
+				wp_send_json_error();
+			}
+
+			wp_die();
+		}
+
 
 		/**
 		 * Add the WordPress settings menu item.
@@ -274,7 +351,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			?>
 			<!-- Clean & Mean UI -->
 			<style>
-				#wpbody-content > div.notice {
+				#wpbody-content > div.notice,
+				#wpbody-content > div.error{
 					display: none;
 				}
 			</style>
@@ -347,13 +425,51 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									</li>
 
 									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Live documentation search
-										<span class="badge badge-light badge-pill">Coming soon</span>
+										<span
+											class="mr-auto"><?php _e( "Documentation and Support Widget", "ayecode-connect" ); ?></span>
+										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+										     role="status">
+											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
+										</div>
+										<div class="custom-control custom-switch">
+											<input type="checkbox" class="custom-control-input" id="ac-setting-support"
+												<?php if ( get_option( $this->client->prefix . "_support", true ) ) {
+													echo "checked";
+												} ?>
+												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_support(this,1);}else{ayecode_connect_support(this,0);}"
+											>
+											<label class="custom-control-label" for="ac-setting-support"></label>
+										</div>
 									</li>
+
+									<?php
+									$status_text_class = 'd-none';
+									if ( $expires = get_option( $this->client->prefix . "_support_user", 0 ) ) {
+										$status_text_class = '';
+									}
+									?>
 									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Support from Dashboard
-										<span class="badge badge-light badge-pill">Coming soon</span>
+										<span
+											class="mr-auto"><?php _e( "Temporary Support User Access", "ayecode-connect" ); ?></span>
+										<div class=" mr-2 <?php echo $status_text_class;?> text-muted ac-support-user-status"
+										     role="status">
+											<span class="badge badge-warning font-weight-normal"><?php echo sprintf( __("Auto expires in %s","ayecode-connect"), human_time_diff( time(), $expires ) ); ?></span>
+										</div>
+										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+										     role="status">
+											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
+										</div>
+										<div class="custom-control custom-switch">
+											<input type="checkbox" class="custom-control-input" id="ac-setting-support-user"
+												<?php if ( get_option( $this->client->prefix . "_support_user", false ) ) {
+													echo "checked";
+												} ?>
+												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_support_user(this,1);}else{ayecode_connect_support_user(this,0);}"
+											>
+											<label class="custom-control-label" for="ac-setting-support-user"></label>
+										</div>
 									</li>
+									
 								</ul>
 
 								<p class="mt-4">
@@ -365,6 +481,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									   class="text-muted">
 										<u><?php _e( 'Disconnect site', 'ayecode-connect' ); ?></u></a>
 								</p>
+
+
+
 								<?php
 							} else {
 								$connect_url = esc_url( $this->client->build_connect_url() );
