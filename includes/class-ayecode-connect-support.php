@@ -108,7 +108,7 @@ class AyeCode_Connect_Support {
 
 			// destroy support user
 			$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
-			if ( $support_user->ID ) {
+			if ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) {
 				$user_id = absint( $support_user->ID );
 				// get all sessions for user with ID $user_id
 				$sessions = WP_Session_Tokens::get_instance( $user_id );
@@ -130,7 +130,7 @@ class AyeCode_Connect_Support {
 			$key = sanitize_text_field( urldecode( $_POST['ayecode_connect_support_user'] ) );
 			if ( wp_check_password( $key, $key_hash ) && $this->support_user > time() ) {
 				$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
-				if ( empty( $support_user->ID ) ) {
+				if ( ! ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) ) {
 					$user_data = array(
 						'user_pass'     => wp_generate_password( 20 ), // we never need to know this
 						'user_login'    => 'ayecode_connect_support_user',
