@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.4
+Tested up to: 5.4.1
 Stable tag: 1.1.0
 
 
@@ -56,6 +56,9 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.1.1 =
+* Shows PHP notice when Elementor is active - FIXED
 
 = 1.1.0 =
 * Support widget and live documentation search now available - ADDED
