@@ -383,7 +383,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$connected_username = $this->client->get_connected_username();
 								?>
 								<div class="alert alert-success  w-50 mx-auto text-left" role="alert">
-									<?php echo sprintf( __( "You are connected to AyeCode Connect as user: %s", "ayecode-conect" ), "<b>$connected_username</b>" ); ?>
+									<?php echo sprintf( __( "You are connected to AyeCode Connect as user: %s", "ayecode-connect" ), "<b>$connected_username</b>" ); ?>
 								</div>
 
 								<ul class="list-group w-50 mx-auto">

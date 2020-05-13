@@ -312,6 +312,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . '_connected_email' );
 			delete_option( $this->prefix . '_connected_name' );
 			delete_option( $this->prefix . '_connected_user_id' );
+			delete_option( $this->prefix . '_connected_user_signatures' );
 			delete_option( $this->prefix . '_licence_sync' );
 			delete_option( $this->prefix . '_licences' );
 			delete_option( $this->prefix . '_support' );
@@ -461,6 +462,19 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			// remove cron
 			wp_clear_scheduled_hook( $this->prefix . "_callback" );
+
+			// destroy support user
+			$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
+			if ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) {
+				require_once(ABSPATH.'wp-admin/includes/user.php');
+				$user_id = absint($support_user->ID);
+				// get all sessions for user with ID $user_id
+				$sessions = WP_Session_Tokens::get_instance($user_id);
+				// we have got the sessions, destroy them all!
+				$sessions->destroy_all();
+				$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
+				wp_delete_user( $user_id, $reassign );
+			}
 
 			return $response;
 
@@ -919,6 +933,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				// destroy support user
 				$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
 				if ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) {
+					require_once(ABSPATH.'wp-admin/includes/user.php');
 					$user_id = absint($support_user->ID);
 					// get all sessions for user with ID $user_id
 					$sessions = WP_Session_Tokens::get_instance($user_id);

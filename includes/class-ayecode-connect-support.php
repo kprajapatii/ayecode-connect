@@ -109,6 +109,7 @@ class AyeCode_Connect_Support {
 			// destroy support user
 			$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
 			if ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) {
+				require_once(ABSPATH.'wp-admin/includes/user.php');
 				$user_id = absint( $support_user->ID );
 				// get all sessions for user with ID $user_id
 				$sessions = WP_Session_Tokens::get_instance( $user_id );
