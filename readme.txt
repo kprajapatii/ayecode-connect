@@ -6,8 +6,8 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.4.1
-Stable tag: 1.1.0
+Tested up to: 5.4
+Stable tag: 1.1.1
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -58,7 +58,9 @@ TBA
 == Changelog ==
 
 = 1.1.1 =
-* Shows PHP notice when Elementor is active - FIXED
+* If support user not set PHP Notice can show if debugging enabled - FIXED
+* Remove support user if plugin deactivated - ADDED
+* Remove support user immediately if site disconnected - CHANGED
 
 = 1.1.0 =
 * Support widget and live documentation search now available - ADDED

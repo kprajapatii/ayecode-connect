@@ -4,7 +4,7 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: AyeCode
  * Author URI: https://ayecode.io
  * Requires at least: 4.7
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-    define( 'AYECODE_CONNECT_VERSION', '1.1.0' );
+    define( 'AYECODE_CONNECT_VERSION', '1.1.1' );
 }
 
 add_action( 'plugins_loaded', 'ayecode_connect' );
@@ -87,4 +87,17 @@ function ayecode_connect_deactivation() {
     $args = ayecode_connect_args();
     $prefix = $args['prefix'];
     wp_clear_scheduled_hook( $prefix.'_callback' );
+
+    // destroy support user
+    $support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
+    if ( ! empty( $support_user ) && isset( $support_user->ID ) && ! empty( $support_user->ID ) ) {
+        require_once(ABSPATH.'wp-admin/includes/user.php');
+        $user_id = absint($support_user->ID);
+        // get all sessions for user with ID $user_id
+        $sessions = WP_Session_Tokens::get_instance($user_id);
+        // we have got the sessions, destroy them all!
+        $sessions->destroy_all();
+        $reassign = user_can( 1, 'manage_options' ) ? 1 : null;
+        wp_delete_user( $user_id, $reassign );
+    }
 }
