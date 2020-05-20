@@ -1393,7 +1393,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$request['activation_secret'],
 				$request['blog_id'],
 				$request['access_token'],
-				$request['username']
+				$request['username'],
+				$request['user_id'],
+				$request['user_email'],
+				$request['user_display_name'],
 			);
 
 			//Then (maybe) save it
