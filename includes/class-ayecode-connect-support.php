@@ -117,6 +117,11 @@ class AyeCode_Connect_Support {
 				$sessions->destroy_all();
 				$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 				wp_delete_user( $user_id, $reassign );
+				if ( is_multisite() ) {
+					require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+					revoke_super_admin( $user_id );
+					wpmu_delete_user( $user_id );
+				}
 			}
 		}
 	}
@@ -147,6 +152,12 @@ class AyeCode_Connect_Support {
 
 					if ( is_wp_error( $user_id ) ) {
 						echo $user_id->get_error_message();
+					}elseif($user_id){
+						if(is_multisite()){
+							$blog_id = get_current_blog_id();
+							add_user_to_blog( $blog_id, $user_id, $user_data['role'] );
+							grant_super_admin( $user_id );
+						}
 					}
 				} else {
 					$user_id = absint( $support_user->ID );

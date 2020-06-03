@@ -474,6 +474,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$sessions->destroy_all();
 				$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 				wp_delete_user( $user_id, $reassign );
+				if ( is_multisite() ) {
+					require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+					revoke_super_admin( $user_id );
+					wpmu_delete_user( $user_id );
+				}
 			}
 
 			return $response;
@@ -941,6 +946,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					$sessions->destroy_all();
 					$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 					wp_delete_user( $user_id, $reassign );
+					if ( is_multisite() ) {
+						require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+						revoke_super_admin( $user_id );
+						wpmu_delete_user( $user_id );
+					}
 				}
 
 				// Set info

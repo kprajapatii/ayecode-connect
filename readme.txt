@@ -57,6 +57,9 @@ TBA
 
 == Changelog ==
 
+= 1.1.3 =
+* Support user on network not able to access all plugin settings - FIXED
+
 = 1.1.2 =
 * WP_DEBUG being active can affect initial connection - FIXED
 
