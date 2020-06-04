@@ -306,11 +306,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		 * Add the WordPress settings menu item.
 		 */
 		public function menu_item() {
+			$url_change_disconnection_notice = get_transient( $this->client->prefix . '_site_moved');
 
 			$page = add_submenu_page(
 				'index.php',
 				$this->name,
-				$this->name,
+				$url_change_disconnection_notice ? sprintf($this->name.' <span class="awaiting-mod">%s</span>', "!") : $this->name,
 				'manage_options',
 				'ayecode-connect',
 				array(
@@ -482,9 +483,20 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										<u><?php _e( 'Disconnect site', 'ayecode-connect' ); ?></u></a>
 								</p>
 
-
-
 								<?php
+
+								if(isset($_REQUEST['ayedebug'])){
+									$all_licences = get_option( $this->client->prefix . "_licences" );
+									echo '<p class="mt-4 text-left"><pre class="text-left">';
+
+									echo '<h4>Debug Info</h4>';
+
+									print_r($all_licences);
+
+									echo '</pre></p>';
+								}
+
+
 							} else {
 								$connect_url = esc_url( $this->client->build_connect_url() );
 								?>
@@ -495,11 +507,19 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									   class="btn btn-primary"><?php _e( 'Connect Site', 'ayecode-connect' ); ?></a>
 								</p>
 								<?php
+								// check for url change
+								$url_change_disconnection_notice = get_transient( $this->client->prefix . '_site_moved');
+								if($url_change_disconnection_notice){
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									_e("Your website URL has changed, please re-connect with your new URL.","ayecode-connect");
+									echo "</div>";
+								}
+
 								// check for local domain
 								$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 								$localhost = $this->client->is_usable_domain($host);
 								if(is_wp_error($localhost)){
-									echo '<div class="alert alert-danger w-50 mx-auto" role="alert">';
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
 									_e("It looks like you might be running on localhost, AyeCode Connect will only work on a live website.","ayecode-connect");
 									echo "</div>";
 								}

@@ -93,6 +93,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				do_action( $this->prefix . '_connected_to_remote' );
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
+				add_action( 'admin_init', array( $this, 'check_for_url_change') );
 
 				// Support Widget
 				if(is_admin()){
@@ -118,11 +119,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				//Not Connected
 				add_action( 'rest_api_init', array( $this, 'register_connection_routes' ) );
 				add_action( 'init', array( $this, 'maybe_redirect_to_connection_page' ) );
+				add_action( 'admin_notices', array( $this, 'website_url_change_error') );
 				do_action( $this->prefix . '_not_connected_to_remote' );
 
 			}
 
 		}
+
+
 
 		/**
 		 * A notice to show that the site is now connected.
@@ -317,8 +321,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . '_licences' );
 			delete_option( $this->prefix . '_support' );
 			delete_option( $this->prefix . '_support_user' );
+			delete_option( $this->prefix . '_url' );
 			delete_transient( $this->prefix . '_activation_secret' );
 			delete_transient( $this->prefix . '_support_user_key' );
+			delete_transient( $this->prefix . '_site_moved' );
 
 		}
 
@@ -437,7 +443,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * Disconnects from the remote servers.
 		 * Forgets all connection details and tells the remote servers to do the same.
 		 */
-		public function disconnect_site() {
+		public function disconnect_site($disconnect_remote = true) {
 
 			$site_id = $this->get_blog_id();
 
@@ -446,12 +452,17 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return false;
 			}
 
-			//Disconnect from remote...
-			$args     = array(
-				'url'    => $this->get_api_url( sprintf( '/sites/%d', $site_id ) ),
-				'method' => 'DELETE'
-			);
-			$response = self::remote_request( $args );
+			if($disconnect_remote){
+				//Disconnect from remote...
+				$args     = array(
+					'url'    => $this->get_api_url( sprintf( '/sites/%d', $site_id ) ),
+					'method' => 'DELETE'
+				);
+				$response = self::remote_request( $args );
+			}else{
+				$response = true;
+			}
+
 
 
 			//Then delete local secrets
@@ -1194,7 +1205,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				'url'         => '',
 				'blog_id'     => $this->get_blog_id(),
 				'method'      => 'POST',
-				'timeout'     => 10,
+				'timeout'     => 20,
 				'redirection' => 0,
 				'headers'     => array(),
 				'stream'      => false,
@@ -1398,6 +1409,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 */
 		public function verify_registration( WP_REST_Request $request ) {
 
+			// delete the URL change transient if set
+			delete_transient( $this->prefix . '_site_moved');
+
 			//Prepare the registration data
 			$registration_data = array(
 				$request['activation_secret'],
@@ -1429,6 +1443,50 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$url    = add_query_arg( 'action', $action, get_admin_url() );
 
 			return rest_ensure_response( $url );
+
+		}
+
+
+		/**
+		 * Check if the website URL changes and disconnect the site and show re-connect notice if so.
+		 */
+		public function check_for_url_change(){
+
+			// get current site URL
+			$connected_site_url = get_option( $this->prefix . "_url" );
+
+			// get the current site URL
+			$site_url = trailingslashit( str_replace( array("http://","https://"),"", site_url() ) );
+
+			// if current site URL is empty then add it
+			if(empty($connected_site_url)){
+				$connected_site_url = $site_url;
+				update_option($this->prefix . "_url", $connected_site_url);
+			}
+
+			// check for site URL change, disconnect site and add warning
+			if( $connected_site_url && $site_url && $connected_site_url != $site_url ){
+				// disconnect site but not from remote (that would invalidate the other site)
+				$this->disconnect_site(false);
+
+				// set a transient for 1 month so we can show a warning
+				set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
+			}
+		}
+
+		/**
+		 * Show admin notice if site URL changes.
+		 */
+		public function website_url_change_error(){
+			$url_change_disconnection_notice = get_transient( $this->prefix . '_site_moved');
+			if($url_change_disconnection_notice){
+				$ayecode_connect = admin_url( "index.php?page=ayecode-connect" );
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p><?php echo sprintf( __( '<b>AyeCode Connect:</b> Your website URL has changed, please %sre-connect%s this site.', 'ayecode-connect' ),"<a href='$ayecode_connect'>", "</a>" ); ?></p>
+				</div>
+				<?php
+			}
 
 		}
 
