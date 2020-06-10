@@ -61,12 +61,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @static
 		 * @return AyeCode_Connect_Remote_Actions - Main instance.
 		 */
-		public static function instance( $prefix = '' ) {
+		public static function instance( $prefix = '' ,$client = '') {
 			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Connect_Remote_Actions ) ) {
 				self::$instance = new AyeCode_Connect_Remote_Actions;
 
 				if ( $prefix ) {
 					self::$instance->prefix = $prefix;
+				}
+
+				if ( $client ) {
+					self::$instance->client = $client;
 				}
 
 				$remote_actions = array(
@@ -78,10 +82,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				 * Add any actions in the style of "{$prefix}_remote_action_{$action}"
 				 */
 				foreach ( $remote_actions as $action => $call ) {
-					add_action( $prefix . '_remote_action_' . $action, array(
+					if( !has_action($prefix . '_remote_action_' . $action,array(
 						self::$instance,
 						$call
-					) ); // set settings
+					)) ){
+						add_action( $prefix . '_remote_action_' . $action, array(
+							self::$instance,
+							$call
+						) ); // set settings
+					}
+
 				}
 
 			}
@@ -102,6 +112,22 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result    = array( "success" => true, );
 				$installed = ! empty( $_REQUEST['installed'] ) ? $this->sanitize_licences( $_REQUEST['installed'] ) : array();
 				$all       = ! empty( $_REQUEST['all'] ) ? $this->sanitize_licences( $_REQUEST['all'], true ) : array();
+				$site_id   = ! empty( $_REQUEST['site_id'] ) ? absint($_REQUEST['site_id']) : '';
+				$site_url  = ! empty( $_REQUEST['site_url'] ) ? esc_url_raw($_REQUEST['site_url']) : '';
+				
+
+				// verify site_id
+				if( $site_id != get_option( $this->prefix . '_blog_id', false ) ){
+					return array( "success" => false );
+				}
+
+				// verify site_url
+				if( $site_url && get_option( $this->prefix . "_url" ) ){
+					$changed =  $this->client->check_for_url_change( $site_url );
+					if( $changed ){
+						return array( "success" => false );
+					}
+				}
 
 				// Update licence keys for installed addons
 				if ( ! empty( $installed ) && defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
