@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 5.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -56,6 +56,10 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.1.4 =
+* License sync now checks if site_id and site_url are correct and will work before syncing - CHANGED
+* Detect and disconnect if site_url changes and invalidates licences - ADDED
 
 = 1.1.3 =
 * Support user on network not able to access all plugin settings - FIXED

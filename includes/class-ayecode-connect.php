@@ -1362,7 +1362,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			 * This is only loaded if authenticated.
 			 */
 			require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';
-			AyeCode_Connect_Remote_Actions::instance( $prefix );
+			AyeCode_Connect_Remote_Actions::instance( $prefix, $this );
 
 			$response = apply_filters( "{$prefix}_remote_action_{$action}", array( "success" => false ) );
 
@@ -1450,10 +1450,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		/**
 		 * Check if the website URL changes and disconnect the site and show re-connect notice if so.
 		 */
-		public function check_for_url_change(){
+		public function check_for_url_change($connected_site_url = ''){
+
+			$result = false;
 
 			// get current site URL
-			$connected_site_url = get_option( $this->prefix . "_url" );
+			$connected_site_url = $connected_site_url ? trailingslashit( str_replace( array("http://","https://"),"", $connected_site_url ) ): get_option( $this->prefix . "_url" );
 
 			// get the current site URL
 			$site_url = trailingslashit( str_replace( array("http://","https://"),"", site_url() ) );
@@ -1471,7 +1473,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 				// set a transient for 1 month so we can show a warning
 				set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
+
+				$result = true;
 			}
+
+			return $result;
 		}
 
 		/**
