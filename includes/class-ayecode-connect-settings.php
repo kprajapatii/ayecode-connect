@@ -81,6 +81,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					add_action( 'wp_ajax_ayecode_connect_licences', array( self::$instance, 'ajax_toggle_licences' ) );
 					add_action( 'wp_ajax_ayecode_connect_support', array( self::$instance, 'ajax_toggle_support' ) );
 					add_action( 'wp_ajax_ayecode_connect_support_user', array( self::$instance, 'ajax_toggle_support_user' ) );
+					add_action( 'wp_ajax_ayecode_connect_install_must_use_plugin', array( self::$instance, 'install_mu_plugin' ) );
 
 				}
 
@@ -94,6 +95,28 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			}
 
 			return self::$instance;
+		}
+
+		public function install_mu_plugin(){
+			$result = false;
+			if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
+				require_once( ABSPATH . '/wp-admin/includes/class-wp-filesystem-direct.php' );
+			}
+
+			if (  class_exists( 'WP_Filesystem_Direct' ) ) {
+				$wp_filesystem_direct = new WP_Filesystem_Direct(true);
+				$src = dirname( __FILE__ )."/../assets/wpmu/ayecode-connect-filter-fix.php";
+				$des = WPMU_PLUGIN_DIR."/ayecode-connect-filter-fix.php";
+				$result = $wp_filesystem_direct->move($src,$des,true);
+			}
+
+			if($result){
+				wp_send_json_success(__("Plugin installed, this should resolve any update issues, if you still have issues please contact support.","ayecode-connect"));
+			}else{
+				wp_send_json_error(__("Something went wrong, please contact support.","ayecode-connect"));
+			}
+
+			wp_die();
 		}
 
 		/**
@@ -494,6 +517,21 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									print_r($all_licences);
 
 									echo '</pre></p>';
+								}
+
+
+								// fix for other plugins calling get_plugins() too early.
+								if( defined( 'WP_EASY_UPDATES_ACTIVE' ) ){
+									$plugins = get_plugins();
+									$first = reset($plugins);
+									if(!empty($plugins) && !isset($first['Update URL'])){
+										echo '<div class="ac-get-plugins-fix"><div class="alert alert-danger w-50 mx-auto " role="alert"><span class="badge badge-pill badge-light">!</span> ';
+										_e("Another plugin is calling the get_plugins() function too early which may block updates. We can try to fix this by calling our filter first with a must use plugin.","ayecode-connect");
+										echo "<button class='btn btn-white d-block mt-2 mx-auto' onclick='ayecode_connect_install_must_use_plugin();'>".__("Install now","ayecode-connect")."</button>";
+										echo '<div class="spinner-border spinner-border-sm mt-2 d-none text-white"  role="status">
+											<span class="sr-only">'.__( "Loading...", "ayecode-connect" ).'</span>
+									</div></div></div>';
+									}
 								}
 
 
