@@ -1452,6 +1452,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 */
 		public function check_for_url_change($connected_site_url = ''){
 
+			// if WPML is installed then bail as this can dynamically change the URL
+			if(defined('ICL_LANGUAGE_CODE')){
+				return false;
+			}
+
 			$result = false;
 
 			// get current site URL

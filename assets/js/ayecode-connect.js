@@ -222,3 +222,39 @@ function ayecode_connect_support_user($input,$state){
         }
     }); // end of ajax
 }
+
+/**
+ * Request to enable/disable support user.
+ *
+ * @param $input
+ * @param $state
+ */
+function ayecode_connect_install_must_use_plugin(){
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'ayecode_connect_install_must_use_plugin',
+            security: ayecode_connect.nonce,
+        },
+        beforeSend: function() {
+            jQuery('.ac-get-plugins-fix button').prop('disabled', true);
+            jQuery('.ac-get-plugins-fix .spinner-border').toggleClass('d-none');
+        },
+        success: function(data, textStatus, xhr) {
+            console.log(data);
+
+            if(data.success){
+                jQuery('.ac-get-plugins-fix .alert').removeClass('alert-danger').addClass('alert-success').html(data.data);
+            }else{
+                jQuery('.ac-get-plugins-fix .alert').html(data.data);
+            }
+            
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(textStatus);
+            jQuery('.ac-get-plugins-fix .spinner-border').toggleClass('d-none');
+        }
+    }); // end of ajax
+}
