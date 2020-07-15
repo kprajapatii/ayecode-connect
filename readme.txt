@@ -6,8 +6,8 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.4
-Stable tag: 1.1.5
+Tested up to: 5.5
+Stable tag: 1.1.6
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -56,6 +56,10 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.1.6 =
+* CloudFlare can cause our server validation methods to fail resulting in licenses not being added - FIXED
+* Stored keys will be cleared when deactivating 'One click addon installs' - CHANGED
 
 = 1.1.5 =
 * WPML dynamic URL change can disconnect a site - FIXED

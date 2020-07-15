@@ -141,6 +141,21 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		}
 
 		/**
+		 * Remove all site licenses.
+		 */
+		public function clear_all_licenses(){
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( - 1 );
+			}
+
+			// remove AC licenses
+			delete_option( $this->client->prefix . '_licences' );
+
+			// remove WPEU licences
+			delete_option( 'exup_keys' );
+		}
+
+		/**
 		 * Disconnect site via ajax call.
 		 */
 		public function ajax_disconnect_site() {
@@ -242,6 +257,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			} else { // disable
 				update_option( $this->client->prefix . "_licence_sync", false );
 				wp_clear_scheduled_hook( $this->client->prefix . "_callback" );
+
+				// clear all licenses
+				$this->clear_all_licenses();
 			}
 
 
@@ -345,6 +363,17 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			add_action( "admin_print_styles-{$page}", array( $this, 'scripts' ) );
 
+
+
+			// maybe clear licenses
+			$nonce = !empty($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce'] : '';
+			$action = !empty($_REQUEST['ac_action']) ? esc_attr($_REQUEST['ac_action']) : '';
+			if ( $action && $action == 'clear-licenses' && $nonce && wp_verify_nonce( $nonce, 'ayecode-connect-debug' ) ) {
+				$this->clear_all_licenses();
+				wp_redirect(admin_url( "index.php?page=ayecode-connect&ayedebug=1" ));
+				exit;
+			}
+
 		}
 
 		/**
@@ -370,8 +399,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		 * Settings page HTML.
 		 */
 		public function settings_page() {
-			// bsui wrapper makes our bootstrap wrapper work
 
+			// bsui wrapper makes our bootstrap wrapper work
 			?>
 			<!-- Clean & Mean UI -->
 			<style>
@@ -510,11 +539,27 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 								if(isset($_REQUEST['ayedebug'])){
 									$all_licences = get_option( $this->client->prefix . "_licences" );
+									$actual_licences = get_option( "exup_keys" );
 									echo '<p class="mt-4 text-left"><pre class="text-left">';
 
+									$blog_id = get_option( $this->client->prefix . '_blog_id', false );
+									$site_url = get_option( $this->client->prefix . '_url', false );
+
 									echo '<h4>Debug Info</h4>';
+									echo '<h5>blog id '.$blog_id .'</h5>';
+									echo '<h5>Site URL '.$site_url .'</h5>';
+
+									echo "<div>";
+									$debug_nonce = wp_create_nonce( 'ayecode-connect-debug' );
+									echo "<a href='".admin_url( "index.php?page=ayecode-connect&ayedebug=1&ac_action=clear-licenses&_wpnonce=$debug_nonce" )."' class='btn btn-primary'>".__("Clear all licenses","ayecode-connect")."</a>";
+									echo "</div>";
 
 									print_r($all_licences);
+									echo '<h4>actual licences</h4>';
+									print_r($actual_licences);
+
+									echo '<h4>get_plugins()</h4>';
+									print_r(get_plugins());
 
 									echo '</pre></p>';
 								}
@@ -524,7 +569,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								if( defined( 'WP_EASY_UPDATES_ACTIVE' ) ){
 									$plugins = get_plugins();
 									$first = reset($plugins);
-									if(!empty($plugins) && !isset($first['Update URL'])){
+									if( ( !empty($plugins) && !isset($first['Update URL']) ) || isset($_REQUEST['ayemu']) || isset($_REQUEST['ayedebug']) ){
 										echo '<div class="ac-get-plugins-fix"><div class="alert alert-danger w-50 mx-auto " role="alert"><span class="badge badge-pill badge-light">!</span> ';
 										_e("Another plugin is calling the get_plugins() function too early which may block updates. We can try to fix this by calling our filter first with a must use plugin.","ayecode-connect");
 										echo "<button class='btn btn-white d-block mt-2 mx-auto' onclick='ayecode_connect_install_must_use_plugin();'>".__("Install now","ayecode-connect")."</button>";
