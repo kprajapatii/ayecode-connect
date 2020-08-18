@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.1.5\n"
+"Project-Id-Version: AyeCode Connect 1.1.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-02 15:41+0100\n"
-"PO-Revision-Date: 2020-07-02 15:41+0100\n"
+"POT-Creation-Date: 2020-07-15 11:04+0100\n"
+"PO-Revision-Date: 2020-07-15 11:04+0100\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/class-ayecode-connect-remote-actions.php:439
+#: includes/class-ayecode-connect-remote-actions.php:446
 msgid "Download source not valid."
 msgstr ""
 
@@ -38,97 +38,101 @@ msgstr ""
 msgid "Something went wrong, please contact support."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:231
+#: includes/class-ayecode-connect-settings.php:246
 msgid "Plugin and theme update notifications must be enabled first"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:317
-#: includes/class-ayecode-connect-settings.php:480
+#: includes/class-ayecode-connect-settings.php:335
+#: includes/class-ayecode-connect-settings.php:509
 #, php-format
 msgid "Auto expires in %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:362
+#: includes/class-ayecode-connect-settings.php:391
 msgid "Something went wrong, try refreshing the page and trying again."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:363
+#: includes/class-ayecode-connect-settings.php:392
 msgid "Are you sure you with to disconnect your site?"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:402
+#: includes/class-ayecode-connect-settings.php:431
 msgid ""
 "One click addon installs, live documentation search, support right from your "
 "WordPress Dashboard"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:410
+#: includes/class-ayecode-connect-settings.php:439
 #, php-format
 msgid "You are connected to AyeCode Connect as user: %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:417
+#: includes/class-ayecode-connect-settings.php:446
 msgid "Plugin and theme update notifications"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:420
-#: includes/class-ayecode-connect-settings.php:438
-#: includes/class-ayecode-connect-settings.php:456
-#: includes/class-ayecode-connect-settings.php:484
-#: includes/class-ayecode-connect-settings.php:501
-#: includes/class-ayecode-connect-settings.php:532
+#: includes/class-ayecode-connect-settings.php:449
+#: includes/class-ayecode-connect-settings.php:467
+#: includes/class-ayecode-connect-settings.php:485
+#: includes/class-ayecode-connect-settings.php:513
+#: includes/class-ayecode-connect-settings.php:530
+#: includes/class-ayecode-connect-settings.php:577
 msgid "Loading..."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:435
+#: includes/class-ayecode-connect-settings.php:464
 msgid "One click addon installs, no more license keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:453
+#: includes/class-ayecode-connect-settings.php:482
 msgid "Documentation and Support Widget"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:477
+#: includes/class-ayecode-connect-settings.php:506
 msgid "Temporary Support User Access"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:506
+#: includes/class-ayecode-connect-settings.php:535
 msgid "Disconnect site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:529
+#: includes/class-ayecode-connect-settings.php:554
+msgid "Clear all licenses"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:574
 msgid ""
 "Another plugin is calling the get_plugins() function too early which may "
 "block updates. We can try to fix this by calling our filter first with a "
 "must use plugin."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:530
+#: includes/class-ayecode-connect-settings.php:575
 msgid "Install now"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:542
+#: includes/class-ayecode-connect-settings.php:587
 msgid ""
 "By clicking the <b>Connect Site</b> button, you agree to our <a "
 "href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-"
 "muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:545
+#: includes/class-ayecode-connect-settings.php:590
 msgid "Connect Site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:552
+#: includes/class-ayecode-connect-settings.php:597
 msgid "Your website URL has changed, please re-connect with your new URL."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:561
+#: includes/class-ayecode-connect-settings.php:606
 msgid ""
 "It looks like you might be running on localhost, AyeCode Connect will only "
 "work on a live website."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:572
+#: includes/class-ayecode-connect-settings.php:617
 msgid "AyeCode Ltd are the creators of:"
 msgstr ""
 

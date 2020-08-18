@@ -109,7 +109,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			// validate
 			if ( $this->validate_request() ) {
-				$result    = array( "success" => true, );
+				$result    = array( "success" => true );
 				$installed = ! empty( $_REQUEST['installed'] ) ? $this->sanitize_licences( $_REQUEST['installed'] ) : array();
 				$all       = ! empty( $_REQUEST['all'] ) ? $this->sanitize_licences( $_REQUEST['all'], true ) : array();
 				$site_id   = ! empty( $_REQUEST['site_id'] ) ? absint($_REQUEST['site_id']) : '';
@@ -310,6 +310,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$ip = $_SERVER['REMOTE_ADDR'];
 			}
 
+			// Cloudflare can provide a comma separated ip list
+			if (strpos($ip, ',') !== false) {
+				$ip = reset(explode(",",$ip));
+			}
+
 			return $ip;
 		}
 
@@ -388,7 +393,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			return $slug[0];
 		}
-
+		
 		/**
 		 * Install a plugin from .org in the background via a cron job (used by
 		 * installer - opt in).
@@ -397,6 +402,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param array $plugin_to_install
 		 *
 		 * @since 2.6.0
+		 *
+		 * @return bool
 		 */
 		public function background_installer( $plugin_to_install_id, $plugin_to_install ) {
 
