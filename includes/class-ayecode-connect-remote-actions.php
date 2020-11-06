@@ -76,6 +76,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$remote_actions = array(
 					'install_plugin'  => 'install_plugin',
 					'update_licences' => 'update_licences',
+					'install_theme'  => 'install_theme',
+					'update_options'  => 'update_options',
+					'import_menus'  => 'import_menus',
+					'import_content'  => 'import_content',
 				);
 
 				/*
@@ -97,6 +101,333 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			return self::$instance;
+		}
+
+		public function import_content(){
+			$result = array( "success" => false );
+
+//			wp_mail("stiofansisland@gmail.com","update content debug",print_r($_REQUEST,true));
+
+			// validate
+			if ( $this->validate_request() ) {
+
+				// categories
+				$categories = ! empty( $_REQUEST['categories'] ) ? json_decode( stripslashes( $_REQUEST['categories'] ), true ) : array();
+//				wp_mail("stiofansisland@gmail.com","update content debug cats",print_r($categories,true));
+				if(!empty($categories) && class_exists('GeoDir_Admin_Dummy_Data')){
+					foreach ( $categories as $cpt => $cats ) {
+						GeoDir_Admin_Dummy_Data::create_taxonomies( $cpt, $cats);
+					}
+				}
+
+
+				// posts
+				$posts = ! empty( $_REQUEST['posts'] ) ? json_decode( stripslashes( $_REQUEST['posts'] ), true ) : array();
+//				wp_mail("stiofansisland@gmail.com","update content debug all posts",print_r($posts ,true));
+				if(!empty($posts) && class_exists('GeoDir_Admin_Dummy_Data')){
+//					wp_mail("stiofansisland@gmail.com","update content debug all posts content",print_r($posts,true));
+
+					// insert the dummy data column
+					//geodir_add_column_if_not_exist( $plugin_prefix . $post_type . "_detail", 'post_dummy', "TINYINT(1) NULL DEFAULT '0'" );
+					foreach ( $posts as $cpt => $cpt_posts ) {
+
+						// @todo maybe delete all dummy posts first?
+
+						if ( ! empty( $cpt_posts ) ) {
+							foreach ( $cpt_posts as $post_info ) {
+//								wp_mail("stiofansisland@gmail.com","update content debug posts content",print_r($post_info,true));
+								unset($post_info['ID']);
+								$insert_result = wp_insert_post( $post_info, true ); // we hook into the save_post hook
+//								wp_mail("stiofansisland@gmail.com","update content debug posts",print_r($insert_result,true));
+//								return array( "success" => true );
+							}
+						}
+
+
+
+
+
+
+
+
+
+					}
+				}
+
+
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		public function import_menus(){
+			$result = array( "success" => false );
+
+//			wp_mail("stiofansisland@gmail.com","update menu debug",print_r($_REQUEST,true));
+
+			// validate
+			if ( $this->validate_request() ) {
+
+
+				$menus = ! empty( $_REQUEST['menus'] ) ? $_REQUEST['menus'] : array();
+
+				if ( ! empty( $menus ) ) {
+					foreach($menus as $location => $menu){
+						$import = $this->import_menu( $location, $menu );
+					}
+				}
+				
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Import menu.
+		 * 
+		 * @param $location
+		 * @param $menu
+		 *
+		 * @return bool
+		 */
+		public function import_menu( $location, $menu ){
+			$result = false;
+
+			if ( ! empty( $menu ) ) {
+				$name = esc_attr($menu['name']);
+
+				// Does the menu exist already?
+				$menu_exists = wp_get_nav_menu_object( $name );
+
+				// If it doesn't exist, let's create it.
+				if( !$menu_exists) {
+					$menu_id = wp_create_nav_menu( $name );
+
+					$locations = get_theme_mod( 'nav_menu_locations' );
+
+					if($menu_id){
+						$locations[$location] = $menu_id;
+						set_theme_mod('nav_menu_locations', $locations);
+
+						if ( ! empty( $menu['items'] ) ) {
+							$menu_ids = array();
+							$parent_ids = array();
+							foreach ( $menu['items'] as $item) {
+								// unset some things
+								$p = $item['post'];
+								$metas = $item['post_metas'];
+								$original_id = absint( $p['ID'] );
+								unset($p['ID']);
+								$db_id = wp_insert_post( $p );
+
+								// set id relations
+								$menu_ids[$original_id] = $db_id;
+
+								if($menu_id){
+									// Associate the menu item with the menu term.
+									wp_set_object_terms( $db_id, array( $menu_id ), 'nav_menu' );
+
+									// set meta items
+									if ( ! empty( $metas ) ) {
+										foreach ( $metas as $key => $meta ) {
+											$meta = maybe_unserialize( $meta[0] );
+											if(is_array($meta)){
+												$meta = implode( " ", $meta );
+											}
+
+											// set the correct id
+											if ( $key == '_menu_item_object_id' ) {
+												$meta = absint( $db_id );
+											}
+
+											// set correct parent id
+											if ( $key == '_menu_item_menu_item_parent' && !empty($meta) ) {
+//												$meta = absint( $menu_ids[$meta] );
+												$parent_ids[$db_id] = absint($meta);
+											}
+
+											// set the correct url for add listing pages
+											if ( $key == '_menu_item_url' && !empty($meta) && strpos($meta, 'listing_type=gd_') !== false && function_exists('geodir_add_listing_page_url')) {
+												$url_parts = explode( "=", $meta );
+												if(!empty($url_parts[1])){
+													$meta = geodir_add_listing_page_url(esc_attr($url_parts[1]));
+												}
+
+											}
+
+											update_post_meta( $db_id, sanitize_key($key), $meta );
+										}
+									}
+								}
+
+							}
+
+							// set parent ids after insert
+							if ( ! empty( $parent_ids ) ) {
+								foreach($parent_ids as $id => $p_id){
+									$n_id = !empty($menu_ids[$p_id]) ? absint($menu_ids[$p_id]) : 0;
+									if($n_id){
+										update_post_meta( $id, '_menu_item_menu_item_parent', $n_id );
+									}
+								}
+							}
+						}
+
+					}
+
+				}
+				
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Update site options.
+		 *
+		 * @return array
+		 */
+		public function update_options(){
+			$result = array( "success" => false );
+
+//			wp_mail("stiofansisland@gmail.com","update settings debug j",print_r($_REQUEST,true));
+
+			// validate
+			if ( $this->validate_request() ) {
+				// update
+				$options = ! empty( $_REQUEST['update'] ) ? json_decode( stripslashes( $_REQUEST['update'] ), true ) : array();
+				if(!empty($options)){
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						update_option( esc_attr($key), $option );
+					}
+				}
+
+				// merge
+				$options = ! empty( $_REQUEST['merge'] ) ? json_decode( stripslashes( $_REQUEST['merge'] ), true ) : array();
+//				wp_mail("stiofansisland@gmail.com","update settings debug merge",print_r($options,true));
+				if(!empty($options)){
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						$key = esc_attr($key);
+						$current = get_option($key);
+
+						if(!empty($current) && is_array($current)){
+							update_option( $key, array_merge($current, $option) );
+						}else{
+							update_option( $key, $option );
+						}
+
+					}
+				}
+
+				// delete
+				$options = ! empty( $_REQUEST['delete'] ) ? json_decode( stripslashes( $_REQUEST['delete']) , true ) : array();
+				if(!empty($options)){
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						delete_option( esc_attr($key) );
+					}
+				}
+
+
+				// GD Settings
+				$settings = ! empty( $_REQUEST['geodirectory_settings'] ) ? json_decode( stripslashes( $_REQUEST['geodirectory_settings']) , true ) : array();
+//				wp_mail("stiofansisland@gmail.com","update settings debug GD Settings",print_r($settings,true));
+				if ( ! empty( $settings ) ) {
+					$this->import_geodirectory_settings($settings);
+				}
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Import GeoDirectory custom table settings.
+		 * 
+		 * @param $settings
+		 */
+		public function import_geodirectory_settings($settings){
+			global $wpdb;
+
+			// custom_fields
+			if ( ! empty( $settings['custom_fields'] ) && defined('GEODIR_CUSTOM_FIELDS_TABLE')) {
+				// empty the table first
+				$wpdb->query("TRUNCATE TABLE ".GEODIR_CUSTOM_FIELDS_TABLE );
+
+				// insert
+				foreach ( $settings['custom_fields'] as $custom_field ) {
+					// maybe unserialize and change name
+					if(!empty($custom_field['extra_fields'])){
+						$custom_field['extra'] = maybe_unserialize( $custom_field['extra_fields'] );
+					}
+
+					// packaged key change
+					if ( ! empty( $custom_field['packages'] ) ) {
+						$custom_field['show_on_pkg'] = $custom_field['packages'];
+					}
+
+					unset($custom_field['id']);
+					$r = geodir_custom_field_save($custom_field);
+//									wp_mail("stiofansisland@gmail.com","update settings debug GD Settings",print_r($r,true));
+//					return;
+
+				}
+
+			}
+
+			// sort_fields
+			if ( ! empty( $settings['sort_fields'] ) && defined('GEODIR_CUSTOM_SORT_FIELDS_TABLE')) {
+				// empty the table first
+				$wpdb->query("TRUNCATE TABLE ". GEODIR_CUSTOM_SORT_FIELDS_TABLE );
+
+				// insert
+				foreach ( $settings['sort_fields'] as $sort_fields ) {
+					GeoDir_Settings_Cpt_Sorting::save_custom_field($sort_fields);
+				}
+
+			}
+
+			// tabs
+			if ( ! empty( $settings['tabs'] ) && defined('GEODIR_TABS_LAYOUT_TABLE')) {
+				// empty the table first
+				$wpdb->query("TRUNCATE TABLE ".GEODIR_TABS_LAYOUT_TABLE );
+
+				// insert
+				foreach ( $settings['tabs'] as $tab) {
+					unset($tab['id']);// we need insert not update
+					GeoDir_Settings_Cpt_Tabs::save_tab_item( $tab );
+				}
+
+			}
+
+			// Advanced Search
+			if ( ! empty( $settings['search_fields'] ) && defined('GEODIR_ADVANCE_SEARCH_TABLE')) {
+				// empty the table first
+				$wpdb->query("TRUNCATE TABLE ".GEODIR_ADVANCE_SEARCH_TABLE );
+
+				// insert
+				foreach ( $settings['search_fields'] as $search_field) {
+
+					GeoDir_Adv_Search_Settings_Cpt_Search::save_field( $search_field );
+				}
+
+			}
+
+			// price_packages
+			if ( ! empty( $settings['price_packages'] ) && defined('GEODIR_ADVANCE_SEARCH_TABLE')) {
+				// not implemented yet
+			}
+
 		}
 
 		/**
@@ -333,7 +664,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$parse = parse_url( $url );
 				if ( ! empty( $parse['host'] ) ) {
 					$ip = gethostbyname( $parse['host'] );
-					if ( $ip === "173.208.153.114" ) {
+					if ( $ip === "173.208.153.114" ) { // AyeCode.io Server
+						$result = true;
+					}elseif( $ip === "198.143.164.252" ){ // wordpress.org server
 						$result = true;
 					}
 				}
@@ -352,7 +685,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		public function install_plugin( $result ) {
 			// validate
 			if ( ! $this->validate_request() ) {
-				array( "success" => false );
+				return array( "success" => false );
 			}
 
 			include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); //for plugins_api..
@@ -373,8 +706,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $install ) {
 				$result = array( "success" => true );
 			}
-
-//			update_option("blogname","Localhost2");
 
 			return $result;
 		}
@@ -452,6 +783,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'download_link' => esc_url( $plugin_to_install['download_link'] ),
 							);
 						} else {
+
 							$plugin_information = plugins_api( 'plugin_information', array(
 								'slug'   => $plugin_to_install['repo-slug'],
 								'fields' => array(
@@ -533,6 +865,56 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			return $task_result;
+		}
+
+		/**
+		 * Install theme.
+		 *
+		 * @param $result
+		 *
+		 * @return mixed
+		 */
+		public function install_theme( $result ) {
+			// validate
+			if ( ! $this->validate_request() ) {
+				return array( "success" => false );
+			}
+
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+			include_once ABSPATH . 'wp-admin/includes/theme.php';
+
+			$slug = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
+			$download_link = !empty($_REQUEST['download_link']) ? esc_url_raw($_REQUEST['download_link']) : '';
+
+
+
+			if(empty($download_link)){
+				$api = themes_api(
+					'theme_information',
+					array(
+						'slug'   => $slug,
+						'fields' => array( 'sections' => false ),
+					)
+				);
+
+				if ( is_wp_error( $api ) ) {
+					array( "success" => false );
+				}
+
+				$download_link = $api->download_link;
+
+			}
+
+
+			$skin     = new WP_Ajax_Upgrader_Skin();
+			$upgrader = new Theme_Upgrader( $skin );
+			$install    = $upgrader->install( $download_link );
+
+			if ( $install ) {
+				$result = array( "success" => true );
+			}
+
+			return $result;
 		}
 
 

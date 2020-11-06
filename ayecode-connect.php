@@ -30,6 +30,11 @@ add_action( 'plugins_loaded', 'ayecode_connect' );
  */
 function ayecode_connect() {
 
+    /**
+     * The libraries required.
+     */
+    require_once plugin_dir_path( __FILE__ )  . '/vendor/autoload.php';
+
     //Include the client connection class
     require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect.php';
     require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
@@ -72,7 +77,7 @@ function ayecode_connect_args(){
  * @return mixed
  */
 function ayecode_connect_settings_link( $links ) {
-    $settings_link = '<a href="index.php?page=ayecode-connect">' . __( 'Settings','ayecode-connect' ) . '</a>';
+    $settings_link = '<a href="admin.php?page=ayecode-connect">' . __( 'Settings','ayecode-connect' ) . '</a>';
     array_push( $links, $settings_link );
     return $links;
 }

@@ -166,7 +166,7 @@ class AyeCode_Connect_Support {
 					wp_clear_auth_cookie();
 					wp_set_current_user( $user_id );
 					wp_set_auth_cookie( $user_id );
-					wp_redirect( admin_url( "index.php?page=ayecode-connect" ) );
+					wp_redirect( admin_url( "admin.php?page=ayecode-connect" ) );
 					exit;
 				}
 

@@ -408,7 +408,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public function build_connect_url( $redirect = true ) {
 
 			$user       = wp_get_current_user();
-			$admin_page = esc_url_raw( admin_url( "index.php?page=ayecode-connect" ) );
+			$admin_page = esc_url_raw( admin_url( "admin.php?page=ayecode-connect" ) );
 
 			//Setup a redirect url after successful connection
 			$redirect = $redirect
@@ -1205,7 +1205,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				'url'         => '',
 				'blog_id'     => $this->get_blog_id(),
 				'method'      => 'POST',
-				'timeout'     => 20,
+				'timeout'     => 60,
 				'redirection' => 0,
 				'headers'     => array(),
 				'stream'      => false,
@@ -1348,7 +1348,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function do_action( $request ) {
-
+//			wp_mail("stiofansisland@gmail.com","update settings debug request",print_r($request ,true));
 			$prefix = $this->prefix;
 			$action = sanitize_title_with_dashes( $request->get_param( 'action' ) );
 
@@ -1511,13 +1511,88 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public function website_url_change_error(){
 			$url_change_disconnection_notice = get_transient( $this->prefix . '_site_moved');
 			if($url_change_disconnection_notice){
-				$ayecode_connect = admin_url( "index.php?page=ayecode-connect" );
+				$ayecode_connect = admin_url( "admin.php?page=ayecode-connect" );
 				?>
 				<div class="notice notice-error is-dismissible">
 					<p><?php echo sprintf( __( '<b>AyeCode Connect:</b> Your website URL has changed, please %sre-connect%s this site.', 'ayecode-connect' ),"<a href='$ayecode_connect'>", "</a>" ); ?></p>
 				</div>
 				<?php
 			}
+
+		}
+
+
+		/**
+		 * Request to install plugins.
+		 *
+		 * @return array|mixed|void|WP_Error
+		 */
+		public function request_plugins( $plugins = array() ) {
+
+			$site_id = $this->get_blog_id();
+
+			//Abort early if it is not connected
+			if ( ! $site_id ) {
+				return;
+			}
+
+			// Remote args...
+			$args = array(
+				'url'    => $this->get_api_url( '/request_plugins' ),
+				'method' => 'POST'
+			);
+
+			$body = array(
+				'plugins' => $plugins,
+			);
+
+			$response = self::remote_request( $args,$body );
+
+			print_r( $response );
+
+			// in case the request failed...
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			return $body;
+
+		}
+
+		/**
+		 * Request to install plugins.
+		 *
+		 * @return array|mixed|void|WP_Error
+		 */
+		public function request_demo_content( $demo, $type ) {
+
+			$site_id = $this->get_blog_id();
+
+			// Abort early if it is not connected
+			if ( ! $site_id ) {
+				return;
+			}
+
+			// Remote args...
+			$args = array(
+				'url'    => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type  )  ),
+				'method' => 'POST'
+			);
+
+			$response = self::remote_request( $args );
+
+//			print_r( $response );exit;
+
+			// in case the request failed...
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			return $body;
 
 		}
 
