@@ -118,6 +118,9 @@ class AyeCode_Connect_Support {
 				$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 				wp_delete_user( $user_id, $reassign );
 				if ( is_multisite() ) {
+					if ( ! function_exists( 'wpmu_delete_user' ) ) { 
+						require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+					}
 					revoke_super_admin( $user_id );
 					wpmu_delete_user( $user_id );
 				}

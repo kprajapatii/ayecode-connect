@@ -57,6 +57,9 @@ TBA
 
 == Changelog ==
 
+= 1.1.8 =
+* multisite undefined function wpmu_delete_user() issue - FIXED
+
 = 1.1.7 =
 * WP 5.5 requires API permissions callback param - ADDED
 
