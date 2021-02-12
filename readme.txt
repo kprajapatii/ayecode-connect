@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.5
+Tested up to: 5.6
 Stable tag: 1.2.0-beta
 
 
@@ -61,6 +61,9 @@ TBA
 * One click demo import option added for connected users - ADDED
 * Licenses now auto sync when a new plugin or theme is installed - ADDED
 * Settings now moved to their own admin settings item so we can have sub items - CHANGED
+
+= 1.1.8 =
+* Multisite undefined function wpmu_delete_user() issue - FIXED
 
 = 1.1.7 =
 * WP 5.5 requires API permissions callback param - ADDED

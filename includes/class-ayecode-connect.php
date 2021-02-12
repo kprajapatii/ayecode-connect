@@ -176,7 +176,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					} elseif ( trailingslashit( $update_url ) == "https://userswp.io/" || trailingslashit( $update_url ) == "http://userswp.io/" ) {
 						$domain = 'userswp.io';
 					} elseif ( trailingslashit( $update_url ) == "https://wpinvoicing.com/" || trailingslashit( $update_url ) == "http://wpinvoicing.com/" ) {
-						$domain = 'wwpinvoicing.com';
+						$domain = 'wwpinvoicing.com'; /* TODO: need to fix this after check */
 					}
 
 					if ( $domain ) {
@@ -503,7 +503,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 				wp_delete_user( $user_id, $reassign );
 				if ( is_multisite() ) {
-					require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+					if ( ! function_exists( 'wpmu_delete_user' ) ) { 
+						require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+					}
 					revoke_super_admin( $user_id );
 					wpmu_delete_user( $user_id );
 				}
@@ -975,7 +977,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					$reassign = user_can( 1, 'manage_options' ) ? 1 : null;
 					wp_delete_user( $user_id, $reassign );
 					if ( is_multisite() ) {
-						require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+						if ( ! function_exists( 'wpmu_delete_user' ) ) { 
+							require_once( ABSPATH . 'wp-admin/includes/ms.php' );
+						}
 						revoke_super_admin( $user_id );
 						wpmu_delete_user( $user_id );
 					}
