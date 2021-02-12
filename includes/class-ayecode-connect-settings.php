@@ -601,6 +601,13 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 							} else {
 								$connect_url = esc_url( $this->client->build_connect_url() );
+
+								// check if alert message
+								if(!empty($_REQUEST['alert']) && $_REQUEST['alert'] == 'connect'){
+									echo '<div class="alert alert-warning w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									_e("You must connect your site before you can import demo content.","ayecode-connect");
+									echo "</div>";
+								}
 								?>
 								<small
 									class="text-muted"><?php _e( "By clicking the <b>Connect Site</b> button, you agree to our <a href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd", "ayecode-connect" ); ?></small>
@@ -625,6 +632,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									_e("It looks like you might be running on localhost, AyeCode Connect will only work on a live website.","ayecode-connect");
 									echo "</div>";
 								}
+
+
 							}
 							?>
 						</div>

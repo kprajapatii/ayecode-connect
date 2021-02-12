@@ -29,6 +29,7 @@ add_action( 'plugins_loaded', 'ayecode_connect' );
  * Sets up the client
  */
 function ayecode_connect() {
+    global $ayecode_connect;
 
     /**
      * The libraries required.
@@ -42,10 +43,10 @@ function ayecode_connect() {
     //Prepare client args
     $args   = ayecode_connect_args();
 
-    $client = new AyeCode_Connect( $args );
+    $ayecode_connect = new AyeCode_Connect( $args );
 
     //Call the init method to register routes. This should be called exactly once per client (Preferably before the init hook).
-    $client->init();
+    $ayecode_connect->init();
 
     // Load textdomain
     load_plugin_textdomain( 'ayecode-connect', false, basename( dirname( __FILE__ ) ) . '/languages/' );
@@ -114,3 +115,14 @@ function ayecode_connect_deactivation() {
     // Try to remove the must use plugin. This should fail silently even if file is missing.
     wp_delete_file( WPMU_PLUGIN_DIR."/ayecode-connect-filter-fix.php" );
 }
+
+/**
+ * Sync licenses if connected.
+ */
+function ayecode_connect_sync_licenses() {
+    global $ayecode_connect;
+    if(method_exists($ayecode_connect,'sync_licences')){
+        $ayecode_connect->sync_licences();
+    }
+}
+add_action( 'ayecode_connect_sync_licenses', 'ayecode_connect_sync_licenses' );

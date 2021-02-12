@@ -63,7 +63,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		 * @return AyeCode_Connect_Settings - Main instance.
 		 */
 		public static function instance() {
-			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Connect_Settings ) ) {
+			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Demo_Content ) ) {
 				self::$instance = new AyeCode_Demo_Content;
 
 				$args                     = ayecode_connect_args();
@@ -74,6 +74,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 
 					self::$instance->base_url = str_replace( "/includes/../", "/", plugins_url( '../', __FILE__ ) );
+
+					// prevent redirects when doing ajax
+					if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'ayecode_connect_demo_content' ) {
+						// prevent redirects to settings screens
+						add_filter('wp_redirect','__return_empty_string',200);
+					}
 
 
 					// ajax
@@ -118,7 +124,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				$this->name,
 				$url_change_disconnection_notice ? sprintf($this->name.' <span class="awaiting-mod">%s</span>', "!") : $this->name,
 				'manage_options',
-				'ayecode-demo-content',
+				$this->client->is_registered() ? 'ayecode-demo-content' : 'ayecode-connect&alert=connect',
 				array(
 					$this,
 					'settings_page'
@@ -164,16 +170,6 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		 */
 		public function settings_page() {
 
-			/**
-			 * Export single type data.
-			 */
-//			$export = new GeoDir_Export( array( 'custom_fields' ) );
-//			$export = new GeoDir_Export( array( 'custom_fields', 'sort_fields', 'tabs', 'search_fields', 'price_packages' ) );
-//			$array = $export->export();
-//			$json = $export->export_json();
-//			print_r( $array );
-//			exit;
-
 			// bsui wrapper makes our bootstrap wrapper work
 			?>
 			<!-- Clean & Mean UI -->
@@ -196,17 +192,21 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			<div class="bsui" style="margin-left: -20px; display: flex">
 				<div class="container">
-				<div class="row row-cols-1 row-cols-sm-2  row-cols-md-2 mt-4">
+					<div class="alert alert-warning mt-4 font-weight-bold" role="alert">
+						<?php _e("This feature is still in BETA, please only use on a development site. Please provide feedback and report any issues so this feature can be improved.","ayecode-connect");?>
+					</div>
+					<div class="row row-cols-1 row-cols-sm-2  row-cols-md-2 mt-4">
 
-					<?php
-					foreach ($this->get_sites() as $site){
-						global $ac_site_args;
-						$ac_site_args = $site;
-						load_template( dirname( __FILE__ )."/../templates/import/site.php", false ); // $args only introduced in wp 5.5 so lets use a more backwards compat way
-					}
-					?>
+						<?php
+						foreach ($this->get_sites() as $site){
+							global $ac_site_args,$ac_prefix;
+							$ac_prefix = $this->client->prefix;
+							$ac_site_args = $site;
+							load_template( dirname( __FILE__ )."/../templates/import/site.php", false ); // $args only introduced in wp 5.5 so lets use a more backwards compat way
+						}
+						?>
 
-				</div>
+					</div>
 				</div>
 
 
@@ -229,41 +229,60 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 									<div class="modal-body overflow-auto bg-light scrollbars-ios ac-import-progress d-none">
 										<h6 class=" h6"><?php _e("Importing Demo","ayecode-connect");?></h6>
 										<div class="progress">
-											<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+											<div class="progress-bar main-progress progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
 										</div>
 										<div class="alert alert-danger aci-error mt-3 d-none" role="alert"></div>
 										<ul class="list-group mt-3 aci-import-steps">
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Theme","ayecode-connect");?>
-												<span class="spinner-border spinner-border-sm" role="status"></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Theme","ayecode-connect");?>
+													<span class="spinner-border spinner-border-sm" role="status"></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Plugins","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Plugins","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Settings","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Settings","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Page Templates","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Page Templates","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Categories","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Categories","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Dummy Posts","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Dummy Posts","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
+												<div class="progress mt-1 d-none ">
+													<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Widgets","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Widgets","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
-											<li class="list-group-item d-flex justify-content-between align-items-center">
-												<?php _e("Menus","ayecode-connect");?>
-												<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+											<li class="list-group-item mb-0">
+												<div class="d-flex justify-content-between align-items-center">
+													<?php _e("Menus","ayecode-connect");?>
+													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
+												</div>
 											</li>
 										</ul>
 									</div>
@@ -286,11 +305,6 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					</div>
 				</div>
 
-
-
-
-
-
 			</div>
 
 
@@ -299,23 +313,30 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				var $aci_url = '';
 				var $aci_demo = '';
 				var $aci_percent = 0;
+				var $aci_sub_percent = 0;
 				var $aci_step = 0;
+				var $aci_page = 0;
 				function aci_init($item) {
-					// set the import url
-					$aci_url = jQuery('#ac-item-preview').find('iframe').attr('src');
 
-					// prevent navigate away
-					jQuery('#ac-item-preview').find('.modal-header button,.modal-footer .btn').prop('disabled', true);
+					var r = confirm("<?php _e("This import may remove all current GeoDirectory data, please only proceed if you are ok with this.","ayecode-connect");?>");
+					if (r == true) {
 
-					// set button as importing
-					jQuery($item).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <?php _e("Importing...","ayecode-connect");?>');
+						// set the import url
+						$aci_url = jQuery('#ac-item-preview').find('iframe').attr('src');
 
-					// set status
-					jQuery('#ac-item-preview').find('.ac-item-info,.ac-import-progress').toggleClass('d-none');
-//					alert( $aci_url );
-					
-					// start import
-					aci_step();
+						// prevent navigate away
+						jQuery('#ac-item-preview').find('.modal-header button,.modal-footer .btn').prop('disabled', true);
+
+						// set button as importing
+						jQuery($item).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> <?php _e( "Importing...", "ayecode-connect" );?>');
+
+						// set status
+						jQuery('#ac-item-preview').find('.ac-item-info,.ac-import-progress').toggleClass('d-none');
+
+						// start import
+						aci_step();
+
+					}
 				}
 				
 				
@@ -328,7 +349,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 							action: 'ayecode_connect_demo_content',
 							security: ayecode_connect.nonce,
 							demo: $aci_demo,
-							step: $aci_step
+							step: $aci_step,
+							p_num: $aci_page
 						},
 						beforeSend: function() {
 
@@ -336,12 +358,20 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						success: function(data, textStatus, xhr) {
 							console.log(data);
 							if(data.success){
-								aci_progress($aci_step,data.data.percent);
+								aci_progress($aci_step,data.data);
 								if(data.data.step==8){
 									//done
 								}else{
-									$aci_step++;
-									aci_step();
+									if(data.data.step==5 && data.data.page!== "undefined"){
+										$aci_step = 5;
+										$aci_sub_percent = data.data.sub_percent;
+										$aci_page++;
+										aci_step();
+									}else{
+										$aci_step++;
+										aci_step();
+									}
+
 								}
 
 							}else{
@@ -371,24 +401,37 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					jQuery('#ac-item-preview .modal-footer').html('<a href="#reload" onclick="location.reload();return false;" class="btn btn-primary w-100"><?php _e("ERROR","ayecode-connect");?></a>');
 				}
 
-				function aci_progress($step,$percent){
+				function aci_progress($step,$data){
 					$li = jQuery('#ac-item-preview .aci-import-steps').find('li').eq($step);
 					$li_next = jQuery('#ac-item-preview .aci-import-steps').find('li').eq($step+1);
 
+					// set sub percent
+					if($data.sub_percent){
+						$li.find('.progress').removeClass('d-none');
+						$li.find('.progress-bar').css("width",$data.sub_percent+"%");
+					}else{
+						$li.find('.progress').addClass('d-none');
+					}
+
 					// set percent done
-					jQuery('#ac-item-preview .progress-bar').css("width",$percent+"%");
+					jQuery('#ac-item-preview .progress-bar.main-progress').css("width",$data.percent+"%");
 
-					// mark as done
-					$li.find('span').replaceWith('<span class="text-success h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>');
+					if($data.sub_percent){
 
-					// mark as doing
-					$li_next.find('span').replaceWith('<span class="spinner-border spinner-border-sm" role="status"></span>');
+					}else{
+						// mark as done
+						$li.find('span').replaceWith('<span class="text-success h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>');
+
+						// mark as doing
+						$li_next.find('span').replaceWith('<span class="spinner-border spinner-border-sm" role="status"></span>');
+					}
+
 
 
 					// finish up
 					if($step===7){
 						// stop progress animation
-						jQuery('#ac-item-preview .progress-bar').removeClass('progress-bar-animated progress-bar-striped');
+						jQuery('#ac-item-preview .progress-bar.main-progress').removeClass('progress-bar-animated progress-bar-striped');
 						// un-prevent navigate away
 						jQuery('#ac-item-preview').find('.modal-header button,.modal-footer .btn').prop('disabled', false);
 
@@ -492,10 +535,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			}
 
 
-
 			$sites = $this->get_sites();
 			$step = isset($_POST['step']) ? absint($_POST['step']) : '';
 			$demo = isset($_POST['demo']) ? esc_attr($_POST['demo']) : '';
+			$page = isset($_POST['p_num']) ? absint($_POST['p_num']) : 0;
 			$site = isset($sites->{$demo}) ? $sites->{$demo} : array();
 			$data = array(
 				'step'  => $step,
@@ -535,6 +578,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'percent'   => 30,
 						'warning'     => 'X failed to install', // @todo implement these
 						'info'     => 'WP Rocket will help with speed ', // @todo implement these
+//						'result'    => print_r($result , true)
 					);
 				}
 
@@ -579,15 +623,35 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			}elseif($step === 5){
 				// dummy posts
-				$result =  $this->client->request_demo_content( $demo, 'dummy_posts' );
+				$result =  $this->client->request_demo_content( $demo, 'dummy_posts', $page );
+//				wp_mail('stiofansisland@gmail.com','dummy posts step',$result );
+//				wp_mail('stiofansisland@gmail.com','dummy posts stepa',print_r($result,true) );
 
 				if(is_wp_error( $result ) ){
 					$error = $result;
 				}else{
-					$data = array(
-						'step'  => $step+1,
-						'percent'   => 80,
-					);
+
+					if(isset($result->total) && isset($result->offset) && $result->total >= $result->offset){
+						$sub_percent = $result->offset > $result->total ? 100 : ($result->offset / $result->total) * 100;
+						$data = array(
+							'step'  => $step,
+							'percent'   => 60,
+							'page'  => $page++,
+							'sub_percent'   => round($sub_percent),
+							'total'   => $result->total,
+							'offset'   => $result->offset,
+//							'result' => $result
+
+						);
+					}else{
+						$data = array(
+							'step'  => $step+1,
+							'percent'   => 80,
+//							'result' => $result
+						);
+					}
+
+
 				}
 
 			}elseif($step === 6){
@@ -616,6 +680,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					);
 				}
 
+				// Clear any unwanted data and flush rules
+				delete_transient( 'geodir_cache_excluded_uris' );
+				wp_schedule_single_event( time(), 'geodir_flush_rewrite_rules' );
+
 			}elseif($step === 8){
 				// done
 			}
@@ -641,7 +709,6 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			if(!empty($site->plugins)){
 				$result = $this->client->request_demo_content( $demo, 'plugins' );
-
 
 //				echo '###';
 //				print_r( $result );exit;
@@ -672,8 +739,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			if(!$theme->exists()){
 				$result = $this->client->request_demo_content( $demo, 'theme' );
-
-				if(empty($result->{$demo}->success)){
+//				echo '###'.$demo.'###';print_r( $result );
+				if(empty($result->{$slug}->success)){
 					$result = new WP_Error( 'theme_install_fail', __( "The theme installation failed.", "ayecode-connect" ) );
 				}else{
 					$activate_theme = true;

@@ -94,6 +94,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
 				add_action( 'admin_init', array( $this, 'check_for_url_change') );
+				add_filter( 'upgrader_post_install',array( $this, 'maybe_sync_licenses'),10,3);
 
 				// Support Widget
 				if(is_admin()){
@@ -124,6 +125,22 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			}
 
+		}
+
+		/**
+		 * Maybe sync licenses on new plugin or theme install.
+		 * 
+		 * @param $result
+		 * @param $extra_hooks
+		 * @param $upgrader
+		 *
+		 * @return mixed
+		 */
+		public function maybe_sync_licenses($result,$extra_hooks,$upgrader) {
+			if(!empty($extra_hooks['action']) && $extra_hooks['action']=='install' && !empty($extra_hooks['type']) &&  ($extra_hooks['type']=='plugin' || $extra_hooks['type']=='theme')){
+				wp_schedule_single_event( time(), 'ayecode_connect_sync_licenses' );
+			}
+			return $result;
 		}
 
 
@@ -534,7 +551,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|bool|mixed|WP_Error
 		 */
 		public function sync_licences() {
-
+			error_log('sync_licenses');
 			// only run if WPEU is active
 			if ( ! defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
 				return false;
@@ -1566,7 +1583,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return array|mixed|void|WP_Error
 		 */
-		public function request_demo_content( $demo, $type ) {
+		public function request_demo_content( $demo, $type, $page = 0 ) {
 
 			$site_id = $this->get_blog_id();
 
@@ -1575,9 +1592,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return;
 			}
 
+			$page_arg =  $page ? "?page=".absint( $page ) : '';
 			// Remote args...
 			$args = array(
-				'url'    => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type  )  ),
+				'url'    => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type  )  ).$page_arg,
 				'method' => 'POST'
 			);
 

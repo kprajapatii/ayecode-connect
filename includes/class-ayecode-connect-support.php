@@ -47,6 +47,13 @@ class AyeCode_Connect_Support {
 	public $email;
 
 	/**
+	 * GeoDirectory help scout beacon ID for collecting beta features feedback in AyeCode Connect plugin.
+	 *
+	 * @var string
+	 */
+	public $ac_beta_beacon_id = 'f115773a-6890-4880-8600-59affa616d05';
+
+	/**
 	 * GeoDirectory help scout beacon ID.
 	 *
 	 * @var string
@@ -201,6 +208,7 @@ class AyeCode_Connect_Support {
 			$page_conditions = array(
 				// GD
 				'ayecode-connect'     => $this->gd_beacon_id,
+				'ayecode-demo-content'=> $this->ac_beta_beacon_id,
 				'geodirectory'        => $this->gd_beacon_id,
 				'gd-settings'         => $this->gd_beacon_id,
 				'gd-status'           => $this->gd_beacon_id,
@@ -324,14 +332,33 @@ class AyeCode_Connect_Support {
 				window.Beacon('on', 'email-sent', ayecode_connect_set_support_sent);
 
 
-				// config
-				Beacon('config', {
-					display: {
-						style: 'iconAndText',
-						text: 'help',
+					<?php
+					if ( $this->ac_beta_beacon_id == $beacon_id ) {
+						?>
+						// beta feedback config
+						Beacon('config', {
+							display: {
+								style: 'text',
+								text: 'Beta Feedback'
+							}
+						});
+						Beacon('prefill', {
+							subject: 'Demo Data Beta Feedback'
+						});
+						<?php
+					}else{
+						?>
+						// standard config
+						Beacon('config', {
+							display: {
+								style: 'iconAndText',
+								text: 'help'
+							}
+						});
+						<?php
 					}
-				});
-				<?php
+
+
 				}
 
 				// Set session data
