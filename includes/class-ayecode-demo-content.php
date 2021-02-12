@@ -576,8 +576,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					$data = array(
 						'step'  => $step+1,
 						'percent'   => 30,
-						'warning'     => 'X failed to install', // @todo implement these
-						'info'     => 'WP Rocket will help with speed ', // @todo implement these
+						//'warning'     => 'X failed to install', // @todo implement these
+						//'info'     => 'WP Rocket will help with speed ', // @todo implement these
 //						'result'    => print_r($result , true)
 					);
 				}
@@ -731,7 +731,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				$site = isset($sites->{$demo}) ? $sites->{$demo} : array();
 			}
 
-			$slug = $site->theme->slug;
+			$slug = esc_attr($site->theme->slug);
 
 			$result = false;
 			$activate_theme = false;
@@ -757,9 +757,17 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			// Maybe activate theme
 			if ( $activate_theme ) {
 				// activate
+//				error_log( '###' . $slug );
 				switch_theme( $slug );
 				if($slug == get_option('stylesheet')){
 					$result = true;
+				}
+
+				// if a child theme then the main templare option can fail to update
+				if($result && !empty($site->theme->Template)){
+					$parent_slug = esc_attr( $site->theme->Template );
+//					error_log( '####' . $parent_slug );
+					update_option('template',$parent_slug);
 				}
 			}
 

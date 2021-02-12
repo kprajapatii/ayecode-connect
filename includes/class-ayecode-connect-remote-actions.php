@@ -620,8 +620,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						$geodir_options = geodir_get_settings(); // we need to update the global settings values with the new values.
 						GeoDir_Admin_Install::create_tables();
 
-						$post_types = geodir_get_option( 'post_types', array() );
-						error_log( 'GD tables created' . print_r( $post_types, true ) );
+//						$post_types = geodir_get_option( 'post_types', array() );
+//						error_log( 'GD tables created' . print_r( $post_types, true ) );
 					}
 
 					$this->import_geodirectory_settings( $settings );
