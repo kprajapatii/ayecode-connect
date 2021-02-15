@@ -61,7 +61,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @static
 		 * @return AyeCode_Connect_Remote_Actions - Main instance.
 		 */
-		public static function instance( $prefix = '' ,$client = '') {
+		public static function instance( $prefix = '', $client = '' ) {
 			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AyeCode_Connect_Remote_Actions ) ) {
 				self::$instance = new AyeCode_Connect_Remote_Actions;
 
@@ -76,16 +76,21 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$remote_actions = array(
 					'install_plugin'  => 'install_plugin',
 					'update_licences' => 'update_licences',
+					'install_theme'   => 'install_theme',
+					'update_options'  => 'update_options',
+					'import_menus'    => 'import_menus',
+					'import_content'  => 'import_content',
 				);
 
 				/*
 				 * Add any actions in the style of "{$prefix}_remote_action_{$action}"
 				 */
 				foreach ( $remote_actions as $action => $call ) {
-					if( !has_action($prefix . '_remote_action_' . $action,array(
+					if ( ! has_action( $prefix . '_remote_action_' . $action, array(
 						self::$instance,
 						$call
-					)) ){
+					) )
+					) {
 						add_action( $prefix . '_remote_action_' . $action, array(
 							self::$instance,
 							$call
@@ -97,6 +102,613 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			return self::$instance;
+		}
+
+		/**
+		 * Import content into site.
+		 *
+		 * @return array
+		 */
+		public function import_content() {
+			$result = array( "success" => false );
+
+			// validate
+			if ( $this->validate_request() ) {
+
+				// categories
+				$categories = ! empty( $_REQUEST['categories'] ) ? json_decode( stripslashes( $_REQUEST['categories'] ), true ) : array();
+
+				if ( ! empty( $categories ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
+					foreach ( $categories as $cpt => $cats ) {
+						GeoDir_Admin_Dummy_Data::create_taxonomies( $cpt, $cats );
+					}
+				}
+
+				// maybe remove dummy data
+				if ( ! empty( $_REQUEST['remove_dummy_data'] ) ) {
+
+					$post_types = geodir_get_posttypes( 'names' );
+
+					if ( ! empty( $post_types ) ) {
+						foreach ( $post_types as $post_type ) {
+							$table = geodir_db_cpt_table( $post_type );
+							if ( $table ) {
+								geodir_add_column_if_not_exist( $table, 'post_dummy', "TINYINT(1) NULL DEFAULT '0'" );
+							}
+
+							GeoDir_Admin_Dummy_Data::delete_dummy_posts( $post_type );
+						}
+					}
+				}
+
+
+				// posts
+				$posts = ! empty( $_REQUEST['posts'] ) ? json_decode( stripslashes( $_REQUEST['posts'] ), true ) : array();
+
+				if ( ! empty( $posts ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
+
+					foreach ( $posts as $post_info ) {
+
+						unset( $post_info['ID'] );
+
+						$post_info['post_status'] = 'publish';
+						$post_info['post_dummy']  = '1';
+						// set post data
+						$insert_result = wp_insert_post( $post_info, true ); // we hook into the save_post hook
+
+						// maybe insert attachments
+						if ( ! is_wp_error( $insert_result ) && $insert_result && ! empty( $post_info['_raw_post_images'] ) ) {
+							$this->set_external_media( $insert_result, $post_info['_raw_post_images'] );
+						}
+
+					}
+
+				}
+
+
+				// page templates
+				$pages = ! empty( $_REQUEST['pages'] ) ? json_decode( stripslashes( $_REQUEST['pages'] ), true ) : array();
+				if ( ! empty( $pages ) && function_exists( 'geodir_get_settings' ) ) {
+
+					// GD page templates
+					if ( ! empty( $pages['gd'] ) ) {
+						foreach ( $pages['gd'] as $cpt => $page_templates ) {
+							if ( ! empty( $page_templates ) ) {
+								foreach ( $page_templates as $type => $page ) {
+									$this->import_page_template( $page, $type, $cpt );
+								}
+							}
+						}
+					}
+
+
+					// WP
+					if ( ! empty( $pages['wp'] ) ) {
+						foreach ( $pages['wp'] as $type => $page ) {
+							$this->import_page_template( $page, $type );
+						}
+					}
+
+					// Elementor @todo add check for elementor pro
+					if ( ! empty( $pages['elementor'] ) ) {
+
+
+						foreach ( $pages['elementor'] as $cpt => $page_templates ) {
+
+							// remove old demos
+							$this->delete_demo_posts( $cpt );
+
+							$old_and_new = array();
+							$archives    = array();
+							$items       = array();
+							if ( ! empty( $page_templates ) ) {
+
+								foreach ( $page_templates as $page ) {
+
+									$post_id = $this->import_page_template( $page, 'elementor', $cpt );
+									if ( $post_id && $page['demo_post_id'] ) {
+										$old_id                 = absint( $page['demo_post_id'] );
+										$old_and_new[ $old_id ] = $post_id;
+
+										// archives
+										if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'geodirectory-archive' ) {
+											$archives[ $old_id ] = absint( $post_id );
+										}
+
+										// items
+										if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'geodirectory-archive-item' ) {
+											$items[ $old_id ] = absint( $post_id );
+										}
+									}
+								}
+							}
+
+							// extras
+							if ( ! empty( $old_and_new ) ) {
+
+								// update the elementor display conditions
+								$display_conditions     = get_option( 'elementor_pro_theme_builder_conditions' );
+								$new_display_conditions = $display_conditions;
+								if ( ! empty( $display_conditions ) ) {
+									foreach ( $display_conditions as $type => $condition ) {
+										if ( ! empty( $condition ) ) {
+
+											foreach ( $condition as $id => $rule ) {
+
+												if ( isset( $old_and_new[ $id ] ) ) {
+													unset( $new_display_conditions[ $type ][ $id ] );
+													$new_id                                     = absint( $old_and_new[ $id ] );
+													$new_display_conditions[ $type ][ $new_id ] = $rule;
+												}
+											}
+										}
+									}
+								}
+								update_option( 'elementor_pro_theme_builder_conditions', $new_display_conditions );
+
+								// check for archive item skins and replace with new ids.
+								// check if frontpage is elementor
+								if ( ! empty( $pages['wp']['page_on_front']['meta_input']['_elementor_data'] ) ) {
+									$front_page_id = get_option( 'page_on_front' );
+									$archives[]    = absint( $front_page_id );
+								}
+								if ( ! empty( $archives ) && ! empty( $items ) ) {
+									foreach ( $archives as $archive ) {
+										$_elementor_data = get_post_meta( $archive, '_elementor_data', true );
+										if ( ! empty( $_elementor_data ) ) {
+											foreach ( $items as $old_item => $new_item ) {
+												$replaced = str_replace( '"gd_archive_custom_skin_template":"' . $old_item . '"', '"gd_archive_custom_skin_template":"' . $new_item . '"', $_elementor_data );
+											}
+
+											if ( $_elementor_data !== $replaced ) {
+												update_post_meta( $archive, '_elementor_data', wp_slash( $replaced ) );
+											}
+										}
+									}
+								}
+							}
+
+						}
+					}
+
+
+				}
+
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Delete all dummy posts.
+		 *
+		 * @param $cpt
+		 */
+		public function delete_demo_posts( $cpt ) {
+			// Elementor
+			$posts = get_posts(
+				array(
+					'post_type'   => esc_attr( $cpt ),
+					'meta_key'    => '_ayecode_demo',
+					'meta_value'  => '1',
+					'numberposts' => - 1
+				)
+			);
+			if ( ! empty( $posts ) ) {
+				foreach ( $posts as $p ) {
+					wp_delete_post( $p->ID, true );
+				}
+			}
+		}
+
+		/**
+		 * Set external attachments.
+		 *
+		 * @param $post_id
+		 * @param $files
+		 */
+		public function set_external_media( $post_id, $files ) {
+			if ( ! empty( $files ) && class_exists( 'GeoDir_Media' ) ) {
+				$field = 'post_images';
+				foreach ( $files as $file ) {
+					$file_url     = ! empty( $file['file'] ) ? esc_url_raw( $file['file'] ) : '';
+					$file_title   = ! empty( $file['title'] ) ? esc_attr( $file['title'] ) : '';
+					$file_caption = ! empty( $file['caption'] ) ? esc_url_raw( $file['caption'] ) : '';
+					$order        = ! empty( $file['menu_order'] ) ? absint( $file['menu_order'] ) : '';
+					$other_id     = '';
+					$approved     = ! empty( $file['is_approved'] ) ? absint( $file['is_approved'] ) : '';
+					$placeholder  = true;
+					$metadata     = ! empty( $file['metadata'] ) ? maybe_unserialize( $file['metadata'] ) : '';
+
+					GeoDir_Media::insert_attachment( $post_id, $field, $file_url, $file_title, $file_caption, $order, $approved, $placeholder, $other_id, $metadata );
+				}
+			}
+
+		}
+
+		/**
+		 * Import page templates.
+		 *
+		 * @param $page_template
+		 * @param string $type
+		 * @param string $cpt
+		 *
+		 * @return int|WP_Error
+		 */
+		public function import_page_template( $page_template, $type = '', $cpt = '' ) {
+
+			$settings = geodir_get_settings();
+			$post_id  = 0;
+			if ( $type == 'elementor' ) {
+				$page_template                = (array) $page_template;
+				$page_template['post_type']   = $cpt;
+				$page_template['post_status'] = 'publish';
+
+				$post_id = wp_insert_post( $page_template, true );
+
+				// maybe set tax (not working from wp_insert_post)
+				if ( $post_id && ! empty( $page_template['tax_input'] ) ) {
+
+					if ( ! function_exists( 'wp_create_term' ) ) {
+						include_once ABSPATH . 'wp-admin/includes/taxonomy.php';
+					}
+
+					foreach ( $page_template['tax_input'] as $tax => $slug ) {
+						$tax  = esc_attr( $tax );
+						$slug = esc_attr( $slug );
+						wp_set_object_terms( $post_id, $slug, $tax );
+					}
+				}
+
+
+			} elseif ( $type && $cpt ) {
+				$type           = esc_attr( $type );
+				$cpt            = esc_attr( $cpt );
+				$page_templates = array(
+					'page_add',
+					'page_search',
+					'page_terms_conditions',
+					'page_location',
+					'page_archive',
+					'page_archive_item',
+					'page_details',
+				);
+				if ( in_array( $type, $page_templates ) ) {
+					$page_template = (array) $page_template;
+
+					$current_page_id = 0;
+					if ( $cpt == 'core' ) {
+						$current_page_id = ! empty( $settings[ $type ] ) ? absint( $settings[ $type ] ) : 0;
+					} else {
+						$current_page_id = ! empty( $settings['post_types'][ $cpt ][ $type ] ) ? absint( $settings['post_types'][ $cpt ][ $type ] ) : 0;
+					}
+
+					if ( false === get_post_status( $current_page_id ) ) {
+						// we create a new page
+					} else {
+						$page_template['ID'] = absint( $current_page_id );
+					}
+
+					$page_template['post_type']   = 'page';
+					$page_template['post_status'] = 'publish';
+					$post_id                      = wp_insert_post( $page_template, true );
+
+
+					if ( ! is_wp_error( $post_id ) && $post_id ) {
+
+						if ( $cpt == 'core' ) {
+							geodir_update_option( $type, $post_id );
+						} else {
+							$settings['post_types'][ $cpt ][ $type ] = $post_id;
+							geodir_update_option( 'post_types', $settings['post_types'] );
+						}
+
+					}
+
+				}
+			} elseif ( $type == 'page_on_front' ) {
+
+				$current_page_id = get_option( 'page_on_front' );
+				if ( false === get_post_status( $current_page_id ) ) {
+					// we create a new page
+				} else {
+					$page_template['ID'] = absint( $current_page_id );
+				}
+				$page_template['post_type']   = 'page';
+				$page_template['post_status'] = 'publish';
+				$post_id                      = wp_insert_post( $page_template, true );
+
+				if ( ! is_wp_error( $post_id ) && $post_id ) {
+					update_option( 'show_on_front', 'page' );
+					update_option( 'page_on_front', $post_id );
+				}
+			}
+
+			return $post_id;
+		}
+
+
+		/**
+		 * Import menus.
+		 * 
+		 * @return array
+		 */
+		public function import_menus() {
+			$result = array( "success" => false );
+
+			// validate
+			if ( $this->validate_request() ) {
+
+
+				$menus = ! empty( $_REQUEST['menus'] ) ? $_REQUEST['menus'] : array();
+
+				if ( ! empty( $menus ) ) {
+					foreach ( $menus as $location => $menu ) {
+						$import = $this->import_menu( $location, $menu );
+					}
+				}
+
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Import menu.
+		 *
+		 * @param $location
+		 * @param $menu
+		 *
+		 * @return bool
+		 */
+		public function import_menu( $location, $menu ) {
+			$result = false;
+
+			if ( ! empty( $menu ) ) {
+				$name = esc_attr( $menu['name'] );
+
+				// Does the menu exist already?
+				$menu_exists = wp_get_nav_menu_object( $name );
+
+				// if it exists with the exact name then lets delete it
+				if ( $menu_exists ) {
+					wp_delete_nav_menu( $name );
+				}
+
+				// If it doesn't exist, let's create it.
+				if ( ! $menu_exists ) {
+					$menu_id = wp_create_nav_menu( $name );
+
+					$locations = get_theme_mod( 'nav_menu_locations' );
+
+					if ( $menu_id ) {
+						$locations[ $location ] = $menu_id;
+						set_theme_mod( 'nav_menu_locations', $locations );
+
+						if ( ! empty( $menu['items'] ) ) {
+							$menu_ids   = array();
+							$parent_ids = array();
+							foreach ( $menu['items'] as $item ) {
+								// unset some things
+								$p           = $item['post'];
+								$metas       = $item['post_metas'];
+								$original_id = absint( $p['ID'] );
+								unset( $p['ID'] );
+								$db_id = wp_insert_post( $p );
+
+								// set id relations
+								$menu_ids[ $original_id ] = $db_id;
+
+								if ( $menu_id ) {
+									// Associate the menu item with the menu term.
+									wp_set_object_terms( $db_id, array( $menu_id ), 'nav_menu' );
+
+									// set meta items
+									if ( ! empty( $metas ) ) {
+										foreach ( $metas as $key => $meta ) {
+											$meta = maybe_unserialize( $meta[0] );
+											if ( is_array( $meta ) ) {
+												$meta = implode( " ", $meta );
+											}
+
+											// set the correct id
+											if ( $key == '_menu_item_object_id' ) {
+												$meta = absint( $db_id );
+											}
+
+											// set correct parent id
+											if ( $key == '_menu_item_menu_item_parent' && ! empty( $meta ) ) {
+												$parent_ids[ $db_id ] = absint( $meta );
+											}
+
+											// set the correct url for add listing pages
+											if ( $key == '_menu_item_url' && ! empty( $meta ) && strpos( $meta, 'listing_type=gd_' ) !== false && function_exists( 'geodir_add_listing_page_url' ) ) {
+												$url_parts = explode( "=", $meta );
+												if ( ! empty( $url_parts[1] ) ) {
+													$meta = geodir_add_listing_page_url( esc_attr( $url_parts[1] ) );
+												}
+
+											}
+
+											update_post_meta( $db_id, sanitize_key( $key ), $meta );
+										}
+									}
+								}
+
+							}
+
+							// set parent ids after insert
+							if ( ! empty( $parent_ids ) ) {
+								foreach ( $parent_ids as $id => $p_id ) {
+									$n_id = ! empty( $menu_ids[ $p_id ] ) ? absint( $menu_ids[ $p_id ] ) : 0;
+									if ( $n_id ) {
+										update_post_meta( $id, '_menu_item_menu_item_parent', $n_id );
+									}
+								}
+							}
+						}
+
+					}
+
+				}
+
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Update site options.
+		 *
+		 * @return array
+		 */
+		public function update_options() {
+			$result = array( "success" => false );
+
+			// validate
+			if ( $this->validate_request() ) {
+				// update
+				$options = ! empty( $_REQUEST['update'] ) ? json_decode( stripslashes( $_REQUEST['update'] ), true ) : array();
+				if ( ! empty( $options ) ) {
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						update_option( esc_attr( $key ), $option );
+					}
+				}
+
+				// merge
+				$options = ! empty( $_REQUEST['merge'] ) ? json_decode( stripslashes( $_REQUEST['merge'] ), true ) : array();
+				if ( ! empty( $options ) ) {
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						$key     = esc_attr( $key );
+						$current = get_option( $key );
+
+						if ( ! empty( $current ) && is_array( $current ) ) {
+							update_option( $key, array_merge( $current, $option ) );
+						} else {
+							update_option( $key, $option );
+						}
+
+					}
+				}
+
+				// delete
+				$options = ! empty( $_REQUEST['delete'] ) ? json_decode( stripslashes( $_REQUEST['delete'] ), true ) : array();
+				if ( ! empty( $options ) ) {
+					foreach ( $options as $key => $option ) {
+						// @todo add a options whitelist so only certain options can be updated.
+						delete_option( esc_attr( $key ) );
+					}
+				}
+
+
+				// GD Settings
+				$settings = ! empty( $_REQUEST['geodirectory_settings'] ) ? json_decode( stripslashes( $_REQUEST['geodirectory_settings'] ), true ) : array();
+
+				if ( ! empty( $settings ) ) {
+
+					// run the create tables function to add our new columns.
+					if ( class_exists( 'GeoDir_Admin_Install' ) ) {
+						global $geodir_options;
+						$geodir_options = geodir_get_settings(); // we need to update the global settings values with the new values.
+						GeoDir_Admin_Install::create_tables();
+
+//						$post_types = geodir_get_option( 'post_types', array() );
+//						error_log( 'GD tables created' . print_r( $post_types, true ) );
+					}
+
+					$this->import_geodirectory_settings( $settings );
+				}
+
+				// set as success
+				$result = array( "success" => true );
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Import GeoDirectory custom table settings.
+		 *
+		 * @param $settings
+		 */
+		public function import_geodirectory_settings( $settings ) {
+			global $wpdb;
+
+			// custom_fields
+			if ( ! empty( $settings['custom_fields'] ) && defined( 'GEODIR_CUSTOM_FIELDS_TABLE' ) ) {
+				// empty the table first
+				$wpdb->query( "TRUNCATE TABLE " . GEODIR_CUSTOM_FIELDS_TABLE );
+
+				// insert
+				foreach ( $settings['custom_fields'] as $custom_field ) {
+					// maybe unserialize and change name
+					if ( ! empty( $custom_field['extra_fields'] ) ) {
+						$custom_field['extra'] = maybe_unserialize( $custom_field['extra_fields'] );
+					}
+
+					// packaged key change
+					if ( ! empty( $custom_field['packages'] ) ) {
+						$custom_field['show_on_pkg'] = $custom_field['packages'];
+					}
+
+					unset( $custom_field['id'] );
+					$r = geodir_custom_field_save( $custom_field );
+
+				}
+
+			}
+
+			// sort_fields
+			if ( ! empty( $settings['sort_fields'] ) && defined( 'GEODIR_CUSTOM_SORT_FIELDS_TABLE' ) ) {
+				// empty the table first
+				$wpdb->query( "TRUNCATE TABLE " . GEODIR_CUSTOM_SORT_FIELDS_TABLE );
+
+				// insert
+				foreach ( $settings['sort_fields'] as $sort_fields ) {
+					GeoDir_Settings_Cpt_Sorting::save_custom_field( $sort_fields );
+				}
+
+			}
+
+			// tabs
+			if ( ! empty( $settings['tabs'] ) && defined( 'GEODIR_TABS_LAYOUT_TABLE' ) ) {
+				// empty the table first
+				$wpdb->query( "TRUNCATE TABLE " . GEODIR_TABS_LAYOUT_TABLE );
+
+				// insert
+				foreach ( $settings['tabs'] as $tab ) {
+					unset( $tab['id'] );// we need insert not update
+					GeoDir_Settings_Cpt_Tabs::save_tab_item( $tab );
+				}
+
+			}
+
+			// Advanced Search
+			if ( ! empty( $settings['search_fields'] ) && defined( 'GEODIR_ADVANCE_SEARCH_TABLE' ) ) {
+				// empty the table first
+				$wpdb->query( "TRUNCATE TABLE " . GEODIR_ADVANCE_SEARCH_TABLE );
+
+				// insert
+				foreach ( $settings['search_fields'] as $search_field ) {
+
+					GeoDir_Adv_Search_Settings_Cpt_Search::save_field( $search_field );
+				}
+
+			}
+
+			// price_packages
+			if ( ! empty( $settings['price_packages'] ) && defined( 'GEODIR_ADVANCE_SEARCH_TABLE' ) ) {
+				// not implemented yet
+			}
+
 		}
 
 		/**
@@ -112,19 +724,19 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result    = array( "success" => true );
 				$installed = ! empty( $_REQUEST['installed'] ) ? $this->sanitize_licences( $_REQUEST['installed'] ) : array();
 				$all       = ! empty( $_REQUEST['all'] ) ? $this->sanitize_licences( $_REQUEST['all'], true ) : array();
-				$site_id   = ! empty( $_REQUEST['site_id'] ) ? absint($_REQUEST['site_id']) : '';
-				$site_url  = ! empty( $_REQUEST['site_url'] ) ? esc_url_raw($_REQUEST['site_url']) : '';
-				
+				$site_id   = ! empty( $_REQUEST['site_id'] ) ? absint( $_REQUEST['site_id'] ) : '';
+				$site_url  = ! empty( $_REQUEST['site_url'] ) ? esc_url_raw( $_REQUEST['site_url'] ) : '';
+
 
 				// verify site_id
-				if( $site_id != get_option( $this->prefix . '_blog_id', false ) ){
+				if ( $site_id != get_option( $this->prefix . '_blog_id', false ) ) {
 					return array( "success" => false );
 				}
 
 				// verify site_url
-				if( $site_url && get_option( $this->prefix . "_url" ) ){
-					$changed =  $this->client->check_for_url_change( $site_url );
-					if( $changed ){
+				if ( $site_url && get_option( $this->prefix . "_url" ) ) {
+					$changed = $this->client->check_for_url_change( $site_url );
+					if ( $changed ) {
 						return array( "success" => false );
 					}
 				}
@@ -311,8 +923,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			// Cloudflare can provide a comma separated ip list
-			if (strpos($ip, ',') !== false) {
-				$ip = reset(explode(",",$ip));
+			if ( strpos( $ip, ',' ) !== false ) {
+				$ip = reset( explode( ",", $ip ) );
 			}
 
 			return $ip;
@@ -333,7 +945,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$parse = parse_url( $url );
 				if ( ! empty( $parse['host'] ) ) {
 					$ip = gethostbyname( $parse['host'] );
-					if ( $ip === "173.208.153.114" ) {
+					if ( $ip === "173.208.153.114" ) { // AyeCode.io Server
+						$result = true;
+					} elseif ( $ip === "198.143.164.252" ) { // wordpress.org server
 						$result = true;
 					}
 				}
@@ -352,7 +966,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		public function install_plugin( $result ) {
 			// validate
 			if ( ! $this->validate_request() ) {
-				array( "success" => false );
+				return array( "success" => false );
 			}
 
 			include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); //for plugins_api..
@@ -360,12 +974,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			$plugin_slug = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
 			$plugin      = array(
-				'name'          => isset( $_REQUEST['name'] ) ? esc_attr( $_REQUEST['name'] ) : '',
-				'repo-slug'     => $plugin_slug,
-				'file-slug'     => isset( $_REQUEST['file-slug'] ) ? sanitize_title_for_query( $_REQUEST['file-slug'] ) : '',
-				'download_link' => isset( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '',
-				'activate'      => isset( $_REQUEST['activate'] ) && ! $_REQUEST['activate'] ? false : true,
-				'network_activate'      => isset( $_REQUEST['network_activate'] ) && ! $_REQUEST['network_activate'] ? false : true,
+				'name'             => isset( $_REQUEST['name'] ) ? esc_attr( $_REQUEST['name'] ) : '',
+				'repo-slug'        => $plugin_slug,
+				'file-slug'        => isset( $_REQUEST['file-slug'] ) ? sanitize_title_for_query( $_REQUEST['file-slug'] ) : '',
+				'download_link'    => isset( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '',
+				'activate'         => isset( $_REQUEST['activate'] ) && $_REQUEST['activate'] ? true : false,
+				'network_activate' => isset( $_REQUEST['network_activate'] ) && $_REQUEST['network_activate'] ? true : false,
 			);
 
 			$install = $this->background_installer( $plugin_slug, $plugin );
@@ -373,8 +987,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $install ) {
 				$result = array( "success" => true );
 			}
-
-//			update_option("blogname","Localhost2");
 
 			return $result;
 		}
@@ -393,7 +1005,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			return $slug[0];
 		}
-		
+
 		/**
 		 * Install a plugin from .org in the background via a cron job (used by
 		 * installer - opt in).
@@ -424,12 +1036,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$plugin            = $plugin_slug . '/' . $plugin_file_slug . '.php';
 				$installed         = false;
 				$activate          = isset( $plugin_to_install['activate'] ) && $plugin_to_install['activate'] ? true : false;
-				$network_activate          = isset( $plugin_to_install['network_activate'] ) && $plugin_to_install['network_activate'] ? true : false;
+				$network_activate  = isset( $plugin_to_install['network_activate'] ) && $plugin_to_install['network_activate'] ? true : false;
 
 				// See if the plugin is installed already
 				if ( in_array( $plugin_to_install['repo-slug'], $installed_plugins ) ) {
 					$installed = true;
-//					$activate  = ! is_plugin_active( $plugin );
 				}
 
 				// Install this thing!
@@ -452,6 +1063,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'download_link' => esc_url( $plugin_to_install['download_link'] ),
 							);
 						} else {
+
 							$plugin_information = plugins_api( 'plugin_information', array(
 								'slug'   => $plugin_to_install['repo-slug'],
 								'fields' => array(
@@ -527,12 +1139,62 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							$task_result = true;
 						}
 					} catch ( Exception $e ) {
-						//$task_result = false;
+						$task_result = false;
 					}
 				}
 			}
 
 			return $task_result;
+		}
+
+		/**
+		 * Install theme.
+		 *
+		 * @param $result
+		 *
+		 * @return mixed
+		 */
+		public function install_theme( $result ) {
+			// validate
+			if ( ! $this->validate_request() ) {
+				return array( "success" => false );
+			}
+
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+			include_once ABSPATH . 'wp-admin/includes/theme.php';
+
+			$slug          = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
+			$download_link = ! empty( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '';
+
+
+			if ( empty( $download_link ) ) {
+				$api = themes_api(
+					'theme_information',
+					array(
+						'slug'   => $slug,
+						'fields' => array( 'sections' => false ),
+					)
+				);
+
+				if ( is_wp_error( $api ) ) {
+					array( "success" => false );
+				}
+
+				$download_link = $api->download_link;
+
+			}
+
+
+			$skin     = new WP_Ajax_Upgrader_Skin();
+			$upgrader = new Theme_Upgrader( $skin );
+			$install  = $upgrader->install( $download_link );
+
+			if ( $install ) {
+				$result = array( "success" => true );
+			}
+
+			return $result;
 		}
 
 

@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 5.6
-Stable tag: 1.1.8
+Stable tag: 1.2.0
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -21,6 +21,8 @@ To take full advantage of this plugin you should have one of our plugins install
 The AyeCode Connect Service plugin will link your website with your user account on our website letting you install any purchased addons and keep any purchase licences up to date automatically.
 
 You will be able to remotely manage your activated sites and licences all from your account area on our site.
+
+You can also use our one click demo importer.
 
 == Installation ==
 
@@ -56,6 +58,11 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.2.0 =
+* One click demo import option added for connected users - ADDED
+* Licenses now auto sync when a new plugin or theme is installed - ADDED
+* Settings now moved to their own admin settings item so we can have sub items - CHANGED
 
 = 1.1.8 =
 * Multisite undefined function wpmu_delete_user() issue - FIXED
