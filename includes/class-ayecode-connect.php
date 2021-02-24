@@ -125,6 +125,20 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			}
 
+			// add AUI on our backend pages
+			if ( is_admin() ){
+				add_filter( 'aui_screen_ids', array( $this, 'add_aui_screens') );
+			}
+
+		}
+
+		public function add_aui_screens($screen_ids){
+
+			// AC screens that need AUI
+			$screen_ids[] = 'toplevel_page_ayecode-connect';
+			$screen_ids[] = 'ayecode_page_ayecode-demo-content';
+
+			return $screen_ids;
 		}
 
 		/**

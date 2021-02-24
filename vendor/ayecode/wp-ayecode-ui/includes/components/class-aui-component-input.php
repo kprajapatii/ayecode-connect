@@ -109,7 +109,7 @@ class AUI_Component_Input {
 			}
 
 			// placeholder
-			if(!empty($args['placeholder'])){
+			if(isset($args['placeholder']) && '' != $args['placeholder'] ){
 				$output .= ' placeholder="'.esc_attr($args['placeholder']).'" ';
 			}
 
@@ -298,7 +298,9 @@ else{$eli.attr(\'type\',\'password\');}"
 			'no_wrap'    => false,
 			'rows'      => '',
 			'wysiwyg'   => false,
+			'allow_tags' => false, // Allow HTML tags
 			'element_require'   => '', // [%element_id%] == "1"
+			'extra_attributes'  => array(), // an array of extra attributes
 		);
 
 		/**
@@ -376,7 +378,7 @@ else{$eli.attr(\'type\',\'password\');}"
 			}
 
 			// placeholder
-			if(!empty($args['placeholder'])){
+			if(isset($args['placeholder']) && '' != $args['placeholder']){
 				$output .= ' placeholder="'.esc_attr($args['placeholder']).'" ';
 			}
 
@@ -411,13 +413,21 @@ else{$eli.attr(\'type\',\'password\');}"
 			$class = !empty($args['class']) ? $args['class'] : '';
 			$output .= ' class="form-control '.$class.'" ';
 
+			// extra attributes
+			if(!empty($args['extra_attributes'])){
+				$output .= AUI_Component_Helper::extra_attributes($args['extra_attributes']);
+			}
 
 			// close tag
 			$output .= ' >';
 
 			// value
-			if(!empty($args['value'])){
-				$output .= sanitize_textarea_field($args['value']);
+			if ( ! empty( $args['value'] ) ) {
+				if ( ! empty( $args['allow_tags'] ) ) {
+					$output .= AUI_Component_Helper::sanitize_html_field( $args['value'], $args ); // Sanitize HTML.
+				} else {
+					$output .= sanitize_textarea_field( $args['value'] );
+				}
 			}
 
 			// closing tag
@@ -669,9 +679,9 @@ else{$eli.attr(\'type\',\'password\');}"
 		}
 
 		// select2 placeholder
-		if($is_select2 && !empty($args['placeholder']) && empty($args['data-placeholder'])){
+		if($is_select2 && isset($args['placeholder']) && '' != $args['placeholder'] && empty($args['data-placeholder'])){
 			$args['data-placeholder'] = esc_attr($args['placeholder']);
-			$args['data-allow-clear'] = empty($args['data-allow-clear']) ? true : esc_attr($args['data-allow-clear']);
+			$args['data-allow-clear'] = isset($args['data-allow-clear']) ? (bool) $args['data-allow-clear'] : true;
 		}
 
 		// label
@@ -749,7 +759,7 @@ else{$eli.attr(\'type\',\'password\');}"
 		$output .= ' >';
 
 		// placeholder
-		if(!empty($args['placeholder']) && !$is_select2){
+		if(isset($args['placeholder']) && '' != $args['placeholder'] && !$is_select2){
 			$output .= '<option value="" disabled selected hidden>'.esc_attr($args['placeholder']).'</option>';
 		}elseif($is_select2 && !empty($args['placeholder'])){
 			$output .= "<option></option>"; // select2 needs an empty select to fill the placeholder

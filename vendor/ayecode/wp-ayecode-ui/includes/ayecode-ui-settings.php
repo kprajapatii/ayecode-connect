@@ -35,7 +35,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '1.0.1';
+		public $version = '0.1.43';
 
 		/**
 		 * Class textdomain.
@@ -49,7 +49,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		 *
 		 * @var string
 		 */
-		public $latest = "4.3.1";
+		public $latest = "4.5.3";
 
 		/**
 		 * Current version of select2 being used.
@@ -152,7 +152,8 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 
 			// maybe load JS
 			if ( $this->settings['js'] ) {
-				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 1 );
+				$priority = $this->is_bs3_compat() ? 100 : 1;
+				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), $priority );
 			}
 			if ( $this->settings['js_backend'] && $this->load_admin_scripts() ) {
 				add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 1 );
@@ -174,6 +175,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		public function load_admin_scripts(){
 			$result = true;
 
+			// check if specifically disabled
 			if(!empty($this->settings['disable_admin'])){
 				$url_parts = explode("\n",$this->settings['disable_admin']);
 				foreach($url_parts as $part){
@@ -195,25 +197,59 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		}
 
 		/**
-		 * Adds the Font Awesome styles.
+		 * Check if the current admin screen should load scripts.
+		 * 
+		 * @return bool
+		 */
+		public function is_aui_screen(){
+			$load = false;
+			// check if we should load or not
+			if ( is_admin() ) {
+				// Only enable on set pages
+				$aui_screens = array(
+					'page',
+					'post',
+					'settings_page_ayecode-ui-settings'
+				);
+				$screen_ids = apply_filters( 'aui_screen_ids', $aui_screens );
+
+				$screen = get_current_screen();
+
+//				echo '###'.$screen->id;
+				
+				if ( $screen && in_array( $screen->id, $screen_ids ) ) {
+					$load = true;
+				}
+			}
+
+			return $load;
+		}
+
+		/**
+		 * Adds the styles.
 		 */
 		public function enqueue_style() {
 
-			$css_setting = current_action() == 'wp_enqueue_scripts' ? 'css' : 'css_backend';
+			if( is_admin() && !$this->is_aui_screen()){
+				// don't add wp-admin scripts if not requested to
+			}else{
+				$css_setting = current_action() == 'wp_enqueue_scripts' ? 'css' : 'css_backend';
 
-			if($this->settings[$css_setting]){
-				$compatibility = $this->settings[$css_setting]=='core' ? false : true;
-				$url = $this->settings[$css_setting]=='core' ? $this->url.'assets/css/ayecode-ui.css' : $this->url.'assets/css/ayecode-ui-compatibility.css';
-				wp_register_style( 'ayecode-ui', $url, array(), $this->latest );
-				wp_enqueue_style( 'ayecode-ui' );
+				$rtl = is_rtl() ? '-rtl' : '';
 
-				// flatpickr
-				wp_register_style( 'flatpickr', $this->url.'assets/css/flatpickr.min.css', array(), $this->latest );
+				if($this->settings[$css_setting]){
+					$compatibility = $this->settings[$css_setting]=='core' ? false : true;
+					$url = $this->settings[$css_setting]=='core' ? $this->url.'assets/css/ayecode-ui'.$rtl.'.css' : $this->url.'assets/css/ayecode-ui-compatibility'.$rtl.'.css';
+					wp_register_style( 'ayecode-ui', $url, array(), $this->latest );
+					wp_enqueue_style( 'ayecode-ui' );
+
+					// flatpickr
+					wp_register_style( 'flatpickr', $this->url.'assets/css/flatpickr.min.css', array(), $this->latest );
 
 
-				// fix some wp-admin issues
-				if(is_admin()){
-					$custom_css = "
+					// fix some wp-admin issues
+					if(is_admin()){
+						$custom_css = "
                 body{
                     background-color: #f1f1f1;
                     font-family: -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell,\"Helvetica Neue\",sans-serif;
@@ -249,19 +285,22 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				}
                 ";
 
-					// @todo, remove once fixed :: fix for this bug https://github.com/WordPress/gutenberg/issues/14377
-					$custom_css .= "
+						// @todo, remove once fixed :: fix for this bug https://github.com/WordPress/gutenberg/issues/14377
+						$custom_css .= "
 						.edit-post-sidebar input[type=color].components-text-control__input{
 						    padding: 0;
 						}
 					";
-					wp_add_inline_style( 'ayecode-ui', $custom_css );
+						wp_add_inline_style( 'ayecode-ui', $custom_css );
+					}
+
+					// custom changes
+					wp_add_inline_style( 'ayecode-ui', self::custom_css($compatibility) );
+
 				}
-
-				// custom changes
-				wp_add_inline_style( 'ayecode-ui', self::custom_css($compatibility) );
-
 			}
+
+
 		}
 
 		/**
@@ -430,14 +469,19 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 					};
 
 					var elements = document.getElementsByClassName(selector);
-					for (var i in elements) {
-						var $this = elements[i];
-						if (typeof $this === 'object') {
-							$this.innerHTML = '<i class="far fa-clock"></i> ' + timer($this.getAttribute('title') || $this.getAttribute('datetime'));
+					if (selector && elements && elements.length) {
+						for (var i in elements) {
+							var $el = elements[i];
+							if (typeof $el === 'object') {
+								$el.innerHTML = '<i class="far fa-clock"></i> ' + timer($el.getAttribute('title') || $el.getAttribute('datetime'));
+							}
 						}
 					}
+
 					// update time every minute
-					setTimeout(aui_time_ago, 60000);
+					setTimeout(function() {
+						aui_time_ago(selector);
+					}, 60000);
 
 				}
 
@@ -542,8 +586,8 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				 * Check form condition
 				 */
 				function aui_check_form_condition(condition,form) {
-					if(form){
-						condition = condition.replace("(form)", "('"+form+"')");
+					if (form) {
+						condition = condition.replace(/\(form\)/g, "('"+form+"')");
 					}
 					return new Function("return " + condition+";")();
 				}
@@ -769,6 +813,29 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			), '', $output );
 		}
 
+
+		/**
+		 * JS to help with conflict issues with other plugins and themes using bootstrap v3.
+		 *
+		 * @TODO we may need this when other conflicts arrise.
+		 * @return mixed
+		 */
+		public static function bs3_compat_js() {
+			ob_start();
+			?>
+			<script>
+				<?php if( defined( 'FUSION_BUILDER_VERSION' ) ){ ?>
+				/* With Avada builder */
+
+				<?php } ?>
+			</script>
+			<?php
+			return str_replace( array(
+				'<script>',
+				'</script>'
+			), '', ob_get_clean());
+		}
+
 		/**
 		 * Get inline script used if bootstrap file browser enqueued.
 		 *
@@ -800,43 +867,51 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 		 */
 		public function enqueue_scripts() {
 
-			$js_setting = current_action() == 'wp_enqueue_scripts' ? 'js' : 'js_backend';
+			if( is_admin() && !$this->is_aui_screen()){
+				// don't add wp-admin scripts if not requested to
+			}else {
 
-			// select2
-			wp_register_script( 'select2', $this->url.'assets/js/select2.min.js', array('jquery'), $this->select2_version );
+				$js_setting = current_action() == 'wp_enqueue_scripts' ? 'js' : 'js_backend';
 
-			// flatpickr
-			wp_register_script( 'flatpickr', $this->url.'assets/js/flatpickr.min.js', array(), $this->latest );
+				// select2
+				wp_register_script( 'select2', $this->url . 'assets/js/select2.min.js', array( 'jquery' ), $this->select2_version );
 
-			// Bootstrap file browser
-			wp_register_script( 'aui-custom-file-input', $url = $this->url.'assets/js/bs-custom-file-input.min.js', array('jquery'), $this->select2_version );
-			wp_add_inline_script( 'aui-custom-file-input', $this->inline_script_file_browser() );
+				// flatpickr
+				wp_register_script( 'flatpickr', $this->url . 'assets/js/flatpickr.min.js', array(), $this->latest );
 
-			$load_inline = false;
+				// Bootstrap file browser
+				wp_register_script( 'aui-custom-file-input', $url = $this->url . 'assets/js/bs-custom-file-input.min.js', array( 'jquery' ), $this->select2_version );
+				wp_add_inline_script( 'aui-custom-file-input', $this->inline_script_file_browser() );
 
-			if($this->settings[$js_setting]=='core-popper'){
-				// Bootstrap bundle
-				$url = $this->url.'assets/js/bootstrap.bundle.min.js';
-				wp_register_script( 'bootstrap-js-bundle', $url, array('select2','jquery'), $this->latest );
-				// if in admin then add to footer for compatibility.
-				is_admin() ? wp_enqueue_script( 'bootstrap-js-bundle', '', null, null, true ) : wp_enqueue_script( 'bootstrap-js-bundle');
-				$script = $this->inline_script();
-				wp_add_inline_script( 'bootstrap-js-bundle', $script );
-			}elseif($this->settings[$js_setting]=='popper'){
-				$url = $this->url.'assets/js/popper.min.js';
-				wp_register_script( 'bootstrap-js-popper', $url, array('select2','jquery'), $this->latest );
-				wp_enqueue_script( 'bootstrap-js-popper' );
-				$load_inline = true;
-			}else{
-				$load_inline = true;
-			}
+				$load_inline = false;
 
-			// Load needed inline scripts by faking the loading of a script if the main script is not being loaded
-			if($load_inline){
-				wp_register_script( 'bootstrap-dummy', '',array('select2','jquery') );
-				wp_enqueue_script( 'bootstrap-dummy' );
-				$script = $this->inline_script();
-				wp_add_inline_script( 'bootstrap-dummy', $script  );
+				if ( $this->settings[ $js_setting ] == 'core-popper' ) {
+					// Bootstrap bundle
+					$url = $this->url . 'assets/js/bootstrap.bundle.min.js';
+					wp_register_script( 'bootstrap-js-bundle', $url, array(
+						'select2',
+						'jquery'
+					), $this->latest, $this->is_bs3_compat() );
+					// if in admin then add to footer for compatibility.
+					is_admin() ? wp_enqueue_script( 'bootstrap-js-bundle', '', null, null, true ) : wp_enqueue_script( 'bootstrap-js-bundle' );
+					$script = $this->inline_script();
+					wp_add_inline_script( 'bootstrap-js-bundle', $script );
+				} elseif ( $this->settings[ $js_setting ] == 'popper' ) {
+					$url = $this->url . 'assets/js/popper.min.js';
+					wp_register_script( 'bootstrap-js-popper', $url, array( 'select2', 'jquery' ), $this->latest );
+					wp_enqueue_script( 'bootstrap-js-popper' );
+					$load_inline = true;
+				} else {
+					$load_inline = true;
+				}
+
+				// Load needed inline scripts by faking the loading of a script if the main script is not being loaded
+				if ( $load_inline ) {
+					wp_register_script( 'bootstrap-dummy', '', array( 'select2', 'jquery' ) );
+					wp_enqueue_script( 'bootstrap-dummy' );
+					$script = $this->inline_script();
+					wp_add_inline_script( 'bootstrap-dummy', $script );
+				}
 			}
 
 		}
@@ -901,7 +976,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				'ayetheme' => 'popper',
 				'listimia' => 'required',
 				'listimia_backend' => 'core-popper',
-				'avada'    => 'required',
+				//'avada'    => 'required', // removed as we now add compatibility
 			);
 		}
 
@@ -970,7 +1045,7 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 									for="wpbs-css"><?php _e( 'Load CSS', 'aui' ); ?></label></th>
 							<td>
 								<select name="ayecode-ui-settings[css]" id="wpbs-css">
-									<option	value="compatibility" <?php selected( $this->settings['css'], 'compatibility' ); ?>><?php _e( 'Compatibility Mode', 'aui' ); ?></option>
+									<option	value="compatibility" <?php selected( $this->settings['css'], 'compatibility' ); ?>><?php _e( 'Compatibility Mode (default)', 'aui' ); ?></option>
 									<option value="core" <?php selected( $this->settings['css'], 'core' ); ?>><?php _e( 'Full Mode', 'aui' ); ?></option>
 									<option	value="" <?php selected( $this->settings['css'], '' ); ?>><?php _e( 'Disabled', 'aui' ); ?></option>
 								</select>
@@ -1008,8 +1083,8 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 									for="wpbs-css-admin"><?php _e( 'Load CSS', 'aui' ); ?></label></th>
 							<td>
 								<select name="ayecode-ui-settings[css_backend]" id="wpbs-css-admin">
-									<option	value="compatibility" <?php selected( $this->settings['css_backend'], 'compatibility' ); ?>><?php _e( 'Compatibility Mode', 'aui' ); ?></option>
-									<option value="core" <?php selected( $this->settings['css_backend'], 'core' ); ?>><?php _e( 'Full Mode', 'aui' ); ?></option>
+									<option	value="compatibility" <?php selected( $this->settings['css_backend'], 'compatibility' ); ?>><?php _e( 'Compatibility Mode (default)', 'aui' ); ?></option>
+									<option value="core" <?php selected( $this->settings['css_backend'], 'core' ); ?>><?php _e( 'Full Mode (will cause style issues)', 'aui' ); ?></option>
 									<option	value="" <?php selected( $this->settings['css_backend'], '' ); ?>><?php _e( 'Disabled', 'aui' ); ?></option>
 								</select>
 							</td>
@@ -1087,6 +1162,45 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			)));
 		}
 
+		/**
+		 * CSS to help with conflict issues with other plugins and themes using bootstrap v3.
+		 *
+		 * @return mixed
+		 */
+		public static function bs3_compat_css() {
+			ob_start();
+			?>
+			<style>
+			/* Bootstrap 3 compatibility */
+			body.modal-open .modal-backdrop.show:not(.in) {opacity:0.5;}
+			body.modal-open .modal.show:not(.in)  {opacity:1;z-index: 99999}
+			body.modal-open .modal.show:not(.in) .modal-content  {box-shadow: none;}
+			body.modal-open .modal.show:not(.in)  .modal-dialog {transform: initial;}
+
+			body.modal-open .modal.bsui .modal-dialog{left: auto;}
+
+			.collapse.show:not(.in){display: inherit;}
+			.fade.show{opacity: 1;}
+
+			<?php if( defined( 'SVQ_THEME_VERSION' ) ){ ?>
+			/* KLEO theme specific */
+			.kleo-main-header .navbar-collapse.collapse.show:not(.in){display: inherit !important;}
+			<?php } ?>
+
+			<?php if( defined( 'FUSION_BUILDER_VERSION' ) ){ ?>
+			/* With Avada builder */
+			body.modal-open .modal.in  {opacity:1;z-index: 99999}
+			body.modal-open .modal.bsui.in .modal-content  {box-shadow: none;}
+			.bsui .collapse.in{display: inherit;}
+			<?php } ?>
+			</style>
+			<?php
+			return str_replace( array(
+				'<style>',
+				'</style>'
+			), '', ob_get_clean());
+		}
+
 
 		public static function custom_css($compatibility = true) {
 			$settings = get_option('aui_options');
@@ -1099,6 +1213,12 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 			?>
 			<style>
 				<?php
+
+					// BS v3 compat
+					if( self::is_bs3_compat() ){
+					    echo self::bs3_compat_css();
+					}
+
 					if(!is_admin() && $primary_color != AUI_PRIMARY_COLOR_ORIGINAL){
 						echo self::css_primary($primary_color,$compatibility);
 					}
@@ -1106,6 +1226,9 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 					if(!is_admin() && $secondary_color != AUI_SECONDARY_COLOR_ORIGINAL){
 						echo self::css_secondary($settings['color_secondary'],$compatibility);
 					}
+
+					// Set admin bar z-index lower when modal is open.
+					echo ' body.modal-open #wpadminbar{z-index:999}';
                 ?>
 			</style>
 			<?php
@@ -1118,6 +1241,15 @@ if ( ! class_exists( 'AyeCode_UI_Settings' ) ) {
 				'<style>',
 				'</style>'
 			), '', ob_get_clean());
+		}
+
+		/**
+		 * Check if we should add booststrap 3 compatibility changes.
+		 *
+		 * @return bool
+		 */
+		public static function is_bs3_compat(){
+			return defined('AYECODE_UI_BS3_COMPAT') || defined('SVQ_THEME_VERSION') || defined('FUSION_BUILDER_VERSION');
 		}
 
 		public static function css_primary($color_code,$compatibility){;
