@@ -104,12 +104,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/composer/installers.git",
-            "reference": "98b34f8ab3558bee5caa7c07efbab3f5bd7663ab"
+            "reference": "1b94b414035400a8be5c694048a0e711a86b1080"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/installers/zipball/98b34f8ab3558bee5caa7c07efbab3f5bd7663ab",
-            "reference": "98b34f8ab3558bee5caa7c07efbab3f5bd7663ab",
+            "url": "https://api.github.com/repos/composer/installers/zipball/1b94b414035400a8be5c694048a0e711a86b1080",
+            "reference": "1b94b414035400a8be5c694048a0e711a86b1080",
             "shasum": ""
         },
         "require": {
@@ -127,7 +127,7 @@
             "symfony/phpunit-bridge": "^4.2 || ^5",
             "symfony/process": "^2.3"
         },
-        "time": "2021-02-02T15:00:11+00:00",
+        "time": "2021-03-08T12:02:54+00:00",
         "type": "composer-plugin",
         "extra": {
             "class": "Composer\\Installers\\Plugin",
