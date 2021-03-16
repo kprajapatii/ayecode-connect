@@ -82,6 +82,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					'import_content'  => 'import_content',
 				);
 
+				// set php limits
+				self::set_php_limits();
+
 				/*
 				 * Add any actions in the style of "{$prefix}_remote_action_{$action}"
 				 */
@@ -105,6 +108,37 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		}
 
 		/**
+		 * Delete the old categories.
+		 *
+		 * @param $cpt
+		 */
+		public function delete_gd_categories($cpt){
+			$taxonomy = $cpt.'category';
+			$terms = get_terms( array(
+				'taxonomy' => $taxonomy,
+				'hide_empty' => false,
+			) );
+
+			if ( ! empty( $terms ) ) {
+				foreach ( $terms as $term ) {
+
+					// maybe delete default image and logo
+					$attachment_data = get_term_meta( $term->term_id, 'ct_cat_icon', true );
+					if ( is_array( $attachment_data ) && ! empty( $attachment_data['id'] ) ) {
+						wp_delete_attachment($attachment_data['id'], true);
+					}
+					$attachment_data = get_term_meta( $term->term_id, 'ct_cat_default_img', true );
+					if ( is_array( $attachment_data ) && ! empty( $attachment_data['id'] ) ) {
+						wp_delete_attachment($attachment_data['id'], true);
+					}
+
+					wp_delete_term( $term->term_id, $taxonomy );
+				}
+
+			}
+		}
+
+		/**
 		 * Import content into site.
 		 *
 		 * @return array
@@ -117,12 +151,34 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				// categories
 				$categories = ! empty( $_REQUEST['categories'] ) ? json_decode( stripslashes( $_REQUEST['categories'] ), true ) : array();
+				$cat_old_and_new = array();
 
 				if ( ! empty( $categories ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
 					foreach ( $categories as $cpt => $cats ) {
+
+						// delete cats
+						self::delete_gd_categories($cpt);
+
 						GeoDir_Admin_Dummy_Data::create_taxonomies( $cpt, $cats );
+						$tax = new GeoDir_Admin_Taxonomies();
+						// set the replacements ids
+						foreach ( $cats as $cat ) {
+							$term = get_term_by('name', $cat['name'], $cpt.'category');
+							if ( isset( $term->term_id ) ) {
+								$old_cat_id = absint( $cat['demo_post_id'] );
+								$cat_old_and_new[ $old_cat_id ] = absint( $term->term_id );
+							}
+
+							// regenerate term icons
+							if(method_exists($tax,'regenerate_term_icon'))
+							$tax->regenerate_term_icon( $term->term_id );
+						}
+						
 					}
+
+					update_option('_acdi_replacement_cat_ids',$cat_old_and_new);
 				}
+
 
 				// maybe remove dummy data
 				if ( ! empty( $_REQUEST['remove_dummy_data'] ) ) {
@@ -139,6 +195,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							GeoDir_Admin_Dummy_Data::delete_dummy_posts( $post_type );
 						}
 					}
+
+					// delete any previous posts
+					self::delete_demo_posts( 'post' );
+					self::delete_demo_posts( 'attachment' );
+
 				}
 
 
@@ -147,18 +208,71 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				if ( ! empty( $posts ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
 
+					$hello_world_trashed = false;
 					foreach ( $posts as $post_info ) {
 
 						unset( $post_info['ID'] );
 
 						$post_info['post_status'] = 'publish';
 						$post_info['post_dummy']  = '1';
+						$post_info['post_author']   = 1;
 						// set post data
 						$insert_result = wp_insert_post( $post_info, true ); // we hook into the save_post hook
 
 						// maybe insert attachments
 						if ( ! is_wp_error( $insert_result ) && $insert_result && ! empty( $post_info['_raw_post_images'] ) ) {
 							$this->set_external_media( $insert_result, $post_info['_raw_post_images'] );
+						}
+
+						// post stuff
+						if($post_info['post_type']=='post' && $insert_result){
+
+							// maybe soft delete original hello world post
+							if ( ! $hello_world_trashed ) {
+								wp_delete_post(1,false);
+								$hello_world_trashed = true;
+							}
+
+							// set cats
+							$terms = isset($post_info['_cats']) ? $post_info['_cats'] : array();
+							$post_terms = array();
+							if ( ! empty( $terms ) ) {
+								require_once( ABSPATH . '/wp-admin/includes/taxonomy.php');
+								foreach($terms as $term_name){
+									$term = get_term_by('name', $term_name, 'category');
+									if(!empty($term->term_id)){
+										$post_terms[] = absint($term->term_id);
+									}else{
+										$term_name = esc_attr( $term_name );
+										$term_id = wp_create_category($term_name);
+										if ( $term_id ) {
+											$post_terms[] = absint($term_id);
+										}
+									}
+								}
+
+								if ( ! empty( $post_terms ) ) {
+									wp_set_post_categories($insert_result, $post_terms, false);
+								}
+							}
+
+							// featured image
+							$image_url = !empty($post_info['_featured_image_url']) ? esc_url_raw($post_info['_featured_image_url']) : '';
+
+							if ( $image_url ) {
+								$image = (array) GeoDir_Media::get_external_media( $image_url, '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
+
+								if(!empty($image['url'])){
+									$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment($image);
+									if( $attachment_id ){
+										set_post_thumbnail($insert_result,$attachment_id );
+										update_post_meta($attachment_id,'_ayecode_demo',1);
+									}
+								}
+							}
+
+
+
 						}
 
 					}
@@ -168,14 +282,39 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				// page templates
 				$pages = ! empty( $_REQUEST['pages'] ) ? json_decode( stripslashes( $_REQUEST['pages'] ), true ) : array();
+
+				$old_and_new = array();
+
 				if ( ! empty( $pages ) && function_exists( 'geodir_get_settings' ) ) {
+
+					// remove pages
+					self::delete_demo_posts( 'page' );
 
 					// GD page templates
 					if ( ! empty( $pages['gd'] ) ) {
 						foreach ( $pages['gd'] as $cpt => $page_templates ) {
 							if ( ! empty( $page_templates ) ) {
 								foreach ( $page_templates as $type => $page ) {
-									$this->import_page_template( $page, $type, $cpt );
+									$post_id = $this->import_page_template( $page, $type, $cpt );
+									$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+									if ( $post_id && $old_id ) {
+										$old_and_new[ $old_id ] = $post_id;
+									}
+								}
+							}
+						}
+					}
+
+					// UWP page templates
+					if ( ! empty( $pages['uwp'] ) ) {
+						foreach ( $pages['uwp'] as $cpt => $page_templates ) {
+							if ( ! empty( $page_templates ) ) {
+								foreach ( $page_templates as $type => $page ) {
+									$post_id = $this->import_page_template( $page, $type, $cpt );
+									$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+									if ( $post_id && $old_id ) {
+										$old_and_new[ $old_id ] = $post_id;
+									}
 								}
 							}
 						}
@@ -185,8 +324,13 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					// WP
 					if ( ! empty( $pages['wp'] ) ) {
 						foreach ( $pages['wp'] as $type => $page ) {
-							$this->import_page_template( $page, $type );
+							$post_id = $this->import_page_template( $page, $type );
+							$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+							if ( $post_id && $old_id ) {
+								$old_and_new[ $old_id ] = $post_id;
+							}
 						}
+
 					}
 
 					// Elementor @todo add check for elementor pro
@@ -197,8 +341,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 							// remove old demos
 							$this->delete_demo_posts( $cpt );
-
-							$old_and_new = array();
 							$archives    = array();
 							$items       = array();
 							if ( ! empty( $page_templates ) ) {
@@ -223,6 +365,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								}
 							}
 
+							// temp save replace ids
+							update_option('_acdi_replacement_post_ids',$old_and_new);
+							update_option('_acdi_replacement_archive_item_ids',$items);
+
 							// extras
 							if ( ! empty( $old_and_new ) ) {
 
@@ -246,29 +392,23 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								}
 								update_option( 'elementor_pro_theme_builder_conditions', $new_display_conditions );
 
-								// check for archive item skins and replace with new ids.
-								// check if frontpage is elementor
-								if ( ! empty( $pages['wp']['page_on_front']['meta_input']['_elementor_data'] ) ) {
-									$front_page_id = get_option( 'page_on_front' );
-									$archives[]    = absint( $front_page_id );
-								}
-								if ( ! empty( $archives ) && ! empty( $items ) ) {
-									foreach ( $archives as $archive ) {
-										$_elementor_data = get_post_meta( $archive, '_elementor_data', true );
-										if ( ! empty( $_elementor_data ) ) {
-											foreach ( $items as $old_item => $new_item ) {
-												$replaced = str_replace( '"gd_archive_custom_skin_template":"' . $old_item . '"', '"gd_archive_custom_skin_template":"' . $new_item . '"', $_elementor_data );
-											}
 
-											if ( $_elementor_data !== $replaced ) {
-												update_post_meta( $archive, '_elementor_data', wp_slash( $replaced ) );
-											}
-										}
+								// check pages for replaceable data
+								if ( ! empty( $old_and_new ) ) {
+									foreach ( $old_and_new  as $id ) {
+										$this->parse_elementor_data( $id );
 									}
 								}
+
 							}
 
 						}
+
+						// clear elementor cache after changes
+						if ( defined( 'ELEMENTOR_VERSION' ) ) {
+							\Elementor\Plugin::$instance->files_manager->clear_cache();
+						}
+
 					}
 
 
@@ -280,6 +420,77 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			return $result;
+		}
+
+		public function parse_elementor_data($post_id){
+
+			$_elementor_data = get_post_meta( $post_id, '_elementor_data', true );
+			if ( ! empty( $_elementor_data ) ) {
+
+				$old_and_new = get_option('_acdi_replacement_post_ids');
+				$cat_old_and_new = get_option('_acdi_replacement_cat_ids');
+				$items = get_option('_acdi_replacement_archive_item_ids');
+				$demo_url = get_option('_acdi_demo_url');
+
+				// replace archive item ids
+				$original = $_elementor_data;
+				if ( ! empty( $items ) ) {
+					foreach ( $items as $old_item => $new_item ) {
+						$_elementor_data = str_replace(
+							array('"gd_archive_custom_skin_template":"' . $old_item . '"',
+								'\"gd_archive_custom_skin_template\":\"' . $old_item . '\"',
+								'"gd_custom_skin_template":"' . $old_item . '"',
+								'\"gd_custom_skin_template\":\"' . $old_item . '\"',
+							),
+							array('"gd_archive_custom_skin_template":"' . $new_item . '"',
+								'\"gd_archive_custom_skin_template\":\"' . $new_item . '\"',
+								'"gd_custom_skin_template":"' . $new_item . '"',
+								'\"gd_custom_skin_template\":\"' . $new_item . '\"'
+							),
+							$_elementor_data
+						);
+					}
+				}
+
+
+				// replace cat ids
+				if ( ! empty( $cat_old_and_new ) ) {
+					foreach ( $cat_old_and_new as $old_item => $new_item ) {
+						$_elementor_data = str_replace(
+							array(
+								'taxonomy_id%22%3A%22'.$old_item.'%22',
+								'taxonomy_id":"'.$old_item.'"'
+							),
+							array(
+								'taxonomy_id%22%3A%22'.$new_item.'%22',
+								'taxonomy_id":"'.$new_item.'"'
+							),
+							$_elementor_data
+						);
+					}
+				}
+
+				// replace URL
+				if ( $demo_url ) {
+					$_elementor_data = str_replace(
+						array(
+							$demo_url,
+							str_replace('/','\/', $demo_url ),
+						),
+						array(
+							get_home_url(),
+							str_replace('/','\/', get_home_url() ),
+						),
+						$_elementor_data
+					);
+				}
+
+
+				if ( $original !== $_elementor_data ) {
+					update_post_meta( $post_id, '_elementor_data', wp_slash( $_elementor_data ) );
+				}
+			}
+
 		}
 
 		/**
@@ -302,6 +513,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					wp_delete_post( $p->ID, true );
 				}
 			}
+
 		}
 
 		/**
@@ -329,6 +541,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 		}
 
+
 		/**
 		 * Import page templates.
 		 *
@@ -340,10 +553,34 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function import_page_template( $page_template, $type = '', $cpt = '' ) {
 
+			/*
+			 * The API can't insert unfiltered HTML which is needed for some page builders, so we allow this here and add the filters back at the end.
+			 */
+			kses_remove_filters();
+
 			$settings = geodir_get_settings();
+
+			// some meta data may need to be unserialized
+			$page_template = (array) $page_template;
+			if ( ! empty( $page_template['meta_input'] ) ) {
+				foreach ( $page_template['meta_input'] as $key => $val ) {
+					// elementor json needs slashed
+					if ( $key != '_elementor_data' ) {
+						$val = wp_unslash( $val );
+					}
+					$page_template['meta_input'][$key] = maybe_unserialize( $val );
+
+				}
+			}
+
+
 			$post_id  = 0;
 			if ( $type == 'elementor' ) {
-				$page_template                = (array) $page_template;
+
+				// skip Default kit (maybe we want to update this in future?
+				if( isset($page_template['meta_input']['_elementor_template_type']) && $page_template['meta_input']['_elementor_template_type'] == 'kit' ){return 0;}
+
+				$page_template['post_author']   = 1;
 				$page_template['post_type']   = $cpt;
 				$page_template['post_status'] = 'publish';
 
@@ -367,6 +604,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			} elseif ( $type && $cpt ) {
 				$type           = esc_attr( $type );
 				$cpt            = esc_attr( $cpt );
+
+				// GD
 				$page_templates = array(
 					'page_add',
 					'page_search',
@@ -389,11 +628,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					if ( false === get_post_status( $current_page_id ) ) {
 						// we create a new page
 					} else {
-						$page_template['ID'] = absint( $current_page_id );
+//						$page_template['ID'] = absint( $current_page_id );
+						// send to trash
+						wp_delete_post( absint( $current_page_id ), false );
 					}
 
 					$page_template['post_type']   = 'page';
 					$page_template['post_status'] = 'publish';
+					$page_template['post_author'] = 1;
 					$post_id                      = wp_insert_post( $page_template, true );
 
 
@@ -409,23 +651,89 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 
 				}
+
+
+				// UWP
+				$page_templates = array(
+					'register_page',
+					'login_page',
+					'account_page',
+					'forgot_page',
+					'reset_page',
+					'change_page',
+					'profile_page',
+					'users_page',
+					'user_list_item_page',
+				);
+				if ( function_exists('uwp_get_settings') && in_array( $type, $page_templates ) ) {
+					$settings = uwp_get_settings();
+					$page_template = (array) $page_template;
+
+					$current_page_id = 0;
+					if ( $cpt == 'core' ) {
+						$current_page_id = ! empty( $settings[ $type ] ) ? absint( $settings[ $type ] ) : 0;
+					}
+
+					if ( false === get_post_status( $current_page_id ) ) {
+						// we create a new page
+					} else {
+						//$page_template['ID'] = absint( $current_page_id );
+						// send to trash
+						wp_delete_post( absint( $current_page_id ), false );
+					}
+
+					$page_template['post_type']   = 'page';
+					$page_template['post_status'] = 'publish';
+					$page_template['post_author'] = 1;
+					$post_id                      = wp_insert_post( $page_template, true );
+
+
+					if ( ! is_wp_error( $post_id ) && $post_id ) {
+
+						if ( $cpt == 'core' ) {
+							uwp_update_option( $type, $post_id );
+						}
+
+					}
+
+				}
+
+
 			} elseif ( $type == 'page_on_front' ) {
 
 				$current_page_id = get_option( 'page_on_front' );
 				if ( false === get_post_status( $current_page_id ) ) {
 					// we create a new page
 				} else {
-					$page_template['ID'] = absint( $current_page_id );
+//					$page_template['ID'] = absint( $current_page_id );
+					// send to trash
+					wp_delete_post( absint( $current_page_id ), false );
 				}
 				$page_template['post_type']   = 'page';
 				$page_template['post_status'] = 'publish';
-				$post_id                      = wp_insert_post( $page_template, true );
+				$page_template['post_author'] = 1;
+
+				$post_id = wp_insert_post( $page_template, true );
 
 				if ( ! is_wp_error( $post_id ) && $post_id ) {
 					update_option( 'show_on_front', 'page' );
 					update_option( 'page_on_front', $post_id );
 				}
+			}elseif($type && $cpt==''){
+
+				$page_template['post_type']   = 'page';
+				$page_template['post_status'] = 'publish';
+				$page_template['post_author'] = 1;
+				$post_id = wp_insert_post( $page_template, true );
+
+				if(!empty($page_template['meta_input']['_page_for_posts'])){
+					update_option( 'page_for_posts', $post_id );
+				}
+
 			}
+
+			// We add back the filters for security
+			kses_init_filters();
 
 			return $post_id;
 		}
@@ -479,10 +787,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// if it exists with the exact name then lets delete it
 				if ( $menu_exists ) {
 					wp_delete_nav_menu( $name );
+					$menu_exists = false;
 				}
 
 				// If it doesn't exist, let's create it.
 				if ( ! $menu_exists ) {
+
+					$old_and_new = get_option('_acdi_replacement_post_ids');
+
 					$menu_id = wp_create_nav_menu( $name );
 
 					$locations = get_theme_mod( 'nav_menu_locations' );
@@ -499,6 +811,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								$p           = $item['post'];
 								$metas       = $item['post_metas'];
 								$original_id = absint( $p['ID'] );
+								$p['post_author']   = 1;
 								unset( $p['ID'] );
 								$db_id = wp_insert_post( $p );
 
@@ -519,7 +832,19 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 											// set the correct id
 											if ( $key == '_menu_item_object_id' ) {
-												$meta = absint( $db_id );
+												if($original_id == $meta){
+													$meta = absint( $db_id );
+												}
+
+												// maybe replace page ids
+												if ( ! empty( $old_and_new ) ) {
+													foreach ( $old_and_new as $old => $new ) {
+														if($meta == $old){
+															$meta = $new;
+														}
+													}
+												}
+
 											}
 
 											// set correct parent id
@@ -577,9 +902,36 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$options = ! empty( $_REQUEST['update'] ) ? json_decode( stripslashes( $_REQUEST['update'] ), true ) : array();
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
+
+						if($key=='custom_css'){
+							$post_css = wp_update_custom_css_post($option);
+							if(isset($post_css->ID)){
+								set_theme_mod( 'custom_css_post_id', $post_css->ID );
+							}
+						}
+
+
+						// theme logo
+						if(isset($option['custom_logo_src'])){
+							$image = (array) GeoDir_Media::get_external_media( $option['custom_logo_src'], '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
+
+							if(!empty($image['url'])){
+								$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment($image);
+								if( $attachment_id ){
+									update_post_meta($attachment_id,'_ayecode_demo_img',1);
+									$option['custom_logo'] = $attachment_id;
+								}
+							}
+							
+						}
+						
+						
 						// @todo add a options whitelist so only certain options can be updated.
 						update_option( esc_attr( $key ), $option );
 					}
+
+
+
 				}
 
 				// merge
@@ -620,8 +972,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						$geodir_options = geodir_get_settings(); // we need to update the global settings values with the new values.
 						GeoDir_Admin_Install::create_tables();
 
-//						$post_types = geodir_get_option( 'post_types', array() );
-//						error_log( 'GD tables created' . print_r( $post_types, true ) );
 					}
 
 					$this->import_geodirectory_settings( $settings );
@@ -1195,6 +1545,37 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			return $result;
+		}
+
+		/**
+		 * Try to set higher limits on the fly
+		 */
+		public static function set_php_limits() {
+//			if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+//				error_reporting( 0 );
+//			}
+//			@ini_set( 'display_errors', 0 );
+
+			// try to set higher limits for import
+			$max_input_time     = ini_get( 'max_input_time' );
+			$max_execution_time = ini_get( 'max_execution_time' );
+			$memory_limit       = ini_get( 'memory_limit' );
+
+			if ( $max_input_time !== 0 && $max_input_time != -1 && ( ! $max_input_time || $max_input_time < 3000 ) ) {
+				ini_set( 'max_input_time', 3000 );
+			}
+
+			if ( $max_execution_time !== 0 && ( ! $max_execution_time || $max_execution_time < 3000 ) ) {
+				ini_set( 'max_execution_time', 3000 );
+			}
+
+			if ( $memory_limit && str_replace( 'M', '', $memory_limit ) ) {
+				if ( str_replace( 'M', '', $memory_limit ) < 256 ) {
+					ini_set( 'memory_limit', '256M' );
+				}
+			}
+
+			ini_set( 'auto_detect_line_endings', true );
 		}
 
 
