@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 5.7
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 
 AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -58,6 +58,13 @@ TBA
 3. Connected.
 
 == Changelog ==
+
+= 1.2.2 =
+* Demo import might not create the menu if menu with same name already exists - FIXED
+* Demo import category images not removed when new demo imported - FIXED
+* Demo importer added support for elementor pro imports - ADDED
+* Demo importer added support for Kadence theme imports - ADDED
+* Demo importer now places old template pages in trash instead of fully deleting - CHANGED
 
 = 1.2.1 =
 * AyeCode UI now only loads on specified screen_ids so we add our screen ids - FIXED

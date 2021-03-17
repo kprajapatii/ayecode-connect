@@ -25,11 +25,31 @@ $licences = get_option( $ac_prefix . "_licences" );
 		<div class="sd-src-theme d-none">
 			<?php
 			if(!empty($ac_site_args->theme)){
+				$paid_theme = !empty($ac_site_args->theme->paid);
+
+				$flex_wrap = '';
+				if ( $paid_theme ) {
+					$theme_active = get_template() == $ac_site_args->theme->slug;
+					$badge_class = $theme_active ? 'badge-success' : 'badge-danger';
+					$type_badge = '<span class="badge ' . $badge_class . '">'.__("Paid","ayecode-connect").'</span>';
+
+
+					// warning
+					if ( !$theme_active ) {
+						$url = !empty($ac_site_args->theme->AuthorURI) ? esc_url($ac_site_args->theme->AuthorURI) : '';
+						$warning = sprintf( __("This is a 3rd party paid theme, please install and activate this theme FIRST. %sGet Product%s","ayecode-connect"),"<br><a href='$url' target='_blank'>","</a>" );
+						$flex_wrap = 'flex-wrap';
+						$type_badge .= '<div class="alert alert-warning p-2 mx-0 mb-0 mt-2" role="alert">'.$warning.'</div>';
+					}
+				}else{
+					$type_badge = '<span class="badge badge-success">'.__("Free","ayecode-connect").'</span>';
+				}
+
 				?>
 				<h4 class="h5"><?php _e("Theme","ayecode-connect");?></h4>
 				<ul class="list-group">
-					<li class="list-group-item d-flex justify-content-between align-items-center mb-0 p-2 flex-wrap"><?php echo esc_attr($ac_site_args->theme->Name);?>
-						<span class="badge badge-success"><?php _e("Free","ayecode-connect");?></span>
+					<li class="list-group-item d-flex justify-content-between align-items-center mb-0 p-2 flex-wrap <?php echo $flex_wrap;?>"><?php echo esc_attr($ac_site_args->theme->Name);?>
+						<?php echo $type_badge; ?>
 					</li>
 				</ul>
 				<?php
@@ -100,10 +120,20 @@ $licences = get_option( $ac_prefix . "_licences" );
 			<div class="row d-flex align-items-center">
 				<div class="col">
 					<div class="card-title h5 m-0 p-0">
-						<?php echo esc_attr( $ac_site_args->title );?>
+						<?php
+						echo esc_attr( $ac_site_args->title );
+
+
+						if ( isset( $ac_site_args->requires ) ) {
+							if ( in_array( 'elementor-pro', $ac_site_args->requires ) ) {
+								echo '<span class="ml-2 h4"><i style="color:#db3157;" class="fab fa-elementor" data-toggle="tooltip" title="'.__('Requires Elementor Pro','ayecode-connect').'"></i></span>';
+							}
+						}
+//						print_r($ac_site_args);
+						?>
 					</div>
 				</div>
-				<div class="col">
+				<div class="col-2">
 					<a href="https://demos.ayecode.io/<?php echo esc_attr($ac_site_args->slug); ?>" onclick="ac_preview_site(this);return false;" class="btn btn-primary btn-sm ml-auto float-right" role="button" aria-pressed="true"><?php _e("View","ayecode-connect");?></a>
 				</div>
 			</div>

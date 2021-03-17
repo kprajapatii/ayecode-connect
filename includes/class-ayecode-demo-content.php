@@ -253,13 +253,13 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 											</li>
 											<li class="list-group-item mb-0">
 												<div class="d-flex justify-content-between align-items-center">
-													<?php _e("Page Templates","ayecode-connect");?>
+													<?php _e("Categories","ayecode-connect");?>
 													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
 												</div>
 											</li>
 											<li class="list-group-item mb-0">
 												<div class="d-flex justify-content-between align-items-center">
-													<?php _e("Categories","ayecode-connect");?>
+													<?php _e("Page Templates","ayecode-connect");?>
 													<span class="text-muted h6 p-0 m-0"><i class="fas fa-check-circle"></i></span>
 												</div>
 											</li>
@@ -406,7 +406,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					$li_next = jQuery('#ac-item-preview .aci-import-steps').find('li').eq($step+1);
 
 					// set sub percent
-					if($data.sub_percent){
+					if(typeof($data.sub_percent) !== 'undefined' ){
 						$li.find('.progress').removeClass('d-none');
 						$li.find('.progress-bar').css("width",$data.sub_percent+"%");
 					}else{
@@ -416,7 +416,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					// set percent done
 					jQuery('#ac-item-preview .progress-bar.main-progress').css("width",$data.percent+"%");
 
-					if($data.sub_percent){
+					if(typeof($data.sub_percent) !== 'undefined' ){
 
 					}else{
 						// mark as done
@@ -518,7 +518,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				if ( ! is_wp_error( $data ) && $data['response']['code'] == 200 ) {
 					$responseBody = wp_remote_retrieve_body( $data );
 					$sites        = json_decode( $responseBody );
-//				set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS ); // @todo enable this after testing
+					set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS ); // @todo enable this after testing
 				}
 			}
 
@@ -556,6 +556,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 //			sleep(3);
 
 			if($step === 0){
+
+				// set the demo url
+				update_option('_acdi_demo_url',"https://demos.ayecode.io/".$demo );
+
 				// theme
 				$result =  $this->set_theme( $demo, $site );
 				if(is_wp_error( $result ) ){
@@ -596,8 +600,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				}
 
 			}elseif($step === 3){
-				// page templates
-				$result =  $this->client->request_demo_content( $demo, 'templates' );
+
+				// categories
+				$result =  $this->client->request_demo_content( $demo, 'categories' );
+
 
 				if(is_wp_error( $result ) ){
 					$error = $result;
@@ -609,8 +615,9 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				}
 
 			}elseif($step === 4){
-				// categories
-				$result =  $this->client->request_demo_content( $demo, 'categories' );
+
+				// page templates
+				$result =  $this->client->request_demo_content( $demo, 'templates' );
 
 				if(is_wp_error( $result ) ){
 					$error = $result;
