@@ -125,9 +125,27 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			}
 
-			// add AUI on our backend pages
+
 			if ( is_admin() ){
+				// add AUI on our backend pages
 				add_filter( 'aui_screen_ids', array( $this, 'add_aui_screens') );
+
+				// check for demo site redirect
+				add_action( 'current_screen', array( $this, 'demo_site_redirect' ) );
+			}
+
+		}
+
+		public function demo_site_redirect(){
+
+			$currentScreen = get_current_screen();
+
+			if( $currentScreen->id === "plugin-install" && !empty($_REQUEST['ac-demo-import']) ) {
+				// if installed and active then open the correct demo importer
+				if ( $this->is_active() ) {
+					$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
+					wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=".$demo ));
+				}
 			}
 
 		}
