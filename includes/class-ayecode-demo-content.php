@@ -75,11 +75,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 					self::$instance->base_url = str_replace( "/includes/../", "/", plugins_url( '../', __FILE__ ) );
 
-					// prevent redirects when doing ajax
-					if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'ayecode_connect_demo_content' ) {
-						// prevent redirects to settings screens
-						add_filter('wp_redirect','__return_empty_string',200);
-					}
+					// prevent redirects after plugin/theme activations
+					self::prevent_redirects();
+					add_action( 'init', array( self::$instance, 'prevent_redirects' ),12 );
+
 
 
 					// ajax
@@ -94,6 +93,20 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			}
 
 			return self::$instance;
+		}
+
+		/**
+		 * Prevent plugin/theme redirects after activation.
+		 */
+		public function prevent_redirects(){
+			// prevent redirects when doing ajax
+			if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'ayecode_connect_demo_content' ) {
+				// prevent redirects to settings screens
+				add_filter('wp_redirect','__return_empty_string',200);
+
+				// prevent some transient redirects
+				delete_transient( '_gd_activation_redirect' );
+			}
 		}
 
 
@@ -124,7 +137,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				$this->name,
 				$url_change_disconnection_notice ? sprintf($this->name.' <span class="awaiting-mod">%s</span>', "!") : $this->name,
 				'manage_options',
-				$this->client->is_registered() ? 'ayecode-demo-content' : 'ayecode-connect&alert=connect',
+//				$this->client->is_registered() ? 'ayecode-demo-content' : 'ayecode-connect&alert=connect',
+				'ayecode-demo-content',// : 'ayecode-connect&alert=connect',
 				array(
 					$this,
 					'settings_page'
@@ -169,6 +183,17 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		 * Settings page HTML.
 		 */
 		public function settings_page() {
+
+			// if not connectd then redirect to connection screen
+			if(!$this->client->is_active()){
+				$maybe_demo_redirect = !empty($_REQUEST['ac-demo-import']) ? '&ac-demo-import='.esc_attr(sanitize_title_with_dashes($_REQUEST['ac-demo-import'])) : '';
+				$connect_url = admin_url("admin.php?page=ayecode-connect&alert=connect".$maybe_demo_redirect);
+				?>
+				<script>
+					window.location.replace("<?php echo esc_url_raw($connect_url);?>");
+				</script>
+				<?php
+			}else{
 
 			// bsui wrapper makes our bootstrap wrapper work
 			?>
@@ -459,6 +484,16 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					iFrame.load(function() {
 						jQuery('.ac-preview-loading').removeClass('d-flex');
 					});
+
+					// check for direct link
+					<?php
+						if($_REQUEST['ac-demo-import']){
+							$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
+							?>
+							jQuery(".col").find("[data-demo='<?php echo esc_attr($demo);?>']").find(".btn").click();
+							<?php
+						}
+					?>
 				});
 
 				function ac_preview_site($item){
@@ -496,6 +531,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				}
 			</script>
 			<?php
+			}
 		}
 
 		/**

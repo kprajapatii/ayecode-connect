@@ -70,6 +70,20 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 				self::$instance->client   = new AyeCode_Connect( $args );
 
 				if ( is_admin() ) {
+
+					// check for demo redirect
+					if(self::$instance->client->is_active() && get_transient('ac-demo-import')){
+						$demo = esc_attr(sanitize_title_with_dashes(get_transient('ac-demo-import')));
+						delete_transient('ac-demo-import');
+						wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=".$demo ));
+						exit;
+					}else{
+						// set a transient for demo redirect if set
+						if(!empty($_REQUEST['alert']) && $_REQUEST['alert']=='connect' && !empty($_REQUEST['ac-demo-import'])){
+							set_transient( 'ac-demo-import', esc_attr(sanitize_title_with_dashes($_REQUEST['ac-demo-import'])), 300 );
+						}
+					}
+
 					add_action( 'admin_menu', array( self::$instance, 'menu_item' ) );
 
 
@@ -600,6 +614,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 
 							} else {
+
 								$connect_url = esc_url( $this->client->build_connect_url() );
 
 								// check if alert message

@@ -4,7 +4,7 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.2.2
+ * Version: 1.2.3
  * Author: AyeCode
  * Author URI: https://ayecode.io
  * Requires at least: 4.7
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-    define( 'AYECODE_CONNECT_VERSION', '1.2.2' );
+    define( 'AYECODE_CONNECT_VERSION', '1.2.3' );
 }
 
 add_action( 'plugins_loaded', 'ayecode_connect' );
@@ -128,3 +128,17 @@ function ayecode_connect_sync_licenses() {
     }
 }
 add_action( 'ayecode_connect_sync_licenses', 'ayecode_connect_sync_licenses' );
+
+function ayecode_connect_demo_import_redirect( $plugin ){
+    if ( $plugin == plugin_basename( __FILE__ ) && !empty( $_SERVER['HTTP_REFERER'] ) ) {
+        $parts = parse_url($_SERVER['HTTP_REFERER']);
+        parse_str($parts['query'], $query);
+        if(!empty($query['ac-demo-import'])){
+            $demo = sanitize_title_with_dashes($query['ac-demo-import']);
+            wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=".esc_attr($demo) ));
+            exit;
+        }
+    }
+}
+//register_activation_hook( __FILE__, 'ayecode_connect_demo_import_redirect' );
+add_action( 'activated_plugin',  'ayecode_connect_demo_import_redirect'  );
