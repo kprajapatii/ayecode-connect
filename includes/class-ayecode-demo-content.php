@@ -76,7 +76,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					self::$instance->base_url = str_replace( "/includes/../", "/", plugins_url( '../', __FILE__ ) );
 
 					// prevent redirects after plugin/theme activations
-					self::prevent_redirects();
+					self::$instance->prevent_redirects();
 					add_action( 'init', array( self::$instance, 'prevent_redirects' ),12 );
 
 
