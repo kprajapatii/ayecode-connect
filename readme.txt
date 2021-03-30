@@ -59,6 +59,9 @@ TBA
 
 == Changelog ==
 
+= 1.2.4 =
+* Fix PHP Non-static method error - FIXED
+
 = 1.2.3 =
 * Demo import not always preventing plugin activation re-direct which can cause first import to fail - FIXED
 * Demo import can now open demo import screen via direct URL link - ADDED

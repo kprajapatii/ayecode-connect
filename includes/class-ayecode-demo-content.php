@@ -98,7 +98,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		/**
 		 * Prevent plugin/theme redirects after activation.
 		 */
-		public function prevent_redirects(){
+		public static function prevent_redirects(){
 			// prevent redirects when doing ajax
 			if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'ayecode_connect_demo_content' ) {
 				// prevent redirects to settings screens
