@@ -106,6 +106,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 				// prevent some transient redirects
 				delete_transient( '_gd_activation_redirect' );
+				delete_transient( 'gd_social_importer_redirect' );
 			}
 		}
 
@@ -487,7 +488,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 					// check for direct link
 					<?php
-						if($_REQUEST['ac-demo-import']){
+						if(!empty($_REQUEST['ac-demo-import'])){
 							$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
 							?>
 							jQuery(".col").find("[data-demo='<?php echo esc_attr($demo);?>']").find(".btn").click();
