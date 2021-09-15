@@ -59,6 +59,10 @@ TBA
 
 == Changelog ==
 
+= 1.2.6 =
+* get_plugins() might be undefined in sync_licenses call in some servers - FIXED
+* Added the ability to debug remote calls if constant is defined - ADDED
+
 = 1.2.5 =
 * Prevent GD Social Importer activation redirect on import - FIXED
 
