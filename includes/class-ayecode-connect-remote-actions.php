@@ -37,6 +37,13 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		public $base_url;
 
 		/**
+		 * If debuggin is enabled.
+		 *
+		 * @var
+		 */
+		public $debug;
+
+		/**
 		 * Holds the settings values.
 		 *
 		 * @var array
@@ -73,6 +80,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					self::$instance->client = $client;
 				}
 
+				self::$instance->debug = defined('AC_DEBUG') && AC_DEBUG ? true : false;
+
 				$remote_actions = array(
 					'install_plugin'  => 'install_plugin',
 					'update_licences' => 'update_licences',
@@ -107,12 +116,26 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			return self::$instance;
 		}
 
+		public function debug_log( $call, $type, $args = array() ){
+			$error_str = "AC Debug: $call: $type : ".memory_get_usage()." ";
+			if ( ! empty( $args ) ) {
+				$error_str .= print_r($args,true);
+			}
+
+			if ( $error_str ) {
+				error_log($error_str);
+			}
+		}
+
 		/**
 		 * Delete the old categories.
 		 *
 		 * @param $cpt
 		 */
 		public function delete_gd_categories($cpt){
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			$taxonomy = $cpt.'category';
 			$terms = get_terms( array(
 				'taxonomy' => $taxonomy,
@@ -136,6 +159,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 
 			}
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
 		}
 
 		/**
@@ -144,6 +169,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function import_content() {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			$result = array( "success" => false );
 
 			// validate
@@ -173,7 +201,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							if(method_exists($tax,'regenerate_term_icon'))
 							$tax->regenerate_term_icon( $term->term_id );
 						}
-						
+
 					}
 
 					update_option('_acdi_replacement_cat_ids',$cat_old_and_new);
@@ -419,10 +447,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result = array( "success" => true );
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 			return $result;
 		}
 
 		public function parse_elementor_data($post_id){
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
 			$_elementor_data = get_post_meta( $post_id, '_elementor_data', true );
 			if ( ! empty( $_elementor_data ) ) {
@@ -491,6 +523,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 		}
 
 		/**
@@ -499,6 +533,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param $cpt
 		 */
 		public function delete_demo_posts( $cpt ) {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			// Elementor
 			$posts = get_posts(
 				array(
@@ -514,6 +551,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 		}
 
 		/**
@@ -523,6 +562,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param $files
 		 */
 		public function set_external_media( $post_id, $files ) {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			if ( ! empty( $files ) && class_exists( 'GeoDir_Media' ) ) {
 				$field = 'post_images';
 				foreach ( $files as $file ) {
@@ -539,6 +581,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 		}
 
 
@@ -552,6 +596,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return int|WP_Error
 		 */
 		public function import_page_template( $page_template, $type = '', $cpt = '' ) {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
 			/*
 			 * The API can't insert unfiltered HTML which is needed for some page builders, so we allow this here and add the filters back at the end.
@@ -735,16 +781,21 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			// We add back the filters for security
 			kses_init_filters();
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 			return $post_id;
 		}
 
 
 		/**
 		 * Import menus.
-		 * 
+		 *
 		 * @return array
 		 */
 		public function import_menus() {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			$result = array( "success" => false );
 
 			// validate
@@ -764,6 +815,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result = array( "success" => true );
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 			return $result;
 		}
 
@@ -776,6 +829,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return bool
 		 */
 		public function import_menu( $location, $menu ) {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			$result = false;
 
 			if ( ! empty( $menu ) ) {
@@ -885,6 +941,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 			return $result;
 		}
 
@@ -894,6 +952,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function update_options() {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			$result = array( "success" => false );
 
 			// validate
@@ -922,10 +983,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 									$option['custom_logo'] = $attachment_id;
 								}
 							}
-							
+
 						}
-						
-						
+
+
 						// @todo add a options whitelist so only certain options can be updated.
 						update_option( esc_attr( $key ), $option );
 					}
@@ -981,6 +1042,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result = array( "success" => true );
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 			return $result;
 		}
 
@@ -991,6 +1054,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function import_geodirectory_settings( $settings ) {
 			global $wpdb;
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
 			// custom_fields
 			if ( ! empty( $settings['custom_fields'] ) && defined( 'GEODIR_CUSTOM_FIELDS_TABLE' ) ) {
@@ -1059,6 +1124,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// not implemented yet
 			}
 
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+
 		}
 
 		/**
@@ -1068,6 +1135,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function update_licences() {
 			$result = array( "success" => false );
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
 			// validate
 			if ( $this->validate_request() ) {
@@ -1105,6 +1174,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					update_option( $this->prefix . "_licences", array() );
 				}
 			}
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
 
 			return $result;
 		}
@@ -1314,6 +1385,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return mixed
 		 */
 		public function install_plugin( $result ) {
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+
 			// validate
 			if ( ! $this->validate_request() ) {
 				return array( "success" => false );
@@ -1337,6 +1411,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $install ) {
 				$result = array( "success" => true );
 			}
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
 
 			return $result;
 		}
@@ -1369,6 +1445,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function background_installer( $plugin_to_install_id, $plugin_to_install ) {
 
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 			$task_result = false;
 			if ( ! empty( $plugin_to_install['repo-slug'] ) ) {
 				require_once( ABSPATH . 'wp-admin/includes/file.php' );

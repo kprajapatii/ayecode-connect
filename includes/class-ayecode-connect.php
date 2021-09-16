@@ -604,6 +604,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				'method' => 'POST'
 			);
 
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			$plugins = get_plugins();
 
 			// remove any non AyeCode plugins.
