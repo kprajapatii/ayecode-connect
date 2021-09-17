@@ -80,7 +80,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					}else{
 						// set a transient for demo redirect if set
 						if(!empty($_REQUEST['alert']) && $_REQUEST['alert']=='connect' && !empty($_REQUEST['ac-demo-import'])){
-							set_transient( 'ac-demo-import', esc_attr(sanitize_title_with_dashes($_REQUEST['ac-demo-import'])), 300 );
+							set_transient( 'ac-demo-import', sanitize_title_with_dashes($_REQUEST['ac-demo-import']), 300 );
 						}
 					}
 
@@ -400,7 +400,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			// maybe clear licenses
 			$nonce = !empty($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce'] : '';
-			$action = !empty($_REQUEST['ac_action']) ? esc_attr($_REQUEST['ac_action']) : '';
+			$action = !empty($_REQUEST['ac_action']) ? sanitize_title_with_dashes($_REQUEST['ac_action']) : '';
 			if ( $action && $action == 'clear-licenses' && $nonce && wp_verify_nonce( $nonce, 'ayecode-connect-debug' ) ) {
 				$this->clear_all_licenses();
 				wp_redirect(admin_url( "admin.php?page=ayecode-connect&ayedebug=1" ));
@@ -413,7 +413,6 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		 * Add scripts to our settings page.
 		 */
 		public function scripts() {
-//			wp_enqueue_style( 'ayecode-connect-bootstrap', $this->base_url . 'assets/css/ayecode-ui-compatibility.css', array(), AYECODE_CONNECT_VERSION );
 
 			// Register the script
 			wp_register_script( 'ayecode-connect', $this->base_url . 'assets/js/ayecode-connect.js', array( 'jquery' ), AYECODE_CONNECT_VERSION );

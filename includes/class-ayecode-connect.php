@@ -1462,7 +1462,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public function verify_registration_permission_callback(){
 			$result = false;
 
-			$activation_secret = isset( $_REQUEST['activation_secret'] ) ? esc_attr($_REQUEST['activation_secret']) : '';
+			$activation_secret = isset( $_REQUEST['activation_secret'] ) ? sanitize_key($_REQUEST['activation_secret']) : '';
 			$current_activation_secret =  $this->get_activation_secret();
 
 			if ($current_activation_secret && $activation_secret && $current_activation_secret == $activation_secret ) {

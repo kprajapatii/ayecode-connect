@@ -6,11 +6,11 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.7
-Stable tag: 1.2.5
+Tested up to: 5.8
+Stable tag: 1.2.6
 
 
-AyeCode Connect allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
+AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
 
 == Description ==
 
@@ -18,7 +18,8 @@ To take full advantage of this plugin you should have one of our plugins install
 
 [GeoDirectory](https://wordpress.org/plugins/geodirectory/) | [UsersWP](https://wordpress.org/plugins/userswp/) | [WP Invoicing](https://wordpress.org/plugins/invoicing/)
 
-The AyeCode Connect Service plugin will link your website with your user account on our website letting you install any purchased addons and keep any purchase licences up to date automatically.
+AyeCode Connect is a service plugin, meaning that it will have no functionality until you connect your site to ours. This link allows us to provide extra services to your site such as live documentation search and submission of support tickets.
+After connecting your site you can install our update plugin which will give you the ability to automatically sync license keys of purchases and also be able to remotely install and update purchased products.
 
 You will be able to remotely manage your activated sites and licences all from your account area on our site.
 
@@ -49,7 +50,24 @@ Automatic updates should seamlessly work. We always suggest you backup up your w
 
 == Frequently Asked Questions ==
 
-TBA
+= Do you have T&C's and a Privacy Policy? =
+
+Yes, please see our [terms & conditions](https://ayecode.io/terms-and-conditions/) and [privacy policy.](https://ayecode.io/privacy-policy/)
+
+= Do i need to pay to use this? =
+
+No, you can register a free account on our site which will provide you with live documentation search and the ability to get support directly from your wp-admin area.
+
+= Is my connection to your site safe? =
+
+Yes, our system will only connect via HTTPS ensuring all passed data is encrypted.
+Additionally we built our systems in such a way that;
+Should your database or our database (or both) be compromised, this would not result in access to your site.
+Should your files or our files (or both) be compromised, this would not result in access to your site.
+
+= Your demo importer is not working? =
+
+If your host runs "mod security" on your hosting and has some specific additional rules active, this can block some of our API calls. Please contact our support for help with this.
 
 == Screenshots ==
 
@@ -62,6 +80,8 @@ TBA
 = 1.2.6 =
 * get_plugins() might be undefined in sync_licenses call in some servers - FIXED
 * Added the ability to debug remote calls if constant is defined - ADDED
+* Removed double sanitization and extra sanitization in some functions - CHANGED/ADDED
+* Readme text clarified at the request of the plugin review team - CHANGED
 
 = 1.2.5 =
 * Prevent GD Social Importer activation redirect on import - FIXED
