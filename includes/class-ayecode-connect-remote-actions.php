@@ -964,7 +964,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 											}
 
-											update_post_meta( $db_id, sanitize_key( $key ), wp_strip_all_tags( $meta ) );
+											update_post_meta( $db_id, sanitize_title_with_dashes( $key ), wp_strip_all_tags( $meta ) );
 										}
 									}
 								}
@@ -1036,7 +1036,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						}
 
 						if( $this->can_modify_option( $key ) ) {
-							update_option( sanitize_key( $key ), $option );
+							update_option( sanitize_title_with_dashes( $key ), $option );
 						}
 					}
 					
@@ -1047,14 +1047,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
 
-						$key     = sanitize_key( $key );
+						$key     = sanitize_title_with_dashes( $key );
 						$current = get_option( $key );
 
 						if( $this->can_modify_option( $key ) ) {
 							if ( ! empty( $current ) && is_array( $current ) ) {
-								update_option( sanitize_key( $key ), array_merge( $current, $option ) );
+								update_option( sanitize_title_with_dashes( $key ), array_merge( $current, $option ) );
 							} else {
-								update_option( sanitize_key( $key ), $option );
+								update_option( sanitize_title_with_dashes( $key ), $option );
 							}
 						}
 
@@ -1065,7 +1065,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$options = ! empty( $_REQUEST['delete'] ) ? json_decode( stripslashes( $_REQUEST['delete'] ), true ) : array();
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
-						$key = sanitize_key( $key );
+						$key = sanitize_title_with_dashes( $key );
 						if( $this->can_modify_option( $key ) ){
 							delete_option( $key );
 						}
@@ -1327,7 +1327,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( ! empty( $licence ) && is_array( $licence ) && ! empty( $licence['license_key'] ) ) {
 				// key
 				if ( isset( $licence['license_key'] ) ) {
-					$valid['key'] = sanitize_key( $licence['license_key'] );
+					$valid['key'] = sanitize_title_with_dashes( $licence['license_key'] );
 				}
 				// status
 				if ( isset( $licence['status'] ) ) {
