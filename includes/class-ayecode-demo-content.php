@@ -152,7 +152,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			// maybe clear licenses
 			$nonce = !empty($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce'] : '';
-			$action = !empty($_REQUEST['ac_action']) ? esc_attr($_REQUEST['ac_action']) : '';
+			$action = !empty($_REQUEST['ac_action']) ? sanitize_title_with_dashes($_REQUEST['ac_action']) : '';
 			if ( $action && $action == 'clear-licenses' && $nonce && wp_verify_nonce( $nonce, 'ayecode-connect-debug' ) ) {
 				$this->clear_all_licenses();
 				wp_redirect(admin_url( "admin.php?page=ayecode-connect&ayedebug=1" ));
@@ -187,7 +187,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			// if not connectd then redirect to connection screen
 			if(!$this->client->is_active()){
-				$maybe_demo_redirect = !empty($_REQUEST['ac-demo-import']) ? '&ac-demo-import='.esc_attr(sanitize_title_with_dashes($_REQUEST['ac-demo-import'])) : '';
+				$maybe_demo_redirect = !empty($_REQUEST['ac-demo-import']) ? '&ac-demo-import='.sanitize_title_with_dashes($_REQUEST['ac-demo-import']) : '';
 				$connect_url = admin_url("admin.php?page=ayecode-connect&alert=connect".$maybe_demo_redirect);
 				?>
 				<script>
@@ -574,7 +574,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			$sites = $this->get_sites();
 			$step = isset($_POST['step']) ? absint($_POST['step']) : '';
-			$demo = isset($_POST['demo']) ? esc_attr($_POST['demo']) : '';
+			$demo = isset($_POST['demo']) ? sanitize_title_with_dashes($_POST['demo']) : '';
 			$page = isset($_POST['p_num']) ? absint($_POST['p_num']) : 0;
 			$site = isset($sites->{$demo}) ? $sites->{$demo} : array();
 			$data = array(

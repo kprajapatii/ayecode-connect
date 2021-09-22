@@ -207,7 +207,7 @@ class AyeCode_Connect_Support {
 
 		// page conditions
 		if ( ! empty( $_REQUEST['page'] ) ) {
-			$page            = esc_attr( $_REQUEST['page'] );
+			$page            = sanitize_title_with_dashes( $_REQUEST['page'] );
 			$page_conditions = array(
 				// GD
 				'ayecode-connect'     => $this->gd_beacon_id,

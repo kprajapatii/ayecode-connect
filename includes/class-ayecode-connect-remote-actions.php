@@ -164,6 +164,47 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		}
 
 		/**
+		 * Fully sanitize the category API return.
+		 *
+		 * @param $categories
+		 * @since 1.
+		 * @return array
+		 */
+		public function sanitize_categories( $categories ) {
+			$sanitized = array();
+			if ( ! empty( $categories ) ) {
+				foreach ( $categories as $cpt => $cats ) {
+					$cpt = sanitize_title_with_dashes($cpt);
+					if ( ! empty( $cats ) ) {
+						foreach ( $cats as $key => $cat ) {
+							$key = sanitize_title_with_dashes( $key );
+							if ( ! empty( $cat['name'] ) ) {
+								$sanitized[ $cpt ][ $key ]['name'] = sanitize_title( $cat['name'] );
+							}
+							if ( ! empty( $cat['icon'] ) ) {
+								$sanitized[ $cpt ][ $key ]['icon'] = esc_url_raw( $cat['icon'] );
+							}
+							if ( ! empty( $cat['default_img'] ) ) {
+								$sanitized[ $cpt ][ $key ]['default_img'] = esc_url_raw( $cat['default_img'] );
+							}
+							if ( ! empty( $cat['font_icon'] ) ) {
+								$sanitized[ $cpt ][ $key ]['font_icon'] = sanitize_text_field( $cat['font_icon'] );
+							}
+							if ( ! empty( $cat['color'] ) ) {
+								$sanitized[ $cpt ][ $key ]['color'] = sanitize_hex_color( $cat['color'] );
+							}
+							if ( ! empty( $cat['demo_post_id'] ) ) {
+								$sanitized[ $cpt ][ $key ]['demo_post_id'] = absint( $cat['demo_post_id'] );
+							}
+						}
+					}
+				}
+			}
+
+			return $sanitized;
+		}
+
+		/**
 		 * Import content into site.
 		 *
 		 * @return array
@@ -178,7 +219,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $this->validate_request() ) {
 
 				// categories
-				$categories = ! empty( $_REQUEST['categories'] ) ? json_decode( stripslashes( $_REQUEST['categories'] ), true ) : array();
+				$categories = ! empty( $_REQUEST['categories'] ) ? $this->sanitize_categories( json_decode( stripslashes( $_REQUEST['categories'] ), true ) ) : array();
 				$cat_old_and_new = array();
 
 				if ( ! empty( $categories ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
@@ -231,7 +272,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 
 
-				// posts
+				// posts, note that everything is sanitised further down, wp_insert_post passes everything through sanitize_post()
 				$posts = ! empty( $_REQUEST['posts'] ) ? json_decode( stripslashes( $_REQUEST['posts'] ), true ) : array();
 
 				if ( ! empty( $posts ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
@@ -241,6 +282,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 						unset( $post_info['ID'] );
 
+						$post_info['post_title'] = wp_strip_all_tags( $post_info['post_title'] ); // WP does not automatically do this
 						$post_info['post_status'] = 'publish';
 						$post_info['post_dummy']  = '1';
 						$post_info['post_author']   = 1;
@@ -271,7 +313,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 									if(!empty($term->term_id)){
 										$post_terms[] = absint($term->term_id);
 									}else{
-										$term_name = esc_attr( $term_name );
+										$term_name = sanitize_title( $term_name );
 										$term_id = wp_create_category($term_name);
 										if ( $term_id ) {
 											$post_terms[] = absint($term_id);
@@ -308,7 +350,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 
 
-				// page templates
+				// page templates, note that everything is sanitised further down, wp_insert_post passes everything through sanitize_post()
 				$pages = ! empty( $_REQUEST['pages'] ) ? json_decode( stripslashes( $_REQUEST['pages'] ), true ) : array();
 
 				$old_and_new = array();
@@ -626,6 +668,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// skip Default kit (maybe we want to update this in future?
 				if( isset($page_template['meta_input']['_elementor_template_type']) && $page_template['meta_input']['_elementor_template_type'] == 'kit' ){return 0;}
 
+				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_author']   = 1;
 				$page_template['post_type']   = $cpt;
 				$page_template['post_status'] = 'publish';
@@ -640,16 +683,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 
 					foreach ( $page_template['tax_input'] as $tax => $slug ) {
-						$tax  = esc_attr( $tax );
-						$slug = esc_attr( $slug );
+						$tax  = sanitize_title_with_dashes( $tax );
+						$slug = sanitize_title_with_dashes( $slug );
 						wp_set_object_terms( $post_id, $slug, $tax );
 					}
 				}
 
 
 			} elseif ( $type && $cpt ) {
-				$type           = esc_attr( $type );
-				$cpt            = esc_attr( $cpt );
+				$type           = sanitize_title_with_dashes( $type );
+				$cpt            = sanitize_title_with_dashes( $cpt );
 
 				// GD
 				$page_templates = array(
@@ -679,6 +722,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						wp_delete_post( absint( $current_page_id ), false );
 					}
 
+					$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 					$page_template['post_type']   = 'page';
 					$page_template['post_status'] = 'publish';
 					$page_template['post_author'] = 1;
@@ -728,6 +772,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						wp_delete_post( absint( $current_page_id ), false );
 					}
 
+					$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 					$page_template['post_type']   = 'page';
 					$page_template['post_status'] = 'publish';
 					$page_template['post_author'] = 1;
@@ -755,6 +800,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					// send to trash
 					wp_delete_post( absint( $current_page_id ), false );
 				}
+				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_type']   = 'page';
 				$page_template['post_status'] = 'publish';
 				$page_template['post_author'] = 1;
@@ -767,6 +813,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}elseif($type && $cpt==''){
 
+				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_type']   = 'page';
 				$page_template['post_status'] = 'publish';
 				$page_template['post_author'] = 1;
@@ -801,8 +848,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			// validate
 			if ( $this->validate_request() ) {
 
-
-				$menus = ! empty( $_REQUEST['menus'] ) ? $_REQUEST['menus'] : array();
+				// note, everything is sanitized in import_menu()
+				$menus = ! empty( $_REQUEST['menus'] ) ? wp_unslash( $_REQUEST['menus'] ) : array();
 
 				if ( ! empty( $menus ) ) {
 					foreach ( $menus as $location => $menu ) {
@@ -835,7 +882,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			$result = false;
 
 			if ( ! empty( $menu ) ) {
-				$name = esc_attr( $menu['name'] );
+				$name = sanitize_title( $menu['name'] );
 
 				// Does the menu exist already?
 				$menu_exists = wp_get_nav_menu_object( $name );
@@ -917,7 +964,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 											}
 
-											update_post_meta( $db_id, sanitize_key( $key ), $meta );
+											update_post_meta( $db_id, sanitize_title_with_dashes( $key ), wp_strip_all_tags( $meta ) );
 										}
 									}
 								}
@@ -961,10 +1008,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $this->validate_request() ) {
 				// update
 				$options = ! empty( $_REQUEST['update'] ) ? json_decode( stripslashes( $_REQUEST['update'] ), true ) : array();
+
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
 
 						if($key=='custom_css'){
+							$option = wp_strip_all_tags( $option );
 							$post_css = wp_update_custom_css_post($option);
 							if(isset($post_css->ID)){
 								set_theme_mod( 'custom_css_post_id', $post_css->ID );
@@ -974,7 +1023,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 						// theme logo
 						if(isset($option['custom_logo_src'])){
-							$image = (array) GeoDir_Media::get_external_media( $option['custom_logo_src'], '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
+							$image = (array) GeoDir_Media::get_external_media( esc_url_raw( $option['custom_logo_src'] ), '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
 
 							if(!empty($image['url'])){
 								$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment($image);
@@ -986,27 +1035,27 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 						}
 
-
-						// @todo add a options whitelist so only certain options can be updated.
-						update_option( esc_attr( $key ), $option );
+						if( $this->can_modify_option( $key ) ) {
+							update_option( sanitize_title_with_dashes( $key ), $option );
+						}
 					}
-
-
-
+					
 				}
 
 				// merge
 				$options = ! empty( $_REQUEST['merge'] ) ? json_decode( stripslashes( $_REQUEST['merge'] ), true ) : array();
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
-						// @todo add a options whitelist so only certain options can be updated.
-						$key     = esc_attr( $key );
+
+						$key     = sanitize_title_with_dashes( $key );
 						$current = get_option( $key );
 
-						if ( ! empty( $current ) && is_array( $current ) ) {
-							update_option( $key, array_merge( $current, $option ) );
-						} else {
-							update_option( $key, $option );
+						if( $this->can_modify_option( $key ) ) {
+							if ( ! empty( $current ) && is_array( $current ) ) {
+								update_option( sanitize_title_with_dashes( $key ), array_merge( $current, $option ) );
+							} else {
+								update_option( sanitize_title_with_dashes( $key ), $option );
+							}
 						}
 
 					}
@@ -1016,13 +1065,15 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$options = ! empty( $_REQUEST['delete'] ) ? json_decode( stripslashes( $_REQUEST['delete'] ), true ) : array();
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
-						// @todo add a options whitelist so only certain options can be updated.
-						delete_option( esc_attr( $key ) );
+						$key = sanitize_title_with_dashes( $key );
+						if( $this->can_modify_option( $key ) ){
+							delete_option( $key );
+						}
 					}
 				}
 
 
-				// GD Settings
+				// GD Settings. Sanitized in save functions
 				$settings = ! empty( $_REQUEST['geodirectory_settings'] ) ? json_decode( stripslashes( $_REQUEST['geodirectory_settings'] ), true ) : array();
 
 				if ( ! empty( $settings ) ) {
@@ -1045,6 +1096,33 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
 
 			return $result;
+		}
+		
+		/**
+		 * Check if a options key is allowed to be modified.
+		 * 
+		 * @param $key
+		 * @since 1.2.6
+		 * @return bool
+		 */
+		public function can_modify_option( $key ){
+			$can_modify = false;
+
+			$white_list = array(
+				'elementor_pro_theme_builder_conditions',
+				'ayecode-ui-settings',
+				'aui_options',
+				'custom_css',
+				'geodir_settings',
+				'widget_block',
+				'sidebars_widgets'
+			);
+
+			if( in_array($key,$white_list) || substr( $key, 0, 11 ) === "theme_mods_" || substr( $key, 0, 7 ) === "widget_" ){
+				$can_modify = true;
+			}
+
+			return $can_modify;
 		}
 
 		/**
@@ -1249,7 +1327,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( ! empty( $licence ) && is_array( $licence ) && ! empty( $licence['license_key'] ) ) {
 				// key
 				if ( isset( $licence['license_key'] ) ) {
-					$valid['key'] = sanitize_key( $licence['license_key'] );
+					$valid['key'] = sanitize_title_with_dashes( $licence['license_key'] );
 				}
 				// status
 				if ( isset( $licence['status'] ) ) {
