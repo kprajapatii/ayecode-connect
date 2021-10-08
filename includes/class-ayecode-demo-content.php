@@ -547,7 +547,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 				$args = array(
 					'timeout'     => 30,
-					'redirection' => 0
+					'redirection' => 0,
+					'sslverify'   => AYECODE_CONNECT_SSL_VERIFY,
 				);
 				$url  = $this->client->get_api_url( '/demos' );
 				$data = wp_remote_get( $url, $args );

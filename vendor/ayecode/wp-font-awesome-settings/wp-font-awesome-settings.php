@@ -537,7 +537,7 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 		 */
 		public function get_latest_version_from_api() {
 			$version  = "0";
-			$response = wp_remote_get( "https://api.github.com/repos/FortAwesome/Font-Awesome/releases/latest" );
+			$response = wp_remote_get( "https://api.github.com/repos/FortAwesome/Font-Awesome/releases/latest", array( 'sslverify' => AYECODE_CONNECT_SSL_VERIFY ) );
 			if ( ! is_wp_error( $response ) && is_array( $response ) ) {
 				$api_response = json_decode( wp_remote_retrieve_body( $response ), true );
 				if ( isset( $api_response['tag_name'] ) && version_compare( $api_response['tag_name'], $this->latest, '>=' ) >= 0 && empty( $api_response['prerelease'] ) ) {
