@@ -96,6 +96,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					add_action( 'wp_ajax_ayecode_connect_support', array( self::$instance, 'ajax_toggle_support' ) );
 					add_action( 'wp_ajax_ayecode_connect_support_user', array( self::$instance, 'ajax_toggle_support_user' ) );
 					add_action( 'wp_ajax_ayecode_connect_install_must_use_plugin', array( self::$instance, 'install_mu_plugin' ) );
+					add_action( 'wp_ajax_ayecode_connect_check_connection', array( self::$instance, 'ajax_check_connection' ) );
+					add_action( 'wp_ajax_ayecode_connect_clear_licenses', array( self::$instance, 'ajax_clear_licenses' ) );
 
 					require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-demo-content.php';
 
@@ -382,30 +384,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			);
 
 
-//			$page = add_submenu_page(
-//				'index.php',
-//				$this->name,
-//				$url_change_disconnection_notice ? sprintf($this->name.' <span class="awaiting-mod">%s</span>', "!") : $this->name,
-//				'manage_options',
-//				'ayecode-connect',
-//				array(
-//					$this,
-//					'settings_page'
-//				)
-//			);
-
 			add_action( "admin_print_styles-{$page}", array( $this, 'scripts' ) );
-
-
-
-			// maybe clear licenses
-			$nonce = !empty($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce'] : '';
-			$action = !empty($_REQUEST['ac_action']) ? sanitize_title_with_dashes($_REQUEST['ac_action']) : '';
-			if ( $action && $action == 'clear-licenses' && $nonce && wp_verify_nonce( $nonce, 'ayecode-connect-debug' ) ) {
-				$this->clear_all_licenses();
-				wp_redirect(admin_url( "admin.php?page=ayecode-connect&ayedebug=1" ));
-				exit;
-			}
 
 		}
 
@@ -425,6 +404,68 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			);
 			wp_localize_script( 'ayecode-connect', 'ayecode_connect', $translation_array );
 			wp_enqueue_script( 'ayecode-connect' );
+		}
+
+		/**
+		 * Disconnect site via ajax call.
+		 */
+		public function ajax_check_connection() {
+			// security
+			check_ajax_referer( 'ayecode-connect', 'security' );
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( - 1 );
+			}
+
+			$api_url = $this->client->get_api_url( '/test-connection' );
+
+			$test_hash = wp_generate_password();
+
+			set_transient( 'ac_test_connection', $test_hash, MINUTE_IN_SECONDS );
+
+			$args = array(
+				'method'      => 'POST',
+				'timeout'     => 60,
+				'redirection' => 0,
+				'headers'     => array(),
+				'stream'      => false,
+				'filename'    => null,
+				'sslverify'   => AYECODE_CONNECT_SSL_VERIFY,
+				'body'        => array(
+					'hash'  => $test_hash,
+					'api_url' => get_rest_url( null, $this->client->local_api_namespace )
+				)
+			);
+
+			$result = wp_remote_post( esc_url($api_url), $args );
+			$api_response = json_decode( wp_remote_retrieve_body( $result ), true );
+
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_success($result->get_error_message());
+			} elseif(empty($api_response['success']) && !empty($api_response['message']) ) {
+				wp_send_json_error(esc_attr($api_response['message']));
+			} elseif(!empty($api_response['success']) && !empty($api_response['message']) ) {
+				wp_send_json_success(esc_attr($api_response['message']));
+			}
+
+			wp_die();
+		}
+
+		/**
+		 * Disconnect site via ajax call.
+		 */
+		public function ajax_clear_licenses() {
+			// security
+			check_ajax_referer( 'ayecode-connect', 'security' );
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( - 1 );
+			}
+
+			$this->clear_all_licenses();
+
+			wp_send_json_success(__( "Licenses cleared, refresh page to confirm.", "ayecode-connect" ));
+
+			wp_die();
 		}
 
 		/**
@@ -568,32 +609,121 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								</p>
 
 								<?php
-
-								if(isset($_REQUEST['ayedebug'])){
+								$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );
+								if( ( isset($_REQUEST['ayedebug']) || ( !empty($support_user->ID) && $support_user->ID == get_current_user_id()) ) && current_user_can( 'manage_options' ) ){
 									$all_licences = get_option( $this->client->prefix . "_licences" );
 									$actual_licences = get_option( "exup_keys" );
-									echo '<p class="mt-4 text-left"><pre class="text-left">';
 
 									$blog_id = get_option( $this->client->prefix . '_blog_id', false );
 									$site_url = get_option( $this->client->prefix . '_url', false );
 
-									echo '<h4>Debug Info</h4>';
-									echo '<h5>blog id '.$blog_id .'</h5>';
-									echo '<h5>Site URL '.$site_url .'</h5>';
+									?>
+							<div class='ayedebug-wrapper bsui'>
+								<h4><?php _e("Debug Info","ayecode-connect");?></h4>
+									<div class="accordion text-left mb-4" id="accordionExample">
+										<div class="card mw-100 p-0 m-0">
+											<div class="card-header position-relative" id="headingOne">
+												<h5 class="mb-0 h5 py-2 px-4">
+													<a class="stretched-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+														<?php _e("Connection Info","ayecode-connect");?>
+													</a>
+												</h5>
+											</div>
 
-									echo "<div>";
-									$debug_nonce = wp_create_nonce( 'ayecode-connect-debug' );
-									echo "<a href='".admin_url( "index.php?page=ayecode-connect&ayedebug=1&ac_action=clear-licenses&_wpnonce=$debug_nonce" )."' class='btn btn-primary'>".__("Clear all licenses","ayecode-connect")."</a>";
-									echo "</div>";
+											<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+												<div class="card-body">
+													<?php
+														echo '<h5>blog id '.absint( $blog_id ) .'</h5>';
+														echo '<h5>Site URL '.esc_attr( $site_url ) .'</h5>';
+													?>
+												</div>
+											</div>
+										</div>
+										<div class="card mw-100 p-0 m-0">
+											<div class="card-header position-relative" id="headingTwo">
+												<h5 class="mb-0 h5 py-2 px-4">
+													<a class="collapsed stretched-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+														<?php _e("Debug Tools","ayecode-connect");?>
+													</a>
+												</h5>
+											</div>
+											<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+												<div class="card-body">
+													<?php
+													echo "<button class='btn btn-primary' onclick='ayecode_connect_clear_licenses();'>".__("Clear all licenses","ayecode-connect")."</button>\n";
+													echo "<button class='btn btn-primary' onclick='ayecode_connect_check_connection();'>".__("Test Connection ability","ayecode-connect")."</button>\n";
+													?>
 
-									print_r($all_licences);
-									echo '<h4>actual licences</h4>';
-									print_r($actual_licences);
+													<div class="ac-test-results py-3"></div>
+												</div>
+											</div>
+										</div>
+										<div class="card mw-100 p-0 m-0">
+											<div class="card-header position-relative" id="headingThree">
+												<h5 class="mb-0 h5 py-2 px-4">
+													<a class="collapsed stretched-link" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+														<?php _e("All User Licenses Found","ayecode-connect");?>
+													</a>
+												</h5>
+											</div>
+											<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+												<div class="card-body">
+													<pre>
+													<?php
+													if(empty($all_licences)){
+														_e("No licenses found","ayecode-connect");
+													}else{
+														print_r($all_licences);
+													}
+													?>
+													</pre>
+												</div>
+											</div>
+										</div>
+										<div class="card mw-100 p-0 m-0">
+											<div class="card-header position-relative" id="heading4">
+												<h5 class="mb-0 h5 py-2 px-4">
+													<a class="collapsed stretched-link" type="button" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+														<?php _e("All Installed Licenses","ayecode-connect");?>
+													</a>
+												</h5>
+											</div>
+											<div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent="#accordionExample">
+												<div class="card-body">
+													<pre>
+													<?php
+													if(empty($actual_licences)){
+														_e("No licenses found","ayecode-connect");
+													}else{
+														print_r($actual_licences);
+													}
+													?>
+													</pre>
+												</div>
+											</div>
+										</div>
+										<div class="card mw-100 p-0 m-0">
+											<div class="card-header position-relative" id="heading5">
+												<h5 class="mb-0 h5 py-2 px-4">
+													<a class="collapsed stretched-link" type="button" data-toggle="collapse" data-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+														<?php _e("get_plugins() return <small>(if Update ID is missing from out,  install helper plugin below)</small>","ayecode-connect");?>
+													</a>
+												</h5>
+											</div>
+											<div id="collapse5" class="collapse" aria-labelledby="heading5" data-parent="#accordionExample">
+												<div class="card-body">
+													<pre>
+													<?php
+														print_r(get_plugins());
+													?>
+													</pre>
+												</div>
+											</div>
+										</div>
+									</div>
+							</div>
+									<?php
 
-									echo '<h4>get_plugins()</h4>';
-									print_r(get_plugins());
-
-									echo '</pre></p>';
 								}
 
 

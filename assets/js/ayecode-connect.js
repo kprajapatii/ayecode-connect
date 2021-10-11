@@ -258,3 +258,65 @@ function ayecode_connect_install_must_use_plugin(){
         }
     }); // end of ajax
 }
+
+
+/**
+ * Check server connection.
+ */
+function ayecode_connect_check_connection(){
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'ayecode_connect_check_connection',
+            security: ayecode_connect.nonce,
+        },
+        beforeSend: function() {
+            jQuery('.ac-test-results').html('<div class="spinner-border spinner-border-sm" role="status"></div> Please wait...');
+        },
+        success: function(data, textStatus, xhr) {
+            console.log(data);
+
+            if(data.success){
+                jQuery('.ac-test-results').html(data.data);
+            }else{
+                jQuery('.ac-test-results').html(data.data);
+            }
+
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(textStatus);
+            jQuery('.ac-test-results').html('something went wrong');
+        }
+    }); // end of ajax
+}
+
+function ayecode_connect_clear_licenses(){
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'ayecode_connect_clear_licenses',
+            security: ayecode_connect.nonce,
+        },
+        beforeSend: function() {
+            jQuery('.ac-test-results').html('<div class="spinner-border spinner-border-sm" role="status"></div> Please wait...');
+        },
+        success: function(data, textStatus, xhr) {
+            console.log(data);
+
+            if(data.success){
+                jQuery('.ac-test-results').html(data.data);
+            }else{
+                jQuery('.ac-test-results').html(data.data);
+            }
+
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert(textStatus);
+            jQuery('.ac-test-results').html('something went wrong');
+        }
+    }); // end of ajax
+}

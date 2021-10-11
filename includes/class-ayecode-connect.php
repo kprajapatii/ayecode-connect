@@ -125,6 +125,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			}
 
+			// register test route
+			add_action( 'rest_api_init', array( $this, 'register_test_routes' ) );
+
+
 
 			if ( is_admin() ){
 				// add AUI on our backend pages
@@ -1264,7 +1268,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				'headers'     => array(),
 				'stream'      => false,
 				'filename'    => null,
-				'sslverify'   => true,
+				'sslverify'   => AYECODE_CONNECT_SSL_VERIFY,
 			);
 
 			$args = wp_parse_args( $args, $defaults );
@@ -1452,6 +1456,104 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				)
 			);
 
+		}
+
+		/**
+		 * Register routes used for testing.
+		 */
+		public function register_test_routes() {
+
+			// Returns a url to the connection page.
+			register_rest_route(
+				$this->local_api_namespace,
+				'/test-connection',
+				array(
+					'methods'  => WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'test_connection' ),
+					'permission_callback' => '__return_true'
+				)
+			);
+
+		}
+
+
+		/**
+		 * Allow our server to reply to a test connection request.
+		 *
+		 * @param $request
+		 *
+		 * @return array
+		 */
+		public function test_connection( $request  ) {
+
+			// validate
+			if ( ! $this->validate_request() ) {
+				return array( "success" => false );
+			}
+
+			$hash = esc_attr( $request['hash'] );
+			$stored_hash = esc_attr( get_transient('ac_test_connection') );
+			$success = false;
+			if(!$stored_hash || !$hash){
+				$success = false;
+				$code = "no_hash";
+			}elseif($hash && $stored_hash && $stored_hash!=$hash){
+				$success = false;
+				$code = "hash_not_equal";
+			}elseif($hash && $stored_hash && $stored_hash == $hash){
+				$success = true;
+				$code = "success";
+			}
+
+			$result = array(
+				"success" => $success,
+				"code" => $code
+				);
+
+
+			return $result;
+		}
+
+		/**
+		 * Validate the request origin.
+		 *
+		 * This file is not even loaded unless it passes JWT validation.
+		 *
+		 * @return bool
+		 */
+		private function validate_request() {
+			$result = false;
+
+			if ( $this->get_server_ip() === "173.208.153.114" ) {
+				$result = true;
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Get the request has come from our server.
+		 *
+		 * @return string
+		 */
+		private function get_server_ip() {
+
+			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+				//check ip from share internet
+				$ip = $_SERVER['HTTP_CLIENT_IP'];
+			} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+				//to check ip is pass from proxy
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			} else {
+				$ip = $_SERVER['REMOTE_ADDR'];
+			}
+
+			// Cloudflare can provide a comma separated ip list
+			if ( strpos( $ip, ',' ) !== false ) {
+				$ip = reset( explode( ",", $ip ) );
+			}
+
+			return $ip;
 		}
 
 		/**
