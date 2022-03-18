@@ -99,6 +99,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.2.4 =
 * Fix PHP Non-static method error - FIXED
+* Non-static method AyeCode_Demo_Content::prevent_redirects() should not be called statically - FIXED
 
 = 1.2.3 =
 * Demo import not always preventing plugin activation re-direct which can cause first import to fail - FIXED
