@@ -608,7 +608,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
 			if ( ! empty( $files ) && class_exists( 'GeoDir_Media' ) ) {
-				$field = 'post_images';
+				$field = !empty($file['type']) ? esc_attr($file['type'] ) : 'post_images';
 				foreach ( $files as $file ) {
 					$file_url     = ! empty( $file['file'] ) ? esc_url_raw( $file['file'] ) : '';
 					$file_title   = ! empty( $file['title'] ) ? esc_attr( $file['title'] ) : '';
@@ -1284,6 +1284,13 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			$valid_licences = array();
 
 			if ( ! empty( $licences ) ) {
+
+				// maybe json_decode
+				if ( ! is_array( $licences ) ) {
+					$licences = stripslashes_deep($licences);
+					$licences = json_decode($licences,true);
+				}
+
 				if ( $has_domain ) {
 					// get the array of valid domains
 					$valid_domains = $this->get_valid_domains();

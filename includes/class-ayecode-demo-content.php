@@ -183,7 +183,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		/**
 		 * Settings page HTML.
 		 */
-		public function settings_page() {
+		public function settings_page( $wizard = false ) {
 
 			// if not connectd then redirect to connection screen
 			if(!$this->client->is_active()){
@@ -204,8 +204,15 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				#wpbody-content > div.error{
 					display: none;
 				}
+
+				<?php if($wizard){ ?>
+				.bsui .modal-backdrop.fade.show{
+					display: none !important;
+				}
+				<?php } ?>
 			</style>
 
+				<?php if(!$wizard){ ?>
 			<div class="bsui" style="margin-left: -20px;">
 				<!-- Just an image -->
 				<nav class="navbar bg-white border-bottom">
@@ -214,13 +221,18 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					</a>
 				</nav>
 			</div>
+					<?php } ?>
 
 
-			<div class="bsui" style="margin-left: -20px; display: flex">
-				<div class="container">
-					<div class="alert alert-warning mt-4 font-weight-bold" role="alert">
-						<?php _e("This feature is still in BETA, please only use on a development site. Please provide feedback and report any issues so this feature can be improved.","ayecode-connect");?>
-					</div>
+			<div class="bsui" style="<?php if(!$wizard){ ?>margin-left: -20px; display: flex<?php } ?>">
+				<div class="<?php if(!$wizard){ ?>container<?php } ?>">
+					<?php
+					echo aui()->alert(array(
+							'type'=> 'info',
+							'content'=> __("This importer should only be used on NEW sites, it will change the whole look and appearance of your site.","geodirectory")
+						)
+					);
+					?>
 					<div class="row row-cols-1 row-cols-sm-2  row-cols-md-2 mt-4">
 
 						<?php
@@ -584,15 +596,6 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			);
 			$error = array();
 
-
-//			print_r($this->client->request_plugins($site['plugins']));exit;
-
-			// @todo sanity check
-
-//			print_r($site);
-//			echo '###'.$step;
-//			sleep(3);
-
 			if($step === 0){
 
 				// set the demo url
@@ -755,8 +758,6 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			if(!empty($site->plugins)){
 				$result = $this->client->request_demo_content( $demo, 'plugins' );
 
-//				echo '###';
-//				print_r( $result );exit;
 			}
 
 
@@ -784,7 +785,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 			if(!$theme->exists()){
 				$result = $this->client->request_demo_content( $demo, 'theme' );
-//				echo '###'.$demo.'###';print_r( $result );
+
 				if(empty($result->{$slug}->success)){
 					$result = new WP_Error( 'theme_install_fail', __( "The theme installation failed.", "ayecode-connect" ) );
 				}else{
@@ -802,7 +803,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			// Maybe activate theme
 			if ( $activate_theme ) {
 				// activate
-//				error_log( '###' . $slug );
+
 				switch_theme( $slug );
 				if($slug == get_option('stylesheet')){
 					$result = true;
@@ -811,7 +812,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// if a child theme then the main templare option can fail to update
 				if($result && !empty($site->theme->Template)){
 					$parent_slug = esc_attr( $site->theme->Template );
-//					error_log( '####' . $parent_slug );
+
 					update_option('template',$parent_slug);
 				}
 			}
