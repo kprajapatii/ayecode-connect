@@ -1,3 +1,86 @@
+= 0.1.66 =
+* Textarea shows stripped some part for variable like %category% - FIXED
+
+= 0.1.65 =
+* Changes for Avada builder backend settings display - FIXED
+* Change all script/style versions to AUI version to invalidate cache on each change - CHANGED
+* Toast sometimes hidden by support widgets - FIXED
+* Select field option don't show option selected when value is empty - FIXED
+
+= 0.1.64 =
+* minimised version of iconpicker JS missing from release - FIXED
+
+= 0.1.63 =
+* Deprecated: version_compare(): Passing null to parameter - FIXED
+* iconpicker input type added - ADDED
+* aui_modal_iframe() function added to show iframes in a modal - ADDED
+* aui_toast() function added to add toasts to the screen - ADDED
+* aui_confirm() function added to replace JS confirm with a bootstrap alternative - ADDED
+* modal in wp-admin not showing correctly - FIXED
+* Admin notice added if admin settings not set to defaults - ADDED
+
+= 0.1.62 =
+* Grid view .gv-hide-0 class added to hide items on list view - ADDED
+
+= 0.1.61 =
+* Escape validation pattern - FIXED
+
+= 0.1.60 =
+* Conditional fields changes - CHANGED
+
+= 0.1.59 =
+* Parameter added to add attributes to main wrapper - ADDED
+* Conditional fields scripts added - ADDED
+
+= 0.1.58 =
+* Filter added to be able to override AUI loading from wp-admin - ADDED
+
+= 0.1.57 =
+* Video shows extra padding on Divi theme - FIXED
+
+= 0.1.56 =
+* Radio with empty value do not renders value attribute - FIXED
+
+= 0.1.55 =
+* Add unique CSS class to radio/checkbox wrapper - ADDED
+* Added wp_unslash() to value output helper - ADDED
+
+= 0.1.53 =
+* Better escaping for input values - CHANGED
+
+= 0.1.52 =
+* WP 5.8 legacy widgets preview not loading styles - FIXED
+
+= 0.1.51 =
+* Textarea "name" arg can't contain [square brackets] - FIXED
+
+= 0.1.50 =
+* Scroll within popup scrolls the modal background on iOS mobile device - FIXED
+
+= 0.1.49 =
+* Unable to save empty value for multiselect fields - FIXED
+* Text left/right classes alignment swapped for RTL CSS - CHANGED
+
+= 0.1.48 =
+* Tooltips in wp-admin have wrong margin offset - FIXED
+* Inline CSS and JS is now minified to reduce size - CHANGED
+
+= 0.1.47 =
+* Timeago labels are not translatable - FIXED
+* Kleo theme fix for mobile menu in some situations not showing - FIXED
+
+= 0.1.46 =
+* JS function added to open embedded items in a lightbox gallery - ADDED
+
+= 0.1.45 =
+* Some texts missing a textdomain - FIXED
+
+= 0.1.44 =
+* Field description is missing for radio field - FIXED
+* WP 5.7 Gutenberg widgets screen breaks some AUI CSS - FIXED
+* Calendar labels are not translatable - FIXED
+* Select2 JS labels are not translatable - FIXED
+
 = 0.1.43 =
 * AUI will now only load on backend (wp-admin) pages if the screen id has been added via filter 'aui_screen_ids' - BREAKING CHANGE
 

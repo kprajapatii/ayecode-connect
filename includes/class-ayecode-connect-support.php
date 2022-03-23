@@ -342,11 +342,11 @@ class AyeCode_Connect_Support {
 						Beacon('config', {
 							display: {
 								style: 'text',
-								text: 'Beta Feedback'
+								text: 'Feedback'
 							}
 						});
 						Beacon('prefill', {
-							subject: 'Demo Data Beta Feedback'
+							subject: 'Demo Data Import Feedback'
 						});
 						<?php
 					}else{

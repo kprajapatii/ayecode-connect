@@ -639,7 +639,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			$body = array(
-				'plugins' => $plugins
+				'plugins' => $plugins,
+				'json_format' => true,
 			);
 
 			$response = self::remote_request( $args, $body );
