@@ -218,6 +218,17 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			// validate
 			if ( $this->validate_request() ) {
 
+				// de-sanitize for mod-security
+				if ( ! empty( $_REQUEST['categories'] ) ) {
+					$_REQUEST['categories'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['categories'] );
+				}
+				if ( ! empty( $_REQUEST['posts'] ) ) {
+					$_REQUEST['posts'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['posts'] );
+				}
+				if ( ! empty( $_REQUEST['pages'] ) ) {
+					$_REQUEST['pages'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['pages'] );
+				}
+
 				// categories
 				$categories = ! empty( $_REQUEST['categories'] ) ? $this->sanitize_categories( json_decode( stripslashes( $_REQUEST['categories'] ), true ) ) : array();
 				$cat_old_and_new = array();
@@ -1006,6 +1017,22 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			// validate
 			if ( $this->validate_request() ) {
+
+				// de-sanitize for mod-security
+				if ( ! empty( $_REQUEST['update'] ) ) {
+					$_REQUEST['update'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['update'] );
+				}
+				if ( ! empty( $_REQUEST['merge'] ) ) {
+					$_REQUEST['merge'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['merge'] );
+				}
+				if ( ! empty( $_REQUEST['delete'] ) ) {
+					$_REQUEST['delete'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['delete'] );
+				}
+				if ( ! empty( $_REQUEST['geodirectory_settings'] ) ) {
+					$_REQUEST['geodirectory_settings'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['geodirectory_settings'] );
+				}
+
+
 				// update
 				$options = ! empty( $_REQUEST['update'] ) ? json_decode( stripslashes( $_REQUEST['update'] ), true ) : array();
 
@@ -1039,7 +1066,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							update_option( sanitize_title_with_dashes( $key ), $option );
 						}
 					}
-					
+
 				}
 
 				// merge
@@ -1097,10 +1124,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			return $result;
 		}
-		
+
 		/**
 		 * Check if a options key is allowed to be modified.
-		 * 
+		 *
 		 * @param $key
 		 * @since 1.2.6
 		 * @return bool
@@ -1739,6 +1766,35 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			}
 
 			ini_set( 'auto_detect_line_endings', true );
+		}
+
+		/**
+		 * Arguments for replacing mod-security triggers.
+		 *
+		 * @todo This is mirrored in the AyeCode Connect plugin and changes should be added there also if updating.
+		 *
+		 * @param $values
+		 *
+		 * @return array
+		 */
+		public function str_replace_args( $values = false ) {
+			$salt = 'ZXY';
+			$args = array(
+				'VARCHAR' => 'VARCHAR' . $salt,
+				'TEXT'    => 'TEXT' . $salt,
+				'SELECT'  => 'SELECT' . $salt,
+				'Select'  => 'Select' . $salt,
+				'select'  => 'select' . $salt,
+				'FROM'    => 'FROM' . $salt,
+				'TINYINT' => 'TINYINT' . $salt,
+				'FLOAT'   => 'FLOAT' . $salt,
+				'INT'     => 'INT' . $salt,
+				'-->'     => '--' . $salt . '>',
+				'<!--'     => '<' . $salt . '!--',
+				'javascript'     => 'javsrpt' . $salt,
+			);
+
+			return $values ? array_values( $args ) : array_keys( $args );
 		}
 
 

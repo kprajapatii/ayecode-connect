@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 5.9
-Stable tag: 1.2.9
+Stable tag: 1.2.10
 
 
 AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -76,6 +76,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.2.10 =
+* Added strip/replace functionality to demo content to prevent Mod Security blocking some demo imports - ADDED
 
 = 1.2.9 =
 * Added warning if coming soon plugin detected that connection might not work - ADDED

@@ -1732,7 +1732,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return;
 			}
 
+            $version = !empty($this->version ) ? esc_attr($this->version ) : '';
 			$page_arg =  $page ? "?page=".absint( $page ) : '';
+			$page_arg .= $page_arg ? '&ver=' . esc_attr( $version ) : '?ver=' . esc_attr( $version );
 			// Remote args...
 			$args = array(
 				'url'    => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type  )  ).$page_arg,
@@ -1741,7 +1743,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$response = self::remote_request( $args );
 
-//			print_r( $response );exit;
+//			print_r( $args  );exit;
 
 			// in case the request failed...
 			if ( is_wp_error( $response ) ) {
