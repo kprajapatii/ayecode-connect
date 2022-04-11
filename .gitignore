@@ -3,3 +3,5 @@
 # Composer
 composer.phar
 composer.lock
+vendor/wp-coding-standards/
+vendor/squizlabs/

@@ -1,269 +1,364 @@
-{
-    "packages": [
-        {
-            "name": "ayecode/wp-ayecode-ui",
-            "version": "0.1.66",
-            "version_normalized": "0.1.66.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/AyeCode/wp-ayecode-ui.git",
-                "reference": "1691403835fd8d4c75f204debb25fecf4de52294"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/AyeCode/wp-ayecode-ui/zipball/1691403835fd8d4c75f204debb25fecf4de52294",
-                "reference": "1691403835fd8d4c75f204debb25fecf4de52294",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "~1.0",
-                "php": ">=5.3.0"
-            },
-            "time": "2022-03-07T12:11:00+00:00",
-            "type": "library",
-            "installation-source": "dist",
-            "autoload": {
-                "files": [
-                    "ayecode-ui-loader.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "AyeCode Ltd",
-                    "email": "contact@ayecode.io",
-                    "homepage": "https://ayecode.io/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Bootstrap UI for WordPress plugins and themes.",
-            "homepage": "https://github.com/AyeCode/wp-ayecode-ui",
-            "keywords": [
-                "ayecode",
-                "boot",
-                "bootstrap"
-            ],
-            "support": {
-                "issues": "https://github.com/AyeCode/wp-ayecode-ui/issues",
-                "source": "https://github.com/AyeCode/wp-ayecode-ui/tree/0.1.66"
-            },
-            "install-path": "../ayecode/wp-ayecode-ui"
+[
+    {
+        "name": "ayecode/wp-ayecode-ui",
+        "version": "0.1.70",
+        "version_normalized": "0.1.70.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/AyeCode/wp-ayecode-ui.git",
+            "reference": "e23fedcc0ab8504ba8c2e8590c03e1926fed12e0"
         },
-        {
-            "name": "ayecode/wp-font-awesome-settings",
-            "version": "1.0.13",
-            "version_normalized": "1.0.13.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/AyeCode/wp-font-awesome-settings.git",
-                "reference": "a7a11ee4290674ec214d1fe694139af275350402"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/AyeCode/wp-font-awesome-settings/zipball/a7a11ee4290674ec214d1fe694139af275350402",
-                "reference": "a7a11ee4290674ec214d1fe694139af275350402",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "~1.0",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "*",
-                "squizlabs/php_codesniffer": "^3.2",
-                "wp-coding-standards/wpcs": "*"
-            },
-            "time": "2021-07-13T15:09:44+00:00",
-            "type": "library",
-            "installation-source": "dist",
-            "autoload": {
-                "files": [
-                    "wp-font-awesome-settings.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "AyeCode Ltd",
-                    "email": "contact@ayecode.io",
-                    "homepage": "https://ayecode.io/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Settings page for Font Awesome in WordPress",
-            "homepage": "https://github.com/AyeCode/wp-font-awesome-settings",
-            "keywords": [
-                "FontAwesome",
-                "font-awesome"
-            ],
-            "support": {
-                "issues": "https://github.com/AyeCode/wp-font-awesome-settings/issues",
-                "source": "https://github.com/AyeCode/wp-font-awesome-settings/tree/1.0.13"
-            },
-            "install-path": "../ayecode/wp-font-awesome-settings"
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/AyeCode/wp-ayecode-ui/zipball/e23fedcc0ab8504ba8c2e8590c03e1926fed12e0",
+            "reference": "e23fedcc0ab8504ba8c2e8590c03e1926fed12e0",
+            "shasum": ""
         },
-        {
-            "name": "composer/installers",
-            "version": "1.x-dev",
-            "version_normalized": "1.9999999.9999999.9999999-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/894a0b5c5d34c88b69b097f2aae1439730fa6836",
-                "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0 || ^2.0"
-            },
-            "replace": {
-                "roundcube/plugin-installer": "*",
-                "shama/baton": "*"
-            },
-            "require-dev": {
-                "composer/composer": "1.6.* || ^2.0",
-                "composer/semver": "^1 || ^3",
-                "phpstan/phpstan": "^0.12.55",
-                "phpstan/phpstan-phpunit": "^0.12.16",
-                "symfony/phpunit-bridge": "^4.2 || ^5",
-                "symfony/process": "^2.3"
-            },
-            "time": "2022-03-15T21:23:54+00:00",
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Composer\\Installers\\Plugin",
-                "branch-alias": {
-                    "dev-main": "1.x-dev"
-                },
-                "plugin-modifies-install-path": true
-            },
-            "installation-source": "source",
-            "autoload": {
-                "psr-4": {
-                    "Composer\\Installers\\": "src/Composer/Installers"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kyle Robinson Young",
-                    "email": "kyle@dontkry.com",
-                    "homepage": "https://github.com/shama"
-                }
-            ],
-            "description": "A multi-framework Composer library installer",
-            "homepage": "https://composer.github.io/installers/",
-            "keywords": [
-                "Craft",
-                "Dolibarr",
-                "Eliasis",
-                "Hurad",
-                "ImageCMS",
-                "Kanboard",
-                "Lan Management System",
-                "MODX Evo",
-                "MantisBT",
-                "Mautic",
-                "Maya",
-                "OXID",
-                "Plentymarkets",
-                "Porto",
-                "RadPHP",
-                "SMF",
-                "Starbug",
-                "Thelia",
-                "Whmcs",
-                "WolfCMS",
-                "agl",
-                "aimeos",
-                "annotatecms",
-                "attogram",
-                "bitrix",
-                "cakephp",
-                "chef",
-                "cockpit",
-                "codeigniter",
-                "concrete5",
-                "croogo",
-                "dokuwiki",
-                "drupal",
-                "eZ Platform",
-                "elgg",
-                "expressionengine",
-                "fuelphp",
-                "grav",
-                "installer",
-                "itop",
-                "joomla",
-                "known",
-                "kohana",
-                "laravel",
-                "lavalite",
-                "lithium",
-                "magento",
-                "majima",
-                "mako",
-                "mediawiki",
-                "miaoxing",
-                "modulework",
-                "modx",
-                "moodle",
-                "osclass",
-                "pantheon",
-                "phpbb",
-                "piwik",
-                "ppi",
-                "processwire",
-                "puppet",
-                "pxcms",
-                "reindex",
-                "roundcube",
-                "shopware",
-                "silverstripe",
-                "sydes",
-                "sylius",
-                "symfony",
-                "tastyigniter",
-                "typo3",
-                "wordpress",
-                "yawik",
-                "zend",
-                "zikula"
-            ],
-            "support": {
-                "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/1.x"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "install-path": "./installers"
+        "require": {
+            "composer/installers": "~1.0",
+            "php": ">=5.3.0",
+            "squizlabs/php_codesniffer": "*",
+            "wp-coding-standards/wpcs": "^2.3"
+        },
+        "require-dev": {
+            "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2"
+        },
+        "time": "2022-03-31T10:41:21+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "ayecode-ui-loader.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-3.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "AyeCode Ltd",
+                "email": "contact@ayecode.io",
+                "homepage": "https://ayecode.io/",
+                "role": "Developer"
+            }
+        ],
+        "description": "A Bootstrap UI for WordPress plugins and themes.",
+        "homepage": "https://github.com/AyeCode/wp-ayecode-ui",
+        "keywords": [
+            "ayecode",
+            "boot",
+            "bootstrap"
+        ]
+    },
+    {
+        "name": "ayecode/wp-font-awesome-settings",
+        "version": "1.0.13",
+        "version_normalized": "1.0.13.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/AyeCode/wp-font-awesome-settings.git",
+            "reference": "a7a11ee4290674ec214d1fe694139af275350402"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/AyeCode/wp-font-awesome-settings/zipball/a7a11ee4290674ec214d1fe694139af275350402",
+            "reference": "a7a11ee4290674ec214d1fe694139af275350402",
+            "shasum": ""
+        },
+        "require": {
+            "composer/installers": "~1.0",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "dealerdirect/phpcodesniffer-composer-installer": "*",
+            "squizlabs/php_codesniffer": "^3.2",
+            "wp-coding-standards/wpcs": "*"
+        },
+        "time": "2021-07-13T15:09:44+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "wp-font-awesome-settings.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-3.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "AyeCode Ltd",
+                "email": "contact@ayecode.io",
+                "homepage": "https://ayecode.io/",
+                "role": "Developer"
+            }
+        ],
+        "description": "Settings page for Font Awesome in WordPress",
+        "homepage": "https://github.com/AyeCode/wp-font-awesome-settings",
+        "keywords": [
+            "FontAwesome",
+            "font-awesome"
+        ],
+        "support": {
+            "issues": "https://github.com/AyeCode/wp-font-awesome-settings/issues",
+            "source": "https://github.com/AyeCode/wp-font-awesome-settings/tree/1.0.13"
         }
-    ],
-    "dev": true,
-    "dev-package-names": []
-}
+    },
+    {
+        "name": "composer/installers",
+        "version": "1.x-dev",
+        "version_normalized": "1.9999999.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/composer/installers.git",
+            "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/composer/installers/zipball/894a0b5c5d34c88b69b097f2aae1439730fa6836",
+            "reference": "894a0b5c5d34c88b69b097f2aae1439730fa6836",
+            "shasum": ""
+        },
+        "require": {
+            "composer-plugin-api": "^1.0 || ^2.0"
+        },
+        "replace": {
+            "roundcube/plugin-installer": "*",
+            "shama/baton": "*"
+        },
+        "require-dev": {
+            "composer/composer": "1.6.* || ^2.0",
+            "composer/semver": "^1 || ^3",
+            "phpstan/phpstan": "^0.12.55",
+            "phpstan/phpstan-phpunit": "^0.12.16",
+            "symfony/phpunit-bridge": "^4.2 || ^5",
+            "symfony/process": "^2.3"
+        },
+        "time": "2022-03-15T21:23:54+00:00",
+        "type": "composer-plugin",
+        "extra": {
+            "class": "Composer\\Installers\\Plugin",
+            "branch-alias": {
+                "dev-main": "1.x-dev"
+            },
+            "plugin-modifies-install-path": true
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Composer\\Installers\\": "src/Composer/Installers"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Kyle Robinson Young",
+                "email": "kyle@dontkry.com",
+                "homepage": "https://github.com/shama"
+            }
+        ],
+        "description": "A multi-framework Composer library installer",
+        "homepage": "https://composer.github.io/installers/",
+        "keywords": [
+            "Craft",
+            "Dolibarr",
+            "Eliasis",
+            "Hurad",
+            "ImageCMS",
+            "Kanboard",
+            "Lan Management System",
+            "MODX Evo",
+            "MantisBT",
+            "Mautic",
+            "Maya",
+            "OXID",
+            "Plentymarkets",
+            "Porto",
+            "RadPHP",
+            "SMF",
+            "Starbug",
+            "Thelia",
+            "Whmcs",
+            "WolfCMS",
+            "agl",
+            "aimeos",
+            "annotatecms",
+            "attogram",
+            "bitrix",
+            "cakephp",
+            "chef",
+            "cockpit",
+            "codeigniter",
+            "concrete5",
+            "croogo",
+            "dokuwiki",
+            "drupal",
+            "eZ Platform",
+            "elgg",
+            "expressionengine",
+            "fuelphp",
+            "grav",
+            "installer",
+            "itop",
+            "joomla",
+            "known",
+            "kohana",
+            "laravel",
+            "lavalite",
+            "lithium",
+            "magento",
+            "majima",
+            "mako",
+            "mediawiki",
+            "miaoxing",
+            "modulework",
+            "modx",
+            "moodle",
+            "osclass",
+            "pantheon",
+            "phpbb",
+            "piwik",
+            "ppi",
+            "processwire",
+            "puppet",
+            "pxcms",
+            "reindex",
+            "roundcube",
+            "shopware",
+            "silverstripe",
+            "sydes",
+            "sylius",
+            "symfony",
+            "tastyigniter",
+            "typo3",
+            "wordpress",
+            "yawik",
+            "zend",
+            "zikula"
+        ],
+        "support": {
+            "issues": "https://github.com/composer/installers/issues",
+            "source": "https://github.com/composer/installers/tree/1.x"
+        },
+        "funding": [
+            {
+                "url": "https://packagist.com",
+                "type": "custom"
+            },
+            {
+                "url": "https://github.com/composer",
+                "type": "github"
+            },
+            {
+                "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                "type": "tidelift"
+            }
+        ]
+    },
+    {
+        "name": "squizlabs/php_codesniffer",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+            "reference": "2596a15760a1e652d64707d5ca21af0a31e5d2d8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/2596a15760a1e652d64707d5ca21af0a31e5d2d8",
+            "reference": "2596a15760a1e652d64707d5ca21af0a31e5d2d8",
+            "shasum": ""
+        },
+        "require": {
+            "ext-simplexml": "*",
+            "ext-tokenizer": "*",
+            "ext-xmlwriter": "*",
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+        },
+        "time": "2022-03-31T22:21:18+00:00",
+        "bin": [
+            "bin/phpcs",
+            "bin/phpcbf"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Greg Sherwood",
+                "role": "lead"
+            }
+        ],
+        "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+        "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+        "keywords": [
+            "phpcs",
+            "standards"
+        ]
+    },
+    {
+        "name": "wp-coding-standards/wpcs",
+        "version": "2.3.0",
+        "version_normalized": "2.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
+            "reference": "7da1894633f168fe244afc6de00d141f27517b62"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/7da1894633f168fe244afc6de00d141f27517b62",
+            "reference": "7da1894633f168fe244afc6de00d141f27517b62",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4",
+            "squizlabs/php_codesniffer": "^3.3.1"
+        },
+        "require-dev": {
+            "dealerdirect/phpcodesniffer-composer-installer": "^0.5 || ^0.6",
+            "phpcompatibility/php-compatibility": "^9.0",
+            "phpcsstandards/phpcsdevtools": "^1.0",
+            "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+        },
+        "suggest": {
+            "dealerdirect/phpcodesniffer-composer-installer": "^0.6 || This Composer plugin will sort out the PHPCS 'installed_paths' automatically."
+        },
+        "time": "2020-05-13T23:57:56+00:00",
+        "type": "phpcodesniffer-standard",
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Contributors",
+                "homepage": "https://github.com/WordPress/WordPress-Coding-Standards/graphs/contributors"
+            }
+        ],
+        "description": "PHP_CodeSniffer rules (sniffs) to enforce WordPress coding conventions",
+        "keywords": [
+            "phpcs",
+            "standards",
+            "wordpress"
+        ]
+    }
+]
