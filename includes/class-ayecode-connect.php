@@ -430,8 +430,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			//Prepare transient name
 			$transient = $this->prefix . '_activation_secret';
 
-			//Fetch its value
-			$secret = get_transient( $transient );
+			// Persistent Transients cache
+			if ( wp_using_ext_object_cache() ) {
+                // Fetch its value
+				$secret = $this->get_transient( $transient );
+			}else{
+                // Fetch its value
+				$secret = get_transient( $transient );
+			}
+
 
 			//If set, return
 			if ( ! empty( $secret ) ) {
@@ -448,6 +455,37 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			return $secret;
 
 		}
+
+		/**
+         * Our own non-cached version.
+         *
+		 * @param $transient
+		 *
+		 * @return false|mixed|void
+		 */
+        public function get_transient( $transient ){
+
+            $transient_option = '_transient_' . $transient;
+            if ( ! wp_installing() ) {
+                // If option is not in alloptions, it is not autoloaded and thus has a timeout.
+                $alloptions = wp_load_alloptions();
+                if ( ! isset( $alloptions[ $transient_option ] ) ) {
+                    $transient_timeout = '_transient_timeout_' . $transient;
+                    $timeout           = get_option( $transient_timeout );
+                    if ( false !== $timeout && $timeout < time() ) {
+                        delete_option( $transient_option );
+                        delete_option( $transient_timeout );
+                        $value = false;
+                    }
+                }
+            }
+
+            if ( ! isset( $value ) ) {
+                $value = get_option( $transient_option );
+            }
+
+	        return $value;
+        }
 
 		/**
 		 * Builds a URL to the remote connection auth page.

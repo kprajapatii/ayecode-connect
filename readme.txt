@@ -77,6 +77,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.2.11 =
+* Persistent Object cache plugins can make connection fail - FIXED
+
 = 1.2.10 =
 * Added strip/replace functionality to demo content to prevent Mod Security blocking some demo imports - ADDED
 
