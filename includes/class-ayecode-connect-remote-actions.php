@@ -280,6 +280,25 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					self::delete_demo_posts( 'post' );
 					self::delete_demo_posts( 'attachment' );
 
+					// maybe set page featured images
+					$fi = get_option('_acdi_page_featured_images');
+					if ( ! empty( $fi ) ) {
+
+						foreach($fi as $p => $i){
+							$image = (array) GeoDir_Media::get_external_media( $i, '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
+
+							if(!empty($image['url'])){
+								$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment($image);
+								if( $attachment_id ){
+									set_post_thumbnail($p,$attachment_id );// this will not set if there are dummy posts
+									update_post_meta($attachment_id,'_ayecode_demo',1);
+								}
+							}
+						}
+
+						delete_option('_acdi_page_featured_images');
+					}
+
 				}
 
 
@@ -364,6 +383,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// page templates, note that everything is sanitised further down, wp_insert_post passes everything through sanitize_post()
 				$pages = ! empty( $_REQUEST['pages'] ) ? json_decode( stripslashes( $_REQUEST['pages'] ), true ) : array();
 
+				$featured_images_assign = array();
 				$old_and_new = array();
 
 				if ( ! empty( $pages ) && function_exists( 'geodir_get_settings' ) ) {
@@ -410,6 +430,19 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							if ( $post_id && $old_id ) {
 								$old_and_new[ $old_id ] = $post_id;
 							}
+
+							// featured image
+							$image_url = !empty($page['_featured_image_url']) ? esc_url_raw($page['_featured_image_url']) : '';
+
+							if ( $image_url ) {
+								$featured_images_assign[$post_id] = $image_url;
+							}
+
+
+						}
+
+						if ( ! empty( $featured_images_assign ) ) {
+							update_option('_acdi_page_featured_images', $featured_images_assign);
 						}
 
 					}
@@ -417,11 +450,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					// Elementor @todo add check for elementor pro
 					if ( ! empty( $pages['elementor'] ) ) {
 
-
+						$default_kit_id = get_option( 'elementor_active_kit' );
+						$new_kit_id = 0;
+						delete_option( 'elementor_active_kit' );
 						foreach ( $pages['elementor'] as $cpt => $page_templates ) {
 
 							// remove old demos
 							$this->delete_demo_posts( $cpt );
+
 							$archives    = array();
 							$items       = array();
 							if ( ! empty( $page_templates ) ) {
@@ -442,13 +478,24 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 										if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'geodirectory-archive-item' ) {
 											$items[ $old_id ] = absint( $post_id );
 										}
+
+										// kit
+										if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'kit' ) {
+											$new_kit_id = absint( $post_id );
+										}
 									}
 								}
 							}
 
+							if ( $new_kit_id ) {
+								update_option( 'elementor_active_kit', $new_kit_id);
+							}
+
+
 							// temp save replace ids
 							update_option('_acdi_replacement_post_ids',$old_and_new);
 							update_option('_acdi_replacement_archive_item_ids',$items);
+							update_option( '_acdi_original_elementor_active_kit', $default_kit_id);
 
 							// extras
 							if ( ! empty( $old_and_new ) ) {
@@ -589,7 +636,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
 
-			// Elementor
+			// Elementor allow delete kit (without this it throws a confirmation page and blocks import)
+			$_GET['force_delete_kit'] = 1;
+
 			$posts = get_posts(
 				array(
 					'post_type'   => esc_attr( $cpt ),
@@ -600,7 +649,10 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			);
 			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $p ) {
-					wp_delete_post( $p->ID, true );
+					if($p->post_name != 'default-kit'){
+						wp_delete_post( $p->ID, true );
+					}
+
 				}
 			}
 
@@ -677,7 +729,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			if ( $type == 'elementor' ) {
 
 				// skip Default kit (maybe we want to update this in future?
-				if( isset($page_template['meta_input']['_elementor_template_type']) && $page_template['meta_input']['_elementor_template_type'] == 'kit' ){return 0;}
+				//if( isset($page_template['meta_input']['_elementor_template_type']) && $page_template['meta_input']['_elementor_template_type'] == 'kit' ){return 0;}
 
 				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_author']   = 1;
@@ -686,8 +738,20 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				$post_id = wp_insert_post( $page_template, true );
 
+				if ( is_wp_error( $post_id ) ) {
+					$error_string = $post_id->get_error_message();
+					if ( $this->debug ) { $this->debug_log( __METHOD__, 'post insert error', $error_string ); }
+				}else{
+					if ( $this->debug ) { $this->debug_log( __METHOD__, 'post inserted', $post_id ); }
+				}
+
 				// maybe set tax (not working from wp_insert_post)
 				if ( $post_id && ! empty( $page_template['tax_input'] ) ) {
+
+					// default kit
+					if(!empty($page_template['meta_input']['active_kit'])){
+						update_option( 'elementor_active_kit', $post_id);
+					}
 
 					if ( ! function_exists( 'wp_create_term' ) ) {
 						include_once ABSPATH . 'wp-admin/includes/taxonomy.php';
@@ -1142,7 +1206,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				'custom_css',
 				'geodir_settings',
 				'widget_block',
-				'sidebars_widgets'
+				'sidebars_widgets',
+				'elementor_disable_color_schemes',
+				'elementor_disable_typography_schemes',
 			);
 
 			if( in_array($key,$white_list) || substr( $key, 0, 11 ) === "theme_mods_" || substr( $key, 0, 7 ) === "widget_" ){
@@ -1507,7 +1573,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); //for plugins_api..
 
-
 			$plugin_slug = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
 			$plugin      = array(
 				'name'             => isset( $_REQUEST['name'] ) ? esc_attr( $_REQUEST['name'] ) : '',
@@ -1517,6 +1582,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				'activate'         => isset( $_REQUEST['activate'] ) && $_REQUEST['activate'] ? true : false,
 				'network_activate' => isset( $_REQUEST['network_activate'] ) && $_REQUEST['network_activate'] ? true : false,
 			);
+
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin', $plugin ); }
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin_request', $_REQUEST ); }
 
 			$install = $this->background_installer( $plugin_slug, $plugin );
 
@@ -1559,6 +1627,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 
 			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			if ( $this->debug ) { $this->debug_log( __METHOD__, 'args', $plugin_to_install ); }
+
 			$task_result = false;
 			if ( ! empty( $plugin_to_install['repo-slug'] ) ) {
 				require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -1603,7 +1673,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'download_link' => esc_url( $plugin_to_install['download_link'] ),
 							);
 						} else {
-
+							if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-slug',$plugin_to_install['repo-slug'] ); }
 							$plugin_information = plugins_api( 'plugin_information', array(
 								'slug'   => $plugin_to_install['repo-slug'],
 								'fields' => array(
@@ -1628,12 +1698,15 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							throw new Exception( $plugin_information->get_error_message() );
 						}
 
+						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-info' ); }
+
 						$package  = $plugin_information->download_link;
 						$download = $upgrader->download_package( $package );
 
 						if ( is_wp_error( $download ) ) {
 							throw new Exception( $download->get_error_message() );
 						}
+						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-downloaded' ); }
 
 						$working_dir = $upgrader->unpack_package( $download, true );
 
@@ -1653,6 +1726,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'action' => 'install',
 							),
 						) );
+						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-install', print_r($result, true) ); }
 
 						if ( ! is_wp_error( $result ) ) {
 							$task_result = true;
@@ -1673,7 +1747,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// Activate this thing
 				if ( $activate ) {
 					try {
+						if ( $this->debug ) { $this->debug_log( __METHOD__, 'activate_plugin', $plugin ); }
+
+
 						$result = activate_plugin( $plugin, "", $network_activate );
+
+						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-activate', print_r($result, true) ); }
 
 						if ( ! is_wp_error( $result ) ) {
 							$task_result = true;
