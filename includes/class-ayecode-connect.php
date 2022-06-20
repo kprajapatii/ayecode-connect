@@ -375,6 +375,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . '_support' );
 			delete_option( $this->prefix . '_support_user' );
 			delete_option( $this->prefix . '_url' );
+			delete_option( $this->prefix . '_activation_secret' );
 			delete_transient( $this->prefix . '_activation_secret' );
 			delete_transient( $this->prefix . '_support_user_key' );
 			delete_transient( $this->prefix . '_site_moved' );
@@ -412,6 +413,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			wp_clear_scheduled_hook( $this->prefix . "_callback" );
 			wp_schedule_event( time(), 'daily', $this->prefix . "_callback" );
 
+			// if using object cache clear secret if not used
+			if ( wp_using_ext_object_cache() ) {
+				delete_option( $this->prefix . '_activation_secret' );
+			}
+
 
 			// make the licence sync run on next load
 //			wp_schedule_single_event( time(), $this->prefix . "_callback" );
@@ -430,15 +436,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			//Prepare transient name
 			$transient = $this->prefix . '_activation_secret';
 
-			// Persistent Transients cache
+			// Persistent cache hates transients, either not changing or always changing.
 			if ( wp_using_ext_object_cache() ) {
                 // Fetch its value
-				$secret = $this->get_transient( $transient );
+				$secret = get_option( $transient );
 			}else{
                 // Fetch its value
 				$secret = get_transient( $transient );
 			}
-
 
 			//If set, return
 			if ( ! empty( $secret ) ) {
@@ -448,8 +453,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			//Else, create a new activation secret...
 			$secret = wp_generate_password( 24, false );
 
-			//Then cache it as a transient
-			set_transient( $transient, $secret, 3 * HOUR_IN_SECONDS );
+			if ( wp_using_ext_object_cache() ) {
+				//Then set it as an option
+				add_option( $transient, $secret );
+			}else{
+				//Then cache it as a transient
+				set_transient( $transient, $secret, 3 * HOUR_IN_SECONDS );
+			}
+
 
 			//Return the new activation secret
 			return $secret;
@@ -464,27 +475,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return false|mixed|void
 		 */
         public function get_transient( $transient ){
+            global $wpdb;
 
             $transient_option = '_transient_' . $transient;
-            if ( ! wp_installing() ) {
-                // If option is not in alloptions, it is not autoloaded and thus has a timeout.
-                $alloptions = wp_load_alloptions();
-                if ( ! isset( $alloptions[ $transient_option ] ) ) {
-                    $transient_timeout = '_transient_timeout_' . $transient;
-                    $timeout           = get_option( $transient_timeout );
-                    if ( false !== $timeout && $timeout < time() ) {
-                        delete_option( $transient_option );
-                        delete_option( $transient_timeout );
-                        $value = false;
-                    }
-                }
-            }
 
-            if ( ! isset( $value ) ) {
-                $value = get_option( $transient_option );
-            }
-
-	        return $value;
+	        return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->prefix}options WHERE option_name = %s", $transient_option ) );
         }
 
 		/**

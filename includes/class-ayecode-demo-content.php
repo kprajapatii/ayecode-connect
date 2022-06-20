@@ -229,7 +229,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					<?php
 					echo aui()->alert(array(
 							'type'=> 'info',
-							'content'=> __("This importer should only be used on NEW sites, it will change the whole look and appearance of your site.","geodirectory")
+                            'class' => 'mt-4',
+							'content'=> __("This importer should only be used on NEW sites, it will change the whole look and appearance of your site.","ayecode-connect")
 						)
 					);
 					?>
@@ -568,7 +569,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				if ( ! is_wp_error( $data ) && $data['response']['code'] == 200 ) {
 					$responseBody = wp_remote_retrieve_body( $data );
 					$sites        = json_decode( $responseBody );
-					set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS ); // @todo enable this after testing
+					set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS );
 				}
 			}
 

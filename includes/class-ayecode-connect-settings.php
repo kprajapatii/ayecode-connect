@@ -172,6 +172,11 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			if ( $this->client->is_registered() ) {
 				$this->client->get_remote_user_info();
 			}
+
+            // if using object cache clear secret if not used
+			if ( wp_using_ext_object_cache() ) {
+				delete_option( $this->client->prefix . '_activation_secret' );
+			}
 		}
 
 		/**
@@ -750,28 +755,49 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										</div>
 									</div>
 								</div>
-								<div class="card mw-100 p-0 m-0">
-									<div class="card-header position-relative" id="headingTwo">
-										<h5 class="mb-0 h5 py-2 px-4">
-											<a class="collapsed stretched-link" type="button" data-toggle="collapse"
-											   data-target="#collapseTwo" aria-expanded="false"
-											   aria-controls="collapseTwo">
+                                <div class="card mw-100 p-0 m-0">
+                                    <div class="card-header position-relative" id="headingTwo">
+                                        <h5 class="mb-0 h5 py-2 px-4">
+                                            <a class="collapsed stretched-link" type="button" data-toggle="collapse"
+                                               data-target="#collapseTwo" aria-expanded="false"
+                                               aria-controls="collapseTwo">
+												<?php _e( "Activation Secret", "ayecode-connect" ); ?>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                         data-parent="#accordionExample">
+                                        <div class="card-body">
+											<?php
+											echo $this->client->get_activation_secret();
+							                ?>
+
+                                            <div class="ac-test-results py-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mw-100 p-0 m-0">
+                                    <div class="card-header position-relative" id="headingTwo">
+                                        <h5 class="mb-0 h5 py-2 px-4">
+                                            <a class="collapsed stretched-link" type="button" data-toggle="collapse"
+                                               data-target="#collapseTwo" aria-expanded="false"
+                                               aria-controls="collapseTwo">
 												<?php _e( "Debug Tools", "ayecode-connect" ); ?>
-											</a>
-										</h5>
-									</div>
-									<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-									     data-parent="#accordionExample">
-										<div class="card-body">
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                         data-parent="#accordionExample">
+                                        <div class="card-body">
 											<?php
 											echo "<button class='btn btn-primary' onclick='ayecode_connect_clear_licenses();'>" . __( "Clear all licenses", "ayecode-connect" ) . "</button>\n";
 											echo "<button class='btn btn-primary' onclick='ayecode_connect_check_connection();'>" . __( "Test Connection ability", "ayecode-connect" ) . "</button>\n";
 											?>
 
-											<div class="ac-test-results py-3"></div>
-										</div>
-									</div>
-								</div>
+                                            <div class="ac-test-results py-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
 								<div class="card mw-100 p-0 m-0">
 									<div class="card-header position-relative" id="headingThree">
 										<h5 class="mb-0 h5 py-2 px-4">
