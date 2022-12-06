@@ -3,11 +3,11 @@ Contributors: stiofansisland, paoltaia, ayecode, Ismiaini
 Donate link: https://www.ko-fi.com/stiofan
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Tags:  ayecode, service, geodirectory, userswp, wpinvoicing
+Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 6.0
-Stable tag: 1.2.11
+Tested up to: 6.1
+Stable tag: 1.2.12
 
 
 AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -61,7 +61,7 @@ No, you can register a free account on our site which will provide you with live
 = Is my connection to your site safe? =
 
 Yes, our system will only connect via HTTPS ensuring all passed data is encrypted.
-Additionally we built our systems in such a way that;
+Additionally, we built our systems in such a way that;
 Should your database or our database (or both) be compromised, this would not result in access to your site.
 Should your files or our files (or both) be compromised, this would not result in access to your site.
 
@@ -76,6 +76,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.2.12 =
+* Spelling mistake error which could prevent GetPaid extensions showing correctly - FIXED
 
 = 1.2.11 =
 * Persistent Object cache plugins can make connection fail - FIXED

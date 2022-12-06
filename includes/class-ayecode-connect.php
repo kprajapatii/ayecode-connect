@@ -212,7 +212,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					} elseif ( trailingslashit( $update_url ) == "https://userswp.io/" || trailingslashit( $update_url ) == "http://userswp.io/" ) {
 						$domain = 'userswp.io';
 					} elseif ( trailingslashit( $update_url ) == "https://wpinvoicing.com/" || trailingslashit( $update_url ) == "http://wpinvoicing.com/" ) {
-						$domain = 'wwpinvoicing.com'; /* TODO: need to fix this after check */
+						$domain = 'wpinvoicing.com'; /* TODO: need to fix this after check */
 					}
 
 					if ( $domain ) {

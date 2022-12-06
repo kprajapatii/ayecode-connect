@@ -461,9 +461,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 
 			if ( is_wp_error( $result ) ) {
-				wp_send_json_success( $result->get_error_message() );
+				wp_send_json_success( "to ayecode:" . $result->get_error_message() );
 			} elseif ( empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
-				wp_send_json_error( esc_attr( $api_response['message'] ) );
+				wp_send_json_error( esc_attr("from ayecode:" . $api_response['message'] ) );
 			} elseif ( ! empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
 				wp_send_json_success( esc_attr( $api_response['message'] ) );
 			}
@@ -756,16 +756,16 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									</div>
 								</div>
                                 <div class="card mw-100 p-0 m-0">
-                                    <div class="card-header position-relative" id="headingTwo">
+                                    <div class="card-header position-relative" id="headingTwo2">
                                         <h5 class="mb-0 h5 py-2 px-4">
                                             <a class="collapsed stretched-link" type="button" data-toggle="collapse"
-                                               data-target="#collapseTwo" aria-expanded="false"
-                                               aria-controls="collapseTwo">
+                                               data-target="#collapseTwo2" aria-expanded="false"
+                                               aria-controls="collapseTwo2">
 												<?php _e( "Activation Secret", "ayecode-connect" ); ?>
                                             </a>
                                         </h5>
                                     </div>
-                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                    <div id="collapseTwo2" class="collapse" aria-labelledby="headingTwo2"
                                          data-parent="#accordionExample">
                                         <div class="card-body">
 											<?php
