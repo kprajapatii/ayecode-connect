@@ -184,6 +184,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		 * Settings page HTML.
 		 */
 		public function settings_page( $wizard = false ) {
+            global $aui_bs5;
 
 			// if not connectd then redirect to connection screen
 			if(!$this->client->is_active()){
@@ -261,8 +262,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 								<div class="col-3 border-right pr-0 vh-100 d-flex flex-column">
 									<div class="modal-header">
 										<h5 class="modal-title" id="staticBackdropLabel"></h5>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
+										<button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+											<?php echo $aui_bs5 ? '' : '<span aria-hidden="true">&times;</span>'; ?>
 										</button>
 									</div>
 									<div class="modal-body overflow-auto bg-light scrollbars-ios ac-import-progress d-none">

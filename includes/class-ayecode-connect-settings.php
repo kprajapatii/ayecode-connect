@@ -492,6 +492,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		 * Settings page HTML.
 		 */
 		public function settings_page() {
+            global $aui_bs5;
 
 			// bsui wrapper makes our bootstrap wrapper work
 			?>
@@ -501,6 +502,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 				#wpbody-content > div.error {
 					display: none;
 				}
+                #ayecode-connect-wrapper input[type=checkbox]:checked::before{
+                    content: '';
+                  }
 			</style>
 
 			<div class="bsui" style="margin-left: -20px;">
@@ -536,55 +540,55 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
-											class="mr-auto"><?php _e( "Plugin and theme update notifications", "ayecode-connect" ); ?></span>
-										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+											class="mr-auto me-auto"><?php _e( "Plugin and theme update notifications", "ayecode-connect" ); ?></span>
+										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
-										<div class="custom-control custom-switch">
-											<input type="checkbox" class="custom-control-input" id="ac-setting-updates"
+										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
+											<input type="checkbox" class="custom-control-input form-check-input" id="ac-setting-updates"
 												<?php if ( defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
 													echo "checked";
 												} ?>
 												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_updates(this,1);}else{ayecode_connect_updates(this,0);}"
 											>
-											<label class="custom-control-label" for="ac-setting-updates"></label>
+											<label class="custom-control-label form-check-label" for="ac-setting-updates"></label>
 										</div>
 									</li>
 
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
-											class="mr-auto"><?php _e( "One click addon installs, no more license keys", "ayecode-connect" ); ?></span>
-										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+											class="mr-auto me-auto"><?php _e( "One click addon installs, no more license keys", "ayecode-connect" ); ?></span>
+										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
-										<div class="custom-control custom-switch">
-											<input type="checkbox" class="custom-control-input" id="ac-setting-licences"
+										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
+											<input type="checkbox" class="custom-control-input form-check-input" id="ac-setting-licences"
 												<?php if ( get_option( $this->client->prefix . "_licence_sync" ) ) {
 													echo "checked";
 												} ?>
 												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_licences(this,1);}else{ayecode_connect_licences(this,0);}"
 											>
-											<label class="custom-control-label" for="ac-setting-licences"></label>
+											<label class="custom-control-label form-check-label" for="ac-setting-licences"></label>
 										</div>
 									</li>
 
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
-											class="mr-auto"><?php _e( "Documentation and Support Widget", "ayecode-connect" ); ?></span>
-										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+											class="mr-auto me-auto"><?php _e( "Documentation and Support Widget", "ayecode-connect" ); ?></span>
+										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
-										<div class="custom-control custom-switch">
-											<input type="checkbox" class="custom-control-input" id="ac-setting-support"
+										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
+											<input type="checkbox" class="custom-control-input form-check-input" id="ac-setting-support"
 												<?php if ( get_option( $this->client->prefix . "_support", true ) ) {
 													echo "checked";
 												} ?>
 												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_support(this,1);}else{ayecode_connect_support(this,0);}"
 											>
-											<label class="custom-control-label" for="ac-setting-support"></label>
+											<label class="custom-control-label form-check-label" for="ac-setting-support"></label>
 										</div>
 									</li>
 
@@ -596,33 +600,33 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									?>
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
-											class="mr-auto"><?php _e( "Temporary Support User Access", "ayecode-connect" ); ?></span>
+											class="mr-auto me-auto"><?php _e( "Temporary Support User Access", "ayecode-connect" ); ?></span>
 										<div
-											class=" mr-2 <?php echo $status_text_class; ?> text-muted ac-support-user-status"
+											class=" mr-2 me-2 <?php echo $status_text_class; ?> text-muted ac-support-user-status"
 											role="status">
 											<span
 												class="badge badge-warning font-weight-normal"><?php echo sprintf( __( "Auto expires in %s", "ayecode-connect" ), human_time_diff( time(), $expires ) ); ?></span>
 										</div>
-										<div class="spinner-border spinner-border-sm mr-2 d-none text-muted"
+										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
-										<div class="custom-control custom-switch">
-											<input type="checkbox" class="custom-control-input"
+										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
+											<input type="checkbox" class="custom-control-input form-check-input"
 											       id="ac-setting-support-user"
 												<?php if ( get_option( $this->client->prefix . "_support_user", false ) ) {
 													echo "checked";
 												} ?>
 												   onclick="if(jQuery(this).is(':checked')){ayecode_connect_support_user(this,1);}else{ayecode_connect_support_user(this,0);}"
 											>
-											<label class="custom-control-label" for="ac-setting-support-user"></label>
+											<label class="custom-control-label form-check-label" for="ac-setting-support-user"></label>
 										</div>
 									</li>
 
 								</ul>
 
 								<p class="mt-4">
-									<span class="spinner-border spinner-border-sm mr-2 d-none text-muted" role="status">
+									<span class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted" role="status">
 										<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 									</span>
 									<a href="javascript:void(0)"
@@ -729,25 +733,24 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 						$blog_id  = get_option( $this->client->prefix . '_blog_id', false );
 						$site_url = get_option( $this->client->prefix . '_url', false );
-
+//						$aui_bs5 = 0;
+                        $bs5_prefix = $aui_bs5 ? '-bs' : '';
 						?>
 						<div class='ayedebug-wrapper bsui'>
 							<h4><?php _e( "Debug Info", "ayecode-connect" ); ?></h4>
-							<div class="accordion text-left mb-4" id="accordionExample">
-								<div class="card mw-100 p-0 m-0">
-									<div class="card-header position-relative" id="headingOne">
-										<h5 class="mb-0 h5 py-2 px-4">
-											<a class="stretched-link" type="button" data-toggle="collapse"
-											   data-target="#collapseOne" aria-expanded="true"
-											   aria-controls="collapseOne">
-												<?php _e( "Connection Info", "ayecode-connect" ); ?>
-											</a>
-										</h5>
+							<div class="accordion text-left text-start mb-4" id="accordionExample">
+								<div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+									<div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="headingOne">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?>" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapseOne" aria-expanded="true"
+                                           aria-controls="collapseOne">
+                                            <?php _e( "Connection Info", "ayecode-connect" ); ?>
+                                        </a>
 									</div>
 
-									<div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+									<div id="collapseOne" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse show" aria-labelledby="headingOne"
 									     data-parent="#accordionExample">
-										<div class="card-body">
+										<div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?> ">
 											<?php
 											echo '<h5>blog id ' . absint( $blog_id ) . '</h5>';
 											echo '<h5>Site URL ' . esc_attr( $site_url ) . '</h5>';
@@ -755,40 +758,34 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										</div>
 									</div>
 								</div>
-                                <div class="card mw-100 p-0 m-0">
-                                    <div class="card-header position-relative" id="headingTwo2">
-                                        <h5 class="mb-0 h5 py-2 px-4">
-                                            <a class="collapsed stretched-link" type="button" data-toggle="collapse"
-                                               data-target="#collapseTwo2" aria-expanded="false"
-                                               aria-controls="collapseTwo2">
-												<?php _e( "Activation Secret", "ayecode-connect" ); ?>
-                                            </a>
-                                        </h5>
+                                <div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+                                    <div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="headingTwo2">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?> collapsed" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapseTwo2" aria-expanded="false"
+                                           aria-controls="collapseTwo2">
+                                            <?php _e( "Activation Secret", "ayecode-connect" ); ?>
+                                        </a>
                                     </div>
-                                    <div id="collapseTwo2" class="collapse" aria-labelledby="headingTwo2"
+                                    <div id="collapseTwo2" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse" aria-labelledby="headingTwo2"
                                          data-parent="#accordionExample">
-                                        <div class="card-body">
+                                        <div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 											<?php
 											echo $this->client->get_activation_secret();
 							                ?>
-
-                                            <div class="ac-test-results py-3"></div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card mw-100 p-0 m-0">
-                                    <div class="card-header position-relative" id="headingTwo">
-                                        <h5 class="mb-0 h5 py-2 px-4">
-                                            <a class="collapsed stretched-link" type="button" data-toggle="collapse"
-                                               data-target="#collapseTwo" aria-expanded="false"
-                                               aria-controls="collapseTwo">
-												<?php _e( "Debug Tools", "ayecode-connect" ); ?>
-                                            </a>
-                                        </h5>
+                                <div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+                                    <div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="headingTwo">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?> collapsed" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapseTwo" aria-expanded="false"
+                                           aria-controls="collapseTwo">
+                                            <?php _e( "Debug Tools", "ayecode-connect" ); ?>
+                                        </a>
                                     </div>
-                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                    <div id="collapseTwo" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse" aria-labelledby="headingTwo"
                                          data-parent="#accordionExample">
-                                        <div class="card-body">
+                                        <div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 											<?php
 											echo "<button class='btn btn-primary' onclick='ayecode_connect_clear_licenses();'>" . __( "Clear all licenses", "ayecode-connect" ) . "</button>\n";
 											echo "<button class='btn btn-primary' onclick='ayecode_connect_check_connection();'>" . __( "Test Connection ability", "ayecode-connect" ) . "</button>\n";
@@ -798,19 +795,17 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
                                         </div>
                                     </div>
                                 </div>
-								<div class="card mw-100 p-0 m-0">
-									<div class="card-header position-relative" id="headingThree">
-										<h5 class="mb-0 h5 py-2 px-4">
-											<a class="collapsed stretched-link" type="button" data-toggle="collapse"
-											   data-target="#collapseThree" aria-expanded="false"
-											   aria-controls="collapseThree">
-												<?php _e( "All User Licenses Found", "ayecode-connect" ); ?>
-											</a>
-										</h5>
+								<div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+									<div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="headingThree">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?> collapsed" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapseThree" aria-expanded="false"
+                                           aria-controls="collapseThree">
+                                            <?php _e( "All User Licenses Found", "ayecode-connect" ); ?>
+                                        </a>
 									</div>
-									<div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+									<div id="collapseThree" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse" aria-labelledby="headingThree"
 									     data-parent="#accordionExample">
-										<div class="card-body">
+										<div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 													<pre>
 													<?php
 													if ( empty( $all_licences ) ) {
@@ -823,18 +818,16 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										</div>
 									</div>
 								</div>
-								<div class="card mw-100 p-0 m-0">
-									<div class="card-header position-relative" id="heading4">
-										<h5 class="mb-0 h5 py-2 px-4">
-											<a class="collapsed stretched-link" type="button" data-toggle="collapse"
-											   data-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-												<?php _e( "All Installed Licenses", "ayecode-connect" ); ?>
-											</a>
-										</h5>
+								<div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+									<div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="heading4">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?> collapsed" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                            <?php _e( "All Installed Licenses", "ayecode-connect" ); ?>
+                                        </a>
 									</div>
-									<div id="collapse4" class="collapse" aria-labelledby="heading4"
+									<div id="collapse4" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse" aria-labelledby="heading4"
 									     data-parent="#accordionExample">
-										<div class="card-body">
+										<div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 													<pre>
 													<?php
 													if ( empty( $actual_licences ) ) {
@@ -847,18 +840,16 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										</div>
 									</div>
 								</div>
-								<div class="card mw-100 p-0 m-0">
-									<div class="card-header position-relative" id="heading5">
-										<h5 class="mb-0 h5 py-2 px-4">
-											<a class="collapsed stretched-link" type="button" data-toggle="collapse"
-											   data-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
-												<?php _e( "get_plugins() return <small>(if Update ID is missing from out,  install helper plugin below)</small>", "ayecode-connect" ); ?>
-											</a>
-										</h5>
+								<div class="<?php echo $aui_bs5 ? 'accordion-item' : 'card '; ?> mw-100 p-0 m-0">
+									<div class="<?php echo $aui_bs5 ? 'accordion-header' : 'card-header'; ?> position-relative" id="heading5">
+                                        <a class="<?php echo $aui_bs5 ? 'accordion-button' : 'stretched-link mb-0 h5 py-2 px-4'; ?> collapsed" type="button" data<?php echo $bs5_prefix;?>-toggle="collapse"
+                                           data<?php echo $bs5_prefix;?>-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                            <?php _e( "get_plugins() return <small>(if Update ID is missing from out,  install helper plugin below)</small>", "ayecode-connect" ); ?>
+                                        </a>
 									</div>
-									<div id="collapse5" class="collapse" aria-labelledby="heading5"
+									<div id="collapse5" class="<?php echo $aui_bs5 ? 'accordion-collapse' : ''; ?> collapse" aria-labelledby="heading5"
 									     data-parent="#accordionExample">
-										<div class="card-body">
+										<div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 													<pre>
 													<?php
 													print_r( get_plugins() );
