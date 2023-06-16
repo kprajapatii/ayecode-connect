@@ -67,6 +67,13 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public $textdomain = 'ayecode-connect';
 
 		/**
+		 * Version
+		 *
+		 * @var string
+		 */
+		public $version = '';
+
+		/**
 		 * Class constructor
 		 *
 		 */

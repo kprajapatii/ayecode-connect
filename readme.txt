@@ -77,6 +77,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.2.15 =
+* PHP deprecated notice "Creation of dynamic property" - FIXED
+
 = 1.2.14 =
 * Changes for upcoming Bootstrap v5 option - ADDED
 
