@@ -43,7 +43,8 @@ function aui_bs_convert_sd_output( $output, $instance = '', $args = '', $sd = ''
 			'font-weight-'  => 'fw-',
 			'btn-block'     => 'w-100',
 			'rounded-left'  => 'rounded-start',
-			'rounded-right'  => 'rounded-left',
+			'rounded-right'  => 'rounded-end',
+			'font-italic' => 'fst-italic',
 
 //			'custom-control custom-checkbox'    => 'form-check',
 			// data
