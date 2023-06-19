@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.2
-Stable tag: 1.2.14
+Stable tag: 1.2.15
 
 
 AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
