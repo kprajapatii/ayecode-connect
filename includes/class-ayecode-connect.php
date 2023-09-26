@@ -1689,7 +1689,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			// check for site URL change, disconnect site and add warning
-			if( $connected_site_url && $site_url && $connected_site_url != $site_url ){
+			if( $site_url && $site_url !== '/' && $connected_site_url && $connected_site_url != $site_url ){
 				// disconnect site but not from remote (that would invalidate the other site)
 				$this->disconnect_site(false);
 
