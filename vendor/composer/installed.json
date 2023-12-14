@@ -1,20 +1,20 @@
 [
     {
         "name": "ayecode/wp-ayecode-ui",
-        "version": "0.1.98",
-        "version_normalized": "0.1.98.0",
+        "version": "0.2.5",
+        "version_normalized": "0.2.5.0",
         "source": {
             "type": "git",
             "url": "https://github.com/AyeCode/wp-ayecode-ui.git",
-            "reference": "24295b88f00766d9fff5909d9d9e08d3cf9ca6c4"
+            "reference": "f63bd3018087aa4ed9af1494d76b50667cda0648"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/AyeCode/wp-ayecode-ui/zipball/24295b88f00766d9fff5909d9d9e08d3cf9ca6c4",
-            "reference": "24295b88f00766d9fff5909d9d9e08d3cf9ca6c4",
+            "url": "https://api.github.com/repos/AyeCode/wp-ayecode-ui/zipball/f63bd3018087aa4ed9af1494d76b50667cda0648",
+            "reference": "f63bd3018087aa4ed9af1494d76b50667cda0648",
             "shasum": ""
         },
-        "time": "2023-08-24T16:00:13+00:00",
+        "time": "2023-12-14T17:09:04+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -44,24 +44,24 @@
     },
     {
         "name": "ayecode/wp-font-awesome-settings",
-        "version": "1.1.2",
-        "version_normalized": "1.1.2.0",
+        "version": "1.1.7",
+        "version_normalized": "1.1.7.0",
         "source": {
             "type": "git",
             "url": "https://github.com/AyeCode/wp-font-awesome-settings.git",
-            "reference": "9222b305caf0d1ccc36940007e6786d20f939af8"
+            "reference": "f52f48d05ff760eb1e22e747a2d011c669f25ed1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/AyeCode/wp-font-awesome-settings/zipball/9222b305caf0d1ccc36940007e6786d20f939af8",
-            "reference": "9222b305caf0d1ccc36940007e6786d20f939af8",
+            "url": "https://api.github.com/repos/AyeCode/wp-font-awesome-settings/zipball/f52f48d05ff760eb1e22e747a2d011c669f25ed1",
+            "reference": "f52f48d05ff760eb1e22e747a2d011c669f25ed1",
             "shasum": ""
         },
         "require": {
             "composer/installers": "~1.0",
             "php": ">=5.3.0"
         },
-        "time": "2023-03-28T08:40:35+00:00",
+        "time": "2023-12-14T17:12:22+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
