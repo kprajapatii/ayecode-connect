@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.2.15\n"
+"Project-Id-Version: AyeCode Connect 1.2.17\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 19:58+0530\n"
-"PO-Revision-Date: 2023-06-19 19:59+0530\n"
+"POT-Creation-Date: 2023-12-14 23:38+0530\n"
+"PO-Revision-Date: 2023-12-14 23:38+0530\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -19,8 +19,15 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Generator: Poedit 3.0\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: assets\n"
+"X-Poedit-SearchPathExcluded-1: vendor/composer\n"
+"X-Poedit-SearchPathExcluded-2: vendor/ayecode/wp-ayecode-ui/assets\n"
+"X-Poedit-SearchPathExcluded-3: vendor/ayecode/wp-ayecode-ui/assets-v5\n"
+"X-Poedit-SearchPathExcluded-4: vendor/ayecode/wp-font-awesome-settings/"
+"assets\n"
 
 #: ayecode-connect.php:90 includes/class-ayecode-demo-content.php:290
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3056
 msgid "Settings"
 msgstr ""
 
@@ -131,6 +138,7 @@ msgid ""
 msgstr ""
 
 #: includes/class-ayecode-connect-settings.php:688
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:39
 msgid "Connect Site"
 msgstr ""
 
@@ -354,35 +362,62 @@ msgstr ""
 msgid "View"
 msgstr ""
 
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:36
+msgid "Thanks for choosing an AyeCode Product!"
+msgstr ""
+
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:37
+msgid "Please confirm you wish to connect your site?"
+msgstr ""
+
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:38
+#, php-format
+msgid ""
+"<strong>Have a license?</strong> Forget about entering license keys or "
+"downloading zip files, connect your site for instant access. %slearn more%s"
+msgstr ""
+
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:40
+msgid "Connecting..."
+msgstr ""
+
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:41
+msgid "This service will only work with a live domain, not a localhost."
+msgstr ""
+
+#: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:42
+msgid "Something went wrong, please refresh and try again."
+msgstr ""
+
 #: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:366
 msgid "<b>Style Issue:</b> AyeCode UI is disable or set wrong."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:843
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:370
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:844
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:414
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:850
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:851
 msgid "Here you can adjust settings if you are having compatibility issues."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:857
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:858
 msgid "BootStrap Version"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:858
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:859
 msgid ""
 "V5 is recommended, however if you have another plugin installed using v4, "
 "you may need to use v4 also."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:863
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:864
 msgid "Some options are disabled as your current theme is overriding them."
 msgstr ""
 
 #: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:871
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:449
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:493
 msgid "Version"
 msgstr ""
 
@@ -395,485 +430,485 @@ msgid "v4 (legacy)"
 msgstr ""
 
 #: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:881
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:472
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:516
 msgid "Frontend"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:885
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:923
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:884
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:919
 msgid "Load CSS"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:888
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:926
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:887
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:922
 msgid "Compatibility Mode (default)"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:889
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:888
 msgid "Full Mode"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:890
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:928
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:889
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:924
 msgid "Disabled"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:897
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:935
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:895
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:930
 msgid "Load JS"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:900
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:938
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:898
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:933
 msgid "Core + Popper (default)"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:901
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:939
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:899
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:934
 msgid "Popper"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:902
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:940
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:900
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:935
 msgid "Required functions only"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:903
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:941
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:901
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:936
 msgid "Disabled (not recommended)"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:910
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:907
 msgid "HTML Font Size (px)"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:913
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:910
 msgid ""
 "Our font sizing is rem (responsive based) here you can set the html font "
 "size in-case your theme is setting it too low."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:919
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:473
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:916
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:517
 msgid "Backend"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:927
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:923
 msgid "Full Mode (will cause style issues)"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:948
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:942
 msgid "Disable load on URL"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:950
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:944
 msgid ""
 "If you have backend conflict you can enter a partial URL argument that will "
 "disable the loading of AUI on those pages. Add each argument on a new line."
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:990
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:980
 msgid "AyeCode UI"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:1005
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:995
 msgid "Primary Color"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:1018
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:1008
 msgid "Secondary Color"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2132
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2122
 msgid "January"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2133
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2123
 msgid "February"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2134
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2124
 msgid "March"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2135
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2125
 msgid "April"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2136
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2126
 msgid "May"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2137
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2127
 msgid "June"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2138
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2128
 msgid "July"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2139
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2129
 msgid "August"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2140
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2130
 msgid "September"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2141
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2131
 msgid "October"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2142
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2132
 msgid "November"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2143
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2133
 msgid "December"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2144
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2134
 msgctxt "January abbreviation"
 msgid "Jan"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2145
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2135
 msgctxt "February abbreviation"
 msgid "Feb"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2146
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2136
 msgctxt "March abbreviation"
 msgid "Mar"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2147
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2137
 msgctxt "April abbreviation"
 msgid "Apr"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2148
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2138
 msgctxt "May abbreviation"
 msgid "May"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2149
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2139
 msgctxt "June abbreviation"
 msgid "Jun"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2150
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2140
 msgctxt "July abbreviation"
 msgid "Jul"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2151
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2141
 msgctxt "August abbreviation"
 msgid "Aug"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2152
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2142
 msgctxt "September abbreviation"
 msgid "Sep"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2153
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2143
 msgctxt "October abbreviation"
 msgid "Oct"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2154
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2144
 msgctxt "November abbreviation"
 msgid "Nov"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2155
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2145
 msgctxt "December abbreviation"
 msgid "Dec"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2156
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2146
 msgctxt "Sunday initial"
 msgid "S"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2157
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2147
 msgctxt "Monday initial"
 msgid "M"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2158
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2148
 msgctxt "Tuesday initial"
 msgid "T"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2159
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2149
 msgctxt "Wednesday initial"
 msgid "W"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2160
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2150
 msgctxt "Friday initial"
 msgid "T"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2161
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2151
 msgctxt "Thursday initial"
 msgid "F"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2162
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2152
 msgctxt "Saturday initial"
 msgid "S"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2163
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2153
 msgid "Su"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2164
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2154
 msgid "Mo"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2165
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2155
 msgid "Tu"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2166
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2156
 msgid "We"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2167
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2157
 msgid "Th"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2168
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2158
 msgid "Fr"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2169
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2159
 msgid "Sa"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2170
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2160
 msgid "Sun"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2171
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2161
 msgid "Mon"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2172
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2162
 msgid "Tue"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2173
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2163
 msgid "Wed"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2174
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2164
 msgid "Thu"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2175
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2165
 msgid "Fri"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2176
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2166
 msgid "Sat"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2177
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2167
 msgid "Sunday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2178
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2168
 msgid "Monday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2179
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2169
 msgid "Tuesday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2180
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2170
 msgid "Wednesday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2181
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2171
 msgid "Thursday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2182
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2172
 msgid "Friday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2183
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2173
 msgid "Saturday"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2184
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2174
 msgid "am"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2185
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2175
 msgid "pm"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2186
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2176
 msgid "AM"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2187
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2177
 msgid "PM"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2190
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2180
 msgid "Year"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2191
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2181
 msgid "Hour"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2192
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2182
 msgid "Minute"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2193
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2183
 msgid "Wk"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2194
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2184
 msgid " to "
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2195
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2185
 msgid "Scroll to increment"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2196
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2186
 msgid "Click to toggle"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2294
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2284
 msgid "Select an option&hellip;"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2295
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2285
 msgctxt "enhanced select"
 msgid "No matches found"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2296
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2286
 msgctxt "enhanced select"
 msgid "Loading failed"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2297
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2287
 msgctxt "enhanced select"
 msgid "Please enter 1 or more characters"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2298
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2288
 msgctxt "enhanced select"
 msgid "Please enter %item% or more characters"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2299
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2289
 msgctxt "enhanced select"
 msgid "Please delete 1 character"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2300
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2290
 msgctxt "enhanced select"
 msgid "Please delete %item% characters"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2301
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2291
 msgctxt "enhanced select"
 msgid "You can only select 1 item"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2302
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2292
 msgctxt "enhanced select"
 msgid "You can only select %item% items"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2303
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2293
 msgctxt "enhanced select"
 msgid "Loading more results&hellip;"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2304
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2294
 msgctxt "enhanced select"
 msgid "Searching&hellip;"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2343
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2333
 msgctxt "time ago"
 msgid "ago"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2344
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2334
 msgctxt "time ago"
 msgid "after"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2346
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2336
 msgctxt "time ago"
 msgid "less than a minute"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2347
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2337
 msgctxt "time ago"
 msgid "about a minute"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2348
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2338
 #, php-format
 msgctxt "time ago"
 msgid "%d minutes"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2349
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2339
 msgctxt "time ago"
 msgid "about an hour"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2350
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2340
 #, php-format
 msgctxt "time ago"
 msgid "about %d hours"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2351
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2341
 msgctxt "time ago"
 msgid "a day"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2352
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2342
 #, php-format
 msgctxt "time ago"
 msgid "%d days"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2353
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2343
 msgctxt "time ago"
 msgid "about a month"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2354
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2344
 #, php-format
 msgctxt "time ago"
 msgid "%d months"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2355
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2345
 msgctxt "time ago"
 msgid "about a year"
 msgstr ""
 
-#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2356
+#: vendor/ayecode/wp-ayecode-ui/includes/ayecode-ui-settings.php:2346
 #, php-format
 msgctxt "time ago"
 msgid "%d years"
@@ -883,134 +918,1449 @@ msgstr ""
 msgid "Posts navigation"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:417
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:58
+msgid "Quick Feedback"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:59
+msgid "If you would be kind enough, please tell us why you're deactivating?"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:60
+msgid "Please tell us which plugin?"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:61
+msgid "Please tell us the reason so we can improve the plugin"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:62
+msgid "Do not send my e-mail address with this feedback"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:63
+msgid "Please give us any feedback that could help us improve"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:64
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3664
+msgid "Cancel"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:65
+msgid "Skip &amp; Deactivate"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:66
+msgid "Submit &amp; Deactivate"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:67
+msgid "Please wait"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:68
+msgid "Get Support"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:69
+msgid "Documentation"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:70
+msgid "Thank you!"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:78
+msgid "The plugin suddenly stopped working"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:79
+msgid "The plugin broke my site"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:80
+msgid "Too difficult to setup"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:81
+msgid "Too difficult to get the design i want"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:82
+msgid "I don't need this plugin any more"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:83
+msgid "I found a better plugin"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:84
+msgid "It's a temporary deactivation, I'm troubleshooting"
+msgstr ""
+
+#: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:85
+msgid "Other"
+msgstr ""
+
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:461
 msgid "Font Awesome fonts are loading locally."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:419
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:463
 msgid "Font Awesome fonts are not loading locally!"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:424
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:468
+#: vendor/ayecode/wp-super-duper/sd-functions.php:568
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1149
 msgid "Type"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:427
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:471
 msgid "CSS (default)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:429
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:473
 msgid "Kits (settings managed on fontawesome.com)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:435
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:479
 msgid "Kit URL"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:440
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:484
 #, php-format
 msgid "Requires a free account with Font Awesome. %sGet kit url%s"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:452
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:496
 #, php-format
 msgid "Latest - %s (default)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:468
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:512
 msgid "Enqueue"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:471
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:515
 msgid "Frontend + Backend (default)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:480
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:524
 msgid "Enable pro"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:486
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:530
 #, php-format
 msgid "Requires a subscription. %sLearn more%s  %sManage my allowed domains%s"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:497
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:541
 msgid "Load Fonts Locally"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:502
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:546
 msgid ""
 "(For free version only) Load FontAwesome fonts from locally. This downloads "
 "FontAwesome fonts from fontawesome.com & stores at the local site."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:508
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:552
 msgid "Enable v4 shims compatibility"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:514
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:558
 msgid ""
 "This enables v4 classes to work with v5, sort of like a band-aid until "
 "everyone has updated everything to v5."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:520
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:564
 msgid "Enable JS pseudo elements (not recommended)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:527
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:571
 msgid ""
 "Used only with the JS version, this will make pseudo-elements work but can "
 "be CPU intensive on some sites."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:533
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:577
 msgid "Dequeue"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:539
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:583
 msgid ""
 "This will try to dequeue any other Font Awesome versions loaded by other "
 "sources if they are added with `font-awesome` or `fontawesome` in the name."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:548
-msgid "Get 14,000+ more icons with Font Awesome Pro"
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:592
+msgid "Get 24,000+ more icons with Font Awesome Pro"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:553
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:597
 #, php-format
 msgid "Version: %s (affiliate links provided)"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:658
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:702
 msgid ""
 "The Official Font Awesome Plugin is active, please adjust your settings "
 "there."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:668
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:712
 #, php-format
 msgid ""
 "Font Awesome Pro v6 requires the use of a kit, please setup your kit in "
 "%ssettings.%s"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:697
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:729
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:741
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:773
 msgid "ERROR:"
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:844
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:888
 msgid "Something went wrong in downloading the font awesome to store locally."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:888
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:932
 msgid ""
 "Failed to initialise WP_Filesystem while trying to download the Font Awesome "
 "package."
 msgstr ""
 
-#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:924
+#: vendor/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php:968
 msgid "Fail to move font awesome package!"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:26
+msgid "Placeholder"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:36
+msgid "Hello World"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:41
+#: vendor/ayecode/wp-super-duper/map.php:74
+msgid ""
+"This is an example that will take a text parameter and output it after "
+"`Hello:`."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:47
+msgid "Text after hello:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:49
+msgid "This is the text that will appear after `Hello:`."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:119
+msgid "Another input:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/hello-world.php:120
+msgid "This is an input added via filter."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:25
+msgid ""
+"A Google API key is required to use this block, we recommend installing our "
+"plugin which makes it easy and sets it globally, or you can set a key in the "
+"block settings sidebar: "
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:31
+msgid "API KEY for Google Maps"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:48
+msgid "Placeholderx"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:61
+msgid "Click here, Settings are in the block settings sidebar"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:69
+msgid "Map"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:79
+msgid "Map Type:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:80
+msgid "Select the map type to use."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:83
+msgid "Static Image"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:84
+msgid "Place"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:96
+msgid "Location:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:97
+msgid "Enter the location to show on the map, place, city, zip code or GPS."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:105
+#: vendor/ayecode/wp-super-duper/map.php:134
+msgid "Width:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:106
+msgid ""
+"This is the width of the map, for static maps you can only use px values."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:119
+#: vendor/ayecode/wp-super-duper/map.php:144
+msgid "Height:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:120
+msgid ""
+"This is the height of the map, for static maps you can only use px values."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:135
+#, php-format
+msgid "This is the width of the map, you can use % or px here."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:145
+#: vendor/ayecode/wp-super-duper/map.php:179
+msgid "This is the height of the map, you can use %, px or vh here."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:154
+msgid "Mapview:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:155
+msgid "This is the type of map view that will be used by default."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:157
+msgid "Road Map"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:158
+msgid "Satellite Map"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:168
+msgid "Zoom level:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:169
+msgid "This is the zoom level of the map, `auto` is recommended."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/map.php:178
+msgid "Api Key:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:55
+#: vendor/ayecode/wp-super-duper/sd-functions.php:142
+#: vendor/ayecode/wp-super-duper/sd-functions.php:297
+#: vendor/ayecode/wp-super-duper/sd-functions.php:316
+#: vendor/ayecode/wp-super-duper/sd-functions.php:346
+#: vendor/ayecode/wp-super-duper/sd-functions.php:417
+#: vendor/ayecode/wp-super-duper/sd-functions.php:545
+#: vendor/ayecode/wp-super-duper/sd-functions.php:601
+#: vendor/ayecode/wp-super-duper/sd-functions.php:753
+msgid "None"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:56
+#: vendor/ayecode/wp-super-duper/sd-functions.php:837
+#: vendor/ayecode/wp-super-duper/sd-functions.php:886
+msgid "auto"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:89
+#: vendor/ayecode/wp-super-duper/sd-functions.php:98
+msgid "Margin top"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:93
+#: vendor/ayecode/wp-super-duper/sd-functions.php:164
+#: vendor/ayecode/wp-super-duper/sd-functions.php:221
+#: vendor/ayecode/wp-super-duper/sd-functions.php:328
+#: vendor/ayecode/wp-super-duper/sd-functions.php:356
+#: vendor/ayecode/wp-super-duper/sd-functions.php:396
+#: vendor/ayecode/wp-super-duper/sd-functions.php:986
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1189
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1224
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1249
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1637
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1690
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1744
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1798
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1868
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1916
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1946
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1976
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1999
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2026
+msgid "Wrapper Styles"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:101
+msgid "Margins"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:107
+msgid "Margin right"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:113
+msgid "Margin bottom"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:119
+msgid "Margin left"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:160
+#: vendor/ayecode/wp-super-duper/sd-functions.php:169
+msgid "Padding top"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:172
+msgid "Padding"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:178
+msgid "Padding right"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:184
+msgid "Padding bottom"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:190
+msgid "Padding left"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:217
+msgid "Border"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:226
+msgid "Border radius type"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:228
+#: vendor/ayecode/wp-super-duper/sd-functions.php:241
+#: vendor/ayecode/wp-super-duper/sd-functions.php:252
+#: vendor/ayecode/wp-super-duper/sd-functions.php:261
+#: vendor/ayecode/wp-super-duper/sd-functions.php:271
+#: vendor/ayecode/wp-super-duper/sd-functions.php:296
+#: vendor/ayecode/wp-super-duper/sd-functions.php:374
+#: vendor/ayecode/wp-super-duper/sd-functions.php:836
+#: vendor/ayecode/wp-super-duper/sd-functions.php:929
+#: vendor/ayecode/wp-super-duper/sd-functions.php:968
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1172
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1206
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1479
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1623
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1676
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1730
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1783
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1856
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1904
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1933
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1963
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2016
+msgid "Default"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:237
+msgid "Border radius size"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:253
+#: vendor/ayecode/wp-super-duper/sd-functions.php:317
+msgid "Small"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:254
+#: vendor/ayecode/wp-super-duper/sd-functions.php:319
+msgid "Large"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:259
+msgid "Border width"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:269
+msgid "Border opacity"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:279
+msgid "Border show"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:281
+msgid "Full (set color to show)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:282
+#: vendor/ayecode/wp-super-duper/sd-functions.php:591
+msgid "Top"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:283
+#: vendor/ayecode/wp-super-duper/sd-functions.php:592
+msgid "Bottom"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:284
+#: vendor/ayecode/wp-super-duper/sd-functions.php:930
+msgid "Left"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:285
+#: vendor/ayecode/wp-super-duper/sd-functions.php:931
+msgid "Right"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:286
+msgid "-Top"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:287
+msgid "-Bottom"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:288
+msgid "-Left"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:289
+msgid "-Right"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:294
+msgid "Border color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:318
+msgid "Regular"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:324
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1590
+msgid "Shadow"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:347
+#: vendor/ayecode/wp-super-duper/sd-functions.php:418
+#: vendor/ayecode/wp-super-duper/sd-functions.php:602
+msgid "Transparent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:352
+msgid "Background color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:392
+msgid "Opacity"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:422
+#: vendor/ayecode/wp-super-duper/sd-functions.php:605
+msgid "Custom Color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:426
+msgid "Custom Gradient"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:431
+msgid "Background Color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:435
+#: vendor/ayecode/wp-super-duper/sd-functions.php:451
+#: vendor/ayecode/wp-super-duper/sd-functions.php:466
+#: vendor/ayecode/wp-super-duper/sd-functions.php:479
+#: vendor/ayecode/wp-super-duper/sd-functions.php:489
+#: vendor/ayecode/wp-super-duper/sd-functions.php:502
+#: vendor/ayecode/wp-super-duper/sd-functions.php:515
+#: vendor/ayecode/wp-super-duper/sd-functions.php:526
+msgid "Background"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:447
+#: vendor/ayecode/wp-super-duper/sd-functions.php:624
+#: vendor/ayecode/wp-super-duper/sd-functions.php:757
+#: vendor/ayecode/wp-super-duper/sd-functions.php:801
+msgid "Custom color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:462
+msgid "Custom gradient"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:476
+msgid "Fixed background"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:486
+msgid "Use featured image"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:498
+msgid "Custom image"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:546
+msgid "Mountains"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:547
+msgid "Drops"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:548
+msgid "Clouds"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:549
+msgid "Zigzag"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:550
+msgid "Pyramids"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:551
+msgid "Triangle"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:552
+msgid "Triangle Asymmetrical"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:553
+msgid "Tilt"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:554
+msgid "Opacity Tilt"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:555
+msgid "Opacity Fan"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:556
+msgid "Curve"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:557
+msgid "Curve Asymmetrical"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:558
+msgid "Waves"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:559
+msgid "Wave Brush"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:560
+msgid "Waves Pattern"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:561
+msgid "Arrow"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:562
+msgid "Split"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:563
+msgid "Book"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:572
+#: vendor/ayecode/wp-super-duper/sd-functions.php:581
+#: vendor/ayecode/wp-super-duper/sd-functions.php:595
+#: vendor/ayecode/wp-super-duper/sd-functions.php:615
+#: vendor/ayecode/wp-super-duper/sd-functions.php:628
+#: vendor/ayecode/wp-super-duper/sd-functions.php:645
+#: vendor/ayecode/wp-super-duper/sd-functions.php:659
+#: vendor/ayecode/wp-super-duper/sd-functions.php:689
+#: vendor/ayecode/wp-super-duper/sd-functions.php:698
+#: vendor/ayecode/wp-super-duper/sd-functions.php:707
+msgid "Shape Divider"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:579
+msgid "Parent element must be position `relative`"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:589
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1185
+msgid "Position"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:612
+msgid "Color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:637
+msgid "Width"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:652
+msgid "Height"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:686
+msgid "Flip"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:695
+msgid "Invert"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:704
+msgid "Bring to front"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:762
+msgid "Text color"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:766
+#: vendor/ayecode/wp-super-duper/sd-functions.php:805
+#: vendor/ayecode/wp-super-duper/sd-functions.php:941
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1009
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1335
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1364
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1397
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1460
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1491
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1521
+msgid "Typography"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:854
+msgid "Column width"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:858
+#: vendor/ayecode/wp-super-duper/sd-functions.php:901
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1153
+msgid "Container"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:897
+msgid "Row columns"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:932
+msgid "Center"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:937
+msgid "Text align"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:982
+msgid "Display"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1006
+msgid "Text justify"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1029
+msgid "Primary"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1030
+msgid "Secondary"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1031
+msgid "Success"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1032
+msgid "Danger"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1033
+msgid "Warning"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1034
+msgid "Info"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1035
+msgid "Light"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1036
+msgid "Dark"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1037
+msgid "Black"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1038
+msgid "White"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1039
+msgid "Purple"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1040
+msgid "Salmon"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1041
+msgid "Cyan"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1042
+msgid "Gray"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1043
+msgid "Muted"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1044
+msgid "Gray dark"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1045
+msgid "Indigo"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1046
+msgid "Orange"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1049
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1073
+msgid "(button only)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1050
+msgid "Primary outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1051
+msgid "Secondary outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1052
+msgid "Success outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1053
+msgid "Danger outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1054
+msgid "Warning outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1055
+msgid "Info outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1056
+msgid "Light outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1057
+msgid "Dark outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1058
+msgid "White outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1059
+msgid "Purple outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1060
+msgid "Salmon outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1061
+msgid "Cyan outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1062
+msgid "Gray outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1063
+msgid "Gray dark outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1064
+msgid "Indigo outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1065
+msgid "Orange outline"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1074
+msgid "Primary translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1075
+msgid "Secondary translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1076
+msgid "Success translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1077
+msgid "Danger translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1078
+msgid "Warning translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1079
+msgid "Info translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1080
+msgid "Light translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1081
+msgid "Dark translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1082
+msgid "White translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1083
+msgid "Purple translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1084
+msgid "Salmon translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1085
+msgid "Cyan translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1086
+msgid "Gray translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1087
+msgid "Gray dark translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1088
+msgid "Indigo translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1089
+msgid "Orange translucent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1102
+msgid "Facebook"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1103
+msgid "Twitter"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1104
+msgid "Instagram"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1105
+msgid "Linkedin"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1106
+msgid "Flickr"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1107
+msgid "GitHub"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1108
+msgid "YouTube"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1109
+msgid "WordPress"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1110
+msgid "Google"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1111
+msgid "Yahoo"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1112
+msgid "Vkontakte"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1128
+msgid "container (default)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1144
+msgid "no container class"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1220
+msgid "Absolute Position"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1245
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1258
+msgid "Sticky offset"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1255
+msgid "Top offset"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1264
+msgid "Bottom offset"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1288
+msgid "Inherit from parent"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1326
+msgid "Custom size"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1331
+msgid "Font size"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1355
+msgid "Font size (rem)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1388
+msgid "Font Line Height"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1440
+msgid "Inherit"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1456
+msgid "Appearance"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1480
+msgid "lowercase"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1481
+msgid "UPPERCASE"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1482
+msgid "Capitalize"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1487
+msgid "Letter case"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1511
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:235
+msgid "No"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1512
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:235
+msgid "Yes"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1517
+msgid "Font italic"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1541
+msgid "HTML anchor"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1542
+msgid ""
+"Enter a word or two — without spaces — to make a unique web address just for "
+"this block, called an “anchor.” Then, you’ll be able to link directly to "
+"this section of your page."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1545
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1569
+msgid "Advanced"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1565
+msgid "Additional CSS class(es)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1566
+msgid "Separate multiple classes with spaces."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1588
+msgid "none"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1589
+msgid "Zoom"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1591
+msgid "Move up"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1592
+msgid "Move down"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1593
+msgid "Move left"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1594
+msgid "Move right"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1600
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1604
+msgid "Hover Animations"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1633
+msgid "Vertical Align Items"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1686
+msgid "Justify content"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1740
+msgid "Align Self"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1794
+msgid "Flex Order"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1864
+msgid "Flex wrap"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1912
+msgid "Float"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1942
+msgid "Z-index"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1964
+msgid "Auto"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1965
+msgid "Hidden"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1966
+msgid "Visible"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1967
+msgid "Scroll"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1972
+msgid "Overflow"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:1994
+msgid "Max height"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2017
+msgid "IOS Style"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2022
+msgid "Scrollbars"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2682
+msgid "Block Visibility"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2683
+msgid "Set Block Visibility"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2686
+msgid "Visibility Conditions"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2729
+msgid "Logged In"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2730
+msgid "Logged Out"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2731
+msgid "Specific User Roles"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2735
+msgid "GD Field"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2769
+msgid "post date"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2770
+msgid "post modified"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2771
+msgid "Default Category"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2772
+msgid "post id"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2773
+msgid "Post Status"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2787
+msgid "is empty"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2788
+msgid "is not empty"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2789
+msgid "is equal"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2790
+msgid "is not equal"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2791
+msgid "is greater than"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2792
+msgid "is less than"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2793
+msgid "is contains"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2794
+msgid "is not contains"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2809
+msgid "Hide Block"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2810
+msgid "Show Custom Message"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2811
+msgid "Show Page Content"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2812
+msgid "Show Template Part"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2854
+msgid "Select Page..."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/sd-functions.php:2883
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5068
+msgid "Select Template Part..."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:288
+msgid "Select shortcode"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:308
+msgid "Insert shortcode"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:311
+msgid "Copy shortcode"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:531
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1177
+msgid "Advanced Settings"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1470
+#, php-format
+msgid "Placeholder for: %s"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1692
+msgid "General"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:2885
+msgid "Placeholder for:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3664
+msgid "Are you sure?"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3664
+msgid "Delete"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3815
+msgid "Reset"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3815
+msgid "Close"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3815
+msgid "Save Rules"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4909
+msgid "Remove Rule"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4914
+msgid "Rule"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4915
+msgid "Select Rule..."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4922
+msgid "Rule:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4938
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4939
+msgid "FIELD"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4960
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4961
+msgid "CONDITION"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4983
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4985
+msgid "VALUE TO MATCH"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:4997
+msgid "Select User Roles:"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5025
+msgid "Add Rule"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5031
+msgid "What should happen if rules met."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5032
+msgid "Default Output"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5051
+msgid "Page Content"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5052
+msgid "Select Page ID..."
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5067
+msgid "Template Part"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5086
+msgid "Custom Message Type"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5087
+msgid "Default (none)"
+msgstr ""
+
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5110
+msgid "CUSTOM MESSAGE TO SHOW"
 msgstr ""
