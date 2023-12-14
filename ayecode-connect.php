@@ -141,7 +141,13 @@ add_action( 'ayecode_connect_sync_licenses', 'ayecode_connect_sync_licenses' );
 function ayecode_connect_demo_import_redirect( $plugin ){
     if ( $plugin == plugin_basename( __FILE__ ) && !empty( $_SERVER['HTTP_REFERER'] ) ) {
         $parts = parse_url($_SERVER['HTTP_REFERER']);
-        parse_str($parts['query'], $query);
+
+        if ( ! empty( $parts['query'] ) ) {
+            parse_str( $parts['query'], $query );
+        } else {
+            $query = array();
+        }
+
         if(!empty($query['ac-demo-import'])){
             $demo = sanitize_title_with_dashes($query['ac-demo-import']);
             wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=".esc_attr($demo) ));
