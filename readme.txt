@@ -77,7 +77,10 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.2.7 - 2023-12-14 =
+= 1.2.18 - TBD =
+* AUI Updated to latest version - CHANGED
+
+= 1.2.17 - 2023-12-14 =
 * Update textdomain - CHANGED
 
 = 1.2.16 =
