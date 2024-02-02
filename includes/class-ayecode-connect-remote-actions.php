@@ -1844,7 +1844,15 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
-			ini_set( 'auto_detect_line_endings', true );
+			/*
+			 * The `auto_detect_line_endings` setting has been deprecated in PHP 8.1,
+			 * but will continue to work until PHP 9.0.
+			 * For now, we're silencing the deprecation notice as there may still be
+			 * translation files around which haven't been updated in a long time and
+			 * which still use the old MacOS standalone `\r` as a line ending.
+			 * This fix should be revisited when PHP 9.0 is in alpha/beta.
+			 */
+			@ini_set( 'auto_detect_line_endings', true ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		}
 
 		/**
