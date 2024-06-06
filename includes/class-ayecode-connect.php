@@ -1008,7 +1008,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$hash = wp_hash_password( $key  );
 
 				// Valid for seconds
-				$valid_seconds = 3 * DAY_IN_SECONDS;
+				$valid_seconds = 7 * DAY_IN_SECONDS;
 				$expires = time() + $valid_seconds;
 				
 				// Set info

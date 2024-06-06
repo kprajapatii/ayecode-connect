@@ -79,6 +79,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.2.19 =
 * Function auto_detect_line_endings is deprecated - FIXED
+* Support user auto expiry time extended from 3 > 7 days - CHANGED
 
 = 1.2.18 - 2024-01-29 =
 * AUI Updated to latest version - CHANGED
