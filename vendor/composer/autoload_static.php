@@ -7,8 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInit33dbce37e17a6e7f599d541bb29ea01e
 {
     public static $files = array (
-        '24583d3588ebda5228dd453cfaa070da' => __DIR__ . '/..' . '/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php',
         'e8d544c98e79f913e13eae1306ab635e' => __DIR__ . '/..' . '/ayecode/wp-ayecode-ui/ayecode-ui-loader.php',
+        '24583d3588ebda5228dd453cfaa070da' => __DIR__ . '/..' . '/ayecode/wp-font-awesome-settings/wp-font-awesome-settings.php',
+        '42671a413efb740d7040437ff2a982cd' => __DIR__ . '/..' . '/ayecode/wp-super-duper/sd-functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -27,6 +28,7 @@ class ComposerStaticInit33dbce37e17a6e7f599d541bb29ea01e
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'WP_Super_Duper' => __DIR__ . '/..' . '/ayecode/wp-super-duper/wp-super-duper.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

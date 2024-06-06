@@ -94,7 +94,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 */
 		public function init() {
 
-			if ( $this->is_active() ) {
+
+            if ( $this->is_active() ) {
 
 				//Connected
 				do_action( $this->prefix . '_connected_to_remote' );
@@ -135,9 +136,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			// register test route
 			add_action( 'rest_api_init', array( $this, 'register_test_routes' ) );
 
+            // register blocks
+            add_action( 'widgets_init', array( $this, 'register_blocks' ) );
+            add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
 
 
-			if ( is_admin() ){
+            if ( is_admin() ){
 				// add AUI on our backend pages
 				add_filter( 'aui_screen_ids', array( $this, 'add_aui_screens') );
 
@@ -147,6 +151,65 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 		}
 
+        /**
+         * Enqueue editor JS required for blocks.
+         *
+         * @return void
+         */
+        public function enqueue_editor_assets()
+        {
+            if ($this->maybe_load_blocks()) {
+                global $pagenow,$wp_version;
+                $AyeCode_Connect_Settings = AyeCode_Connect_Settings::instance();
+                $deps = ( $pagenow == 'widgets.php' || ( $pagenow == 'site-editor.php' && ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ) ) && version_compare( $wp_version, '5.8', '>=' ) ? array( 'wp-blocks', 'wp-element') : array( 'wp-blocks', 'wp-element', 'wp-editor' );
+                wp_enqueue_script(
+                    'ayecode-editor',
+                    $AyeCode_Connect_Settings->base_url  . 'assets/js/blocks.js',
+                    $deps,
+                    AYECODE_CONNECT_VERSION
+                );
+            }
+        }
+
+        /**
+         * Check if we should load our blocks, check if one of our plugin are active.
+         *
+         * @return mixed|null
+         */
+        public function maybe_load_blocks()
+        {
+            $load = false;
+
+            if(
+                    defined('GEODIRLOCATION_VERSION')
+                    || defined('USERSWP_VERSION')
+//                    || defined('WPINV_VERSION') // not currently used
+            ){
+                $load = true;
+            }
+
+            return apply_filters( $this->prefix . '_load_blocks', $load );
+
+        }
+
+        /**
+         * Register blocks if one of our plugins active.
+         *
+         * @return void
+         */
+        public function register_blocks()
+        {
+
+            if ($this->maybe_load_blocks()) {
+                require_once plugin_dir_path(__FILE__) . '../blocks/class-ayecode-wp-nav.php';
+                register_widget( 'AyeCode_WP_Nav' );
+            }
+
+        }
+
+        /**
+         * @return void
+         */
 		public function demo_site_redirect(){
 
 			$currentScreen = get_current_screen();
@@ -161,6 +224,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 		}
 
+        /**
+         * @param $screen_ids
+         * @return mixed
+         */
 		public function add_aui_screens($screen_ids){
 
 			// AC screens that need AUI

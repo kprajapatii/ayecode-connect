@@ -6,8 +6,8 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 6.4
-Stable tag: 1.2.18
+Tested up to: 6.5
+Stable tag: 1.2.19
 
 
 AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
@@ -77,9 +77,10 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.2.19 =
+= 1.2.19 - 2024-06-06 =
 * Function auto_detect_line_endings is deprecated - FIXED
 * Support user auto expiry time extended from 3 > 7 days - CHANGED
+* Added AyeNav block which allows GeoDirectory and UsesWP dynamic menu items to be added to the core WP Navigation block - ADDED
 
 = 1.2.18 - 2024-01-29 =
 * AUI Updated to latest version - CHANGED
