@@ -91,7 +91,7 @@
     }
 
     function aui_select2_locale() {
-        var aui_select2_params = <?php echo self::select2_locale(); ?>;
+        var aui_select2_params = <?php echo self::select2_locale(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
 
         return {
             'language': {
@@ -150,7 +150,7 @@
      * @param selector string The .class selector
      */
     function aui_time_ago(selector) {
-        var aui_timeago_params = <?php echo self::timeago_locale(); ?>;
+        var aui_timeago_params = <?php echo self::timeago_locale(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
 
         var templates = {
             prefix: aui_timeago_params.prefix_ago,
@@ -242,7 +242,7 @@
     function aui_init_flatpickr(){
         if ( typeof jQuery.fn.flatpickr === "function" && !$aui_doing_init_flatpickr) {
             $aui_doing_init_flatpickr = true;
-			<?php if ( ! empty( $flatpickr_locale ) ) { ?>try{flatpickr.localize(<?php echo $flatpickr_locale; ?>);}catch(err){console.log(err.message);}<?php } ?>
+			<?php if ( ! empty( $flatpickr_locale ) ) { ?>try{flatpickr.localize(<?php echo $flatpickr_locale; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>);}catch(err){console.log(err.message);}<?php } ?>
             jQuery('input[data-aui-init="flatpickr"]:not(.flatpickr-input)').flatpickr();
         }
         $aui_doing_init_flatpickr = false;
@@ -561,7 +561,7 @@
         // remove it first
         jQuery('.aui-carousel-modal').remove();
 
-        var $modal = '<div class="modal fade aui-carousel-modal bsui" tabindex="-1" role="dialog" aria-labelledby="aui-modal-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-xl mw-100"><div class="modal-content bg-transparent border-0"><div class="modal-header"><h5 class="modal-title" id="aui-modal-title"></h5></div><div class="modal-body text-center"><i class="fas fa-circle-notch fa-spin fa-3x"></i></div></div></div></div>';
+        var $modal = '<div class="modal fade aui-carousel-modal bsui" tabindex="-1" role="dialog" aria-labelledby="aui-modal-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-xl mw-100"><div class="modal-content bg-transparent border-0 shadow-none"><div class="modal-header"><h5 class="modal-title" id="aui-modal-title"></h5></div><div class="modal-body text-center"><i class="fas fa-circle-notch fa-spin fa-3x"></i></div></div></div></div>';
         jQuery('body').append($modal);
 
         jQuery('.aui-carousel-modal').modal({
@@ -594,57 +594,51 @@
                     $active = $clicked_href == jQuery(this).attr('href') ? 'active' : '';
                     $carousel  += '<li data-target="#aui-embed-slider-modal" data-slide-to="'+$i+'" class="'+$active+'"></li>';
                     $i++;
-
                 });
                 $carousel  += '</ol>';
             }
 
-
-
             // items
             $i = 0;
-            $carousel  += '<div class="carousel-inner">';
+            $carousel += '<div class="carousel-inner">';
             $container.find('.aui-lightbox-image').each(function() {
                 var a = this;
+                var href = jQuery(a).attr('href');
 
                 $active = $clicked_href == jQuery(this).attr('href') ? 'active' : '';
-                $carousel  += '<div class="carousel-item '+ $active+'"><div>';
-
+                $carousel += '<div class="carousel-item '+ $active+'"><div>';
 
                 // image
                 var css_height = window.innerWidth > window.innerHeight ? '90vh' : 'auto';
-                var img = jQuery(a).find('img').clone().removeClass().addClass('mx-auto d-block w-auto mw-100 rounded').css('max-height',css_height).get(0).outerHTML;
-                $carousel  += img;
+                var img = href ? jQuery(a).find('img').clone().attr('src', href ).attr('sizes', '').removeClass().addClass('mx-auto d-block w-auto mw-100 rounded').css('max-height',css_height).get(0).outerHTML : jQuery(a).find('img').clone().removeClass().addClass('mx-auto d-block w-auto mw-100 rounded').css('max-height',css_height).get(0).outerHTML;
+                $carousel += img;
                 // captions
                 if(jQuery(a).parent().find('.carousel-caption').length ){
-                    $carousel  += jQuery(a).parent().find('.carousel-caption').clone().removeClass('sr-only').get(0).outerHTML;
+                    $carousel += jQuery(a).parent().find('.carousel-caption').clone().removeClass('sr-only').get(0).outerHTML;
                 }else if(jQuery(a).parent().find('.figure-caption').length ){
-                    $carousel  += jQuery(a).parent().find('.figure-caption').clone().removeClass('sr-only').addClass('carousel-caption').get(0).outerHTML;
+                    $carousel += jQuery(a).parent().find('.figure-caption').clone().removeClass('sr-only').addClass('carousel-caption').get(0).outerHTML;
                 }
-                $carousel  += '</div></div>';
+                $carousel += '</div></div>';
                 $i++;
-
             });
+
             $container.find('.aui-lightbox-iframe').each(function() {
                 var a = this;
 
                 $active = $clicked_href == jQuery(this).attr('href') ? 'active' : '';
-                $carousel  += '<div class="carousel-item '+ $active+'"><div class="modal-xl mx-auto embed-responsive embed-responsive-16by9">';
-
+                $carousel += '<div class="carousel-item '+ $active+'"><div class="modal-xl mx-auto embed-responsive embed-responsive-16by9">';
 
                 // iframe
                 var css_height = window.innerWidth > window.innerHeight ? '95vh' : 'auto';
                 var url = jQuery(a).attr('href');
                 var iframe = '<iframe class="embed-responsive-item" style="height:'+css_height +'" src="'+url+'?rel=0&amp;showinfo=0&amp;modestbranding=1&amp;autoplay=1" id="video" allow="autoplay"></iframe>';
                 var img = iframe ;//.css('height',css_height).get(0).outerHTML;
-                $carousel  += img;
+                $carousel += img;
 
-                $carousel  += '</div></div>';
+                $carousel += '</div></div>';
                 $i++;
-
             });
-            $carousel  += '</div>';
-
+            $carousel += '</div>';
 
             // next/prev indicators
             if($images.length > 1) {
@@ -655,7 +649,6 @@
                 $carousel += '</a>';
             }
 
-
             $carousel  += '</div>';
 
             var $close = '<button type="button" class="close text-white text-right position-fixed" style="font-size: 2.5em;right: 20px;top: 10px; z-index: 1055;" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
@@ -665,7 +658,6 @@
             // enable ajax load
             //gd_init_carousel_ajax();
         }
-
     }
 
     /**

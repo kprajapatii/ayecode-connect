@@ -1575,6 +1575,30 @@ function sd_get_class_input( $type = 'css_class', $overwrite = array() ) {
 }
 
 /**
+ * A helper function for the class input.
+ *
+ * @param $type
+ * @param $overwrite
+ *
+ * @return array
+ */
+function sd_get_custom_name_input( $type = 'metadata_name', $overwrite = array() ) {
+
+	$defaults = array(
+		'type'     => 'text',
+		'title'    => __( 'Block Name', 'ayecode-connect' ),
+		'desc'     => __( 'Set a custom name for this block', 'ayecode-connect' ),
+		'default'  => '',
+		'desc_tip' => true,
+		'group'    => __( 'Advanced', 'ayecode-connect' ),
+	);
+
+	$input = wp_parse_args( $overwrite, $defaults );
+
+	return $input;
+}
+
+/**
  * A helper function for font size inputs.
  *
  * @param string $type
@@ -2032,6 +2056,148 @@ function sd_get_scrollbars_input( $type = 'scrollbars', $overwrite = array() ) {
 }
 
 /**
+ * @param $type
+ * @param $overwrite
+ *
+ * @return array
+ */
+function sd_get_new_window_input( $type = 'target', $overwrite = array() ) {
+
+	$defaults = array(
+		'type'     => 'checkbox',
+		'title'    => __( 'Open in new window', 'ayecode-connect' ),
+		'default'  => '',
+		'desc_tip' => true,
+		'group'    => __( 'Link', 'ayecode-connect' ),
+	);
+
+	$input = wp_parse_args( $overwrite, $defaults );
+
+	return $input;
+}
+
+/**
+ * @param $type
+ * @param $overwrite
+ *
+ * @return array
+ */
+function sd_get_nofollow_input( $type = 'nofollow', $overwrite = array() ) {
+
+	$defaults = array(
+		'type'     => 'checkbox',
+		'title'    => __( 'Add nofollow', 'ayecode-connect' ),
+		'default'  => '',
+		'desc_tip' => true,
+		'group'    => __( 'Link', 'ayecode-connect' ),
+	);
+
+	$input = wp_parse_args( $overwrite, $defaults );
+
+	return $input;
+}
+
+/**
+ * @param $type
+ * @param $overwrite
+ *
+ * @return array
+ */
+function sd_get_attributes_input( $type = 'attributes', $overwrite = array() ) {
+
+	$defaults = array(
+		'type'        => 'text',
+		'title'       => __( 'Custom Attributes', 'ayecode-connect' ),
+		'value'       => '',
+		'default'     => '',
+		'placeholder' => 'key|value,key2|value2',
+		'desc_tip'    => true,
+		'group'       => __( 'Link', 'ayecode-connect' ),
+	);
+
+	$input = wp_parse_args( $overwrite, $defaults );
+
+	return $input;
+}
+
+/**
+ * @param $args
+ *
+ * @return string
+ */
+function sd_build_attributes_string_escaped( $args ) {
+	global $aui_bs5;
+
+	$attributes = array();
+	$string_escaped = '';
+
+	if ( ! empty( $args['custom'] ) ) {
+		$attributes = sd_parse_custom_attributes($args['custom']);
+	}
+
+	// new window
+	if ( ! empty( $args['new_window'] ) ) {
+		$attributes['target'] = '_blank';
+	}
+
+	// nofollow
+	if ( ! empty( $args['nofollow'] ) ) {
+		$attributes['rel'] = isset($attributes['rel']) ? $attributes['rel'] . ' nofollow' : 'nofollow';
+	}
+
+	if(!empty($attributes )){
+		foreach ( $attributes as $key => $val ) {
+			$string_escaped .= esc_attr($key) . '="' . esc_attr($val) . '" ';
+		}
+	}
+
+	return $string_escaped;
+}
+
+/**
+ * @info borrowed from elementor
+ *
+ * @param $attributes_string
+ * @param $delimiter
+ *
+ * @return array
+ */
+function sd_parse_custom_attributes( $attributes_string, $delimiter = ',' ) {
+	$attributes = explode( $delimiter, $attributes_string );
+	$result = [];
+
+	foreach ( $attributes as $attribute ) {
+		$attr_key_value = explode( '|', $attribute );
+
+		$attr_key = mb_strtolower( $attr_key_value[0] );
+
+		// Remove any not allowed characters.
+		preg_match( '/[-_a-z0-9]+/', $attr_key, $attr_key_matches );
+
+		if ( empty( $attr_key_matches[0] ) ) {
+			continue;
+		}
+
+		$attr_key = $attr_key_matches[0];
+
+		// Avoid Javascript events and unescaped href.
+		if ( 'href' === $attr_key || 'on' === substr( $attr_key, 0, 2 ) ) {
+			continue;
+		}
+
+		if ( isset( $attr_key_value[1] ) ) {
+			$attr_value = trim( $attr_key_value[1] );
+		} else {
+			$attr_value = '';
+		}
+
+		$result[ $attr_key ] = $attr_value;
+	}
+
+	return $result;
+}
+
+/**
  * Build AUI classes from settings.
  *
  * @param $args
@@ -2448,6 +2614,10 @@ function sd_build_aui_class( $args ) {
 		}
 	}
 
+	if ( ! empty( $classes ) ) {
+		$classes = array_unique( array_filter( array_map( 'trim', $classes ) ) );
+	}
+
 	return implode( ' ', $classes );
 }
 
@@ -2587,7 +2757,7 @@ function sd_build_hover_styles( $args, $is_preview = false ) {
 }
 
 /**
- * Try to get a CSS color varibale for a given value.
+ * Try to get a CSS color variable for a given value.
  *
  * @param $var
  *
@@ -2728,6 +2898,7 @@ function sd_visibility_rules_options() {
 	$options = array(
 		'logged_in'  => __( 'Logged In', 'ayecode-connect' ),
 		'logged_out' => __( 'Logged Out', 'ayecode-connect' ),
+		'post_author'  => __( 'Post Author', 'ayecode-connect' ),
 		'user_roles' => __( 'Specific User Roles', 'ayecode-connect' )
 	);
 
@@ -2743,7 +2914,7 @@ function sd_visibility_rules_options() {
  *
  * @return array
  */
-function sd_visibility_gd_field_options(){
+function sd_visibility_gd_field_options() {
 	$fields = geodir_post_custom_fields( '', 'all', 'all', 'none' );
 
 	$keys = array();
@@ -2766,15 +2937,55 @@ function sd_visibility_gd_field_options(){
 		}
 	}
 
-	$keys['post_date'] = 'post_date ( ' . __( 'post date', 'geodirectory' ) . ' )';
-	$keys['post_modified'] = 'post_modified ( ' . __( 'post modified', 'geodirectory' ) . ' )';
-	$keys['default_category'] = 'default_category ( ' . __( 'Default Category', 'geodirectory' ) . ' )';
-	$keys['post_id'] = 'post_id ( ' . __( 'post id', 'geodirectory' ) . ' )';
-	$keys['post_status'] = 'post_status ( ' . __( 'Post Status', 'geodirectory' ) . ' )';
+	$standard_fields = sd_visibility_gd_standard_field_options();
+
+	if ( ! empty( $standard_fields ) ) {
+		foreach ( $standard_fields as $key => $option ) {
+			$keys[ $key ] = $option;
+		}
+	}
 
 	$options = apply_filters( 'geodir_badge_field_keys', $keys );
 
 	return apply_filters( 'sd_visibility_gd_field_options', $options );
+}
+
+/**
+ * Get visibility GD post standard field options.
+ *
+ * @return array
+ */
+function sd_visibility_gd_standard_field_options( $post_type = '' ) {
+	$fields = sd_visibility_gd_standard_fields( $post_type );
+
+	$options = array();
+
+	foreach ( $fields as $key => $field ) {
+		if ( ! empty( $field['frontend_title'] ) ) {
+			$options[ $key ] = $key . ' ( ' . $field['frontend_title'] . ' )';
+		}
+	}
+
+	return apply_filters( 'sd_visibility_gd_standard_field_options', $options, $fields );
+}
+
+/**
+ * Get visibility GD post standard fields.
+ *
+ * @return array
+ */
+function sd_visibility_gd_standard_fields( $post_type = '' ) {
+	$standard_fields = geodir_post_meta_standard_fields( $post_type );
+
+	$fields = array();
+
+	foreach ( $standard_fields as $key => $field ) {
+		if ( $key != 'post_link' && strpos( $key, 'event' ) === false && ! empty( $field['frontend_title'] ) ) {
+			$fields[ $key ] = $field;
+		}
+	}
+
+	return apply_filters( 'sd_visibility_gd_standard_fields', $fields );
 }
 
 /**
@@ -3077,6 +3288,8 @@ function sd_block_check_rules( $rules ) {
 }
 
 function sd_block_check_rule( $match, $rule ) {
+	global $post;
+
 	if ( $match && ! empty( $rule['type'] ) ) {
 		switch ( $rule['type'] ) {
 			case 'logged_in':
@@ -3085,6 +3298,14 @@ function sd_block_check_rule( $match, $rule ) {
 				break;
 			case 'logged_out':
 				$match = ! is_user_logged_in();
+
+				break;
+			case 'post_author':
+				if ( ! empty( $post ) && $post->post_type != 'page' && ! empty( $post->post_author ) && is_user_logged_in() ) {
+					$match = (int) $post->post_author === (int) get_current_user_id() ? true : false;
+				} else {
+					$match = false;
+				}
 
 				break;
 			case 'user_roles':
@@ -3154,8 +3375,11 @@ function sd_block_check_rule_gd_field( $rule ) {
 		if ( $match_field === '' || ( ! empty( $find_post_keys ) && ( in_array( $match_field, $find_post_keys ) || in_array( $_match_field, $find_post_keys ) ) ) ) {
 			$address_fields = array( 'street2', 'neighbourhood', 'city', 'region', 'country', 'zip', 'latitude', 'longitude' ); // Address fields
 			$field = array();
+			$empty_field = false;
 
-			if ( $match_field && ! in_array( $match_field, array( 'post_date', 'post_modified', 'default_category', 'post_id', 'post_status' ) ) && ! in_array( $match_field, $address_fields ) ) {
+			$standard_fields = sd_visibility_gd_standard_fields();
+
+			if ( $match_field && ! in_array( $match_field, array_keys( $standard_fields ) ) && ! in_array( $match_field, $address_fields ) ) {
 				$package_id = geodir_get_post_package_id( $find_post->ID, $find_post->post_type );
 				$fields = geodir_post_custom_fields( $package_id, 'all', $find_post->post_type, 'none' );
 
@@ -3170,24 +3394,28 @@ function sd_block_check_rule_gd_field( $rule ) {
 				}
 
 				if ( empty( $field ) ) {
-					return false;
+					$empty_field = true;
 				}
 			}
-
-			// Parse search.
-			$search = sd_gd_field_rule_search( $args['search'], $find_post->post_type, $rule );
 
 			// Address fields.
 			if ( in_array( $match_field, $address_fields ) && ( $address_fields = geodir_post_meta_address_fields( '' ) ) ) {
 				if ( ! empty( $address_fields[ $match_field ] ) ) {
 					$field = $address_fields[ $match_field ];
 				}
+			} else if ( in_array( $match_field, array_keys( $standard_fields ) ) ) {
+				if ( ! empty( $standard_fields[ $match_field ] ) ) {
+					$field = $standard_fields[ $match_field ];
+				}
 			}
+
+			// Parse search.
+			$search = sd_gd_field_rule_search( $args['search'], $find_post->post_type, $rule, $field, $find_post );
 
 			$is_date = ( ! empty( $field['type'] ) && $field['type'] == 'datepicker' ) || in_array( $match_field, array( 'post_date', 'post_modified' ) ) ? true : false;
 			$is_date = apply_filters( 'geodir_post_badge_is_date', $is_date, $match_field, $field, $args, $find_post );
 
-			$match_value = isset($find_post->{$match_field}) ? esc_attr( trim( $find_post->{$match_field} ) ) : '';
+			$match_value = isset( $find_post->{$match_field} ) && empty( $empty_field ) ? esc_attr( trim( $find_post->{$match_field} ) ) : '';
 			$match_found = $match_field === '' ? true : false;
 
 			if ( ! $match_found ) {
@@ -3234,13 +3462,54 @@ function sd_block_check_rule_gd_field( $rule ) {
 			}
 
 			$match_found = apply_filters( 'geodir_post_badge_check_match_found', $match_found, $args, $find_post );
+		} else {
+			$field = array();
+
+			// Parse search.
+			$search = sd_gd_field_rule_search( $args['search'], $find_post->post_type, $rule, $field, $find_post );
+
+			$match_value = '';
+			$match_found = $match_field === '' ? true : false;
+
+			if ( ! $match_found ) {
+				switch ( $args['condition'] ) {
+					case 'is_equal':
+						$match_found = (bool) ( $search != '' && $match_value == $search );
+						break;
+					case 'is_not_equal':
+						$match_found = (bool) ( $search != '' && $match_value != $search );
+						break;
+					case 'is_greater_than':
+						$match_found = false;
+						break;
+					case 'is_less_than':
+						$match_found = false;
+						break;
+					case 'is_empty':
+						$match_found = true;
+						break;
+					case 'is_not_empty':
+						$match_found = false;
+						break;
+					case 'is_contains':
+						$match_found = false;
+						break;
+					case 'is_not_contains':
+						$match_found = false;
+						break;
+				}
+			}
+
+			$match_found = apply_filters( 'geodir_post_badge_check_match_found_empty', $match_found, $args, $find_post );
 		}
 	}
 
 	return $match_found;
 }
 
-function sd_gd_field_rule_search( $search, $post_type, $rule ) {
+function sd_gd_field_rule_search( $search, $post_type, $rule, $field = array(), $gd_post = array() ) {
+	global $post;
+
 	if ( ! $search ) {
 		return $search;
 	}
@@ -3248,7 +3517,13 @@ function sd_gd_field_rule_search( $search, $post_type, $rule ) {
 	$orig_search = $search;
 	$_search = strtolower( $search );
 
-	if ( $_search == 'date_today' ) {
+	if ( ! empty( $rule['field'] ) && $rule['field'] == 'post_author' ) {
+		if ( $search == 'current_user' ) {
+			$search = is_user_logged_in() ? (int) get_current_user_id() : - 1;
+		} else if ( $search == 'current_author' ) {
+			$search = ( ! empty( $post ) && $post->post_type != 'page' && isset( $post->post_author ) ) ? absint( $post->post_author ) : - 1;
+		}
+	} else if ( $_search == 'date_today' ) {
 		$search = date( 'Y-m-d' );
 	} else if ( $_search == 'date_tomorrow' ) {
 		$search = date( 'Y-m-d', strtotime( "+1 day" ) );
