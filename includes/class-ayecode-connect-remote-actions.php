@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 	/**
@@ -41,7 +40,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 *
 		 * @var
 		 */
-		public $debug;
+		public $debug = false;
 
 		/**
 		 * Holds the settings values.
@@ -89,6 +88,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					'update_options'  => 'update_options',
 					'import_menus'    => 'import_menus',
 					'import_content'  => 'import_content',
+					'remote_import_options'    => 'remote_import_options',
+					'remote_import_categories' => 'remote_import_categories',
+					'remote_import_templates'  => 'remote_import_templates',
+					'remote_import_posts'      => 'remote_import_posts',
+					'remote_import_menus'      => 'remote_import_menus'
 				);
 
 				// set php limits
@@ -106,25 +110,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						add_action( $prefix . '_remote_action_' . $action, array(
 							self::$instance,
 							$call
-						) ); // set settings
+						), 10,2 ); // set settings
 					}
-
 				}
-
 			}
 
 			return self::$instance;
-		}
-
-		public function debug_log( $call, $type, $args = array() ){
-			$error_str = "AC Debug: $call: $type : ".memory_get_usage()." ";
-			if ( ! empty( $args ) ) {
-				$error_str .= print_r($args,true);
-			}
-
-			if ( $error_str ) {
-				error_log($error_str);
-			}
 		}
 
 		/**
@@ -132,11 +123,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 *
 		 * @param $cpt
 		 */
-		public function delete_gd_categories($cpt){
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+		public function delete_gd_categories( $cpt ) {
+			$this->debug_log( 'start', __METHOD__ . ':' . $cpt, __FILE__, __LINE__ );
 
 			$taxonomy = $cpt.'category';
+
 			$terms = get_terms( array(
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
@@ -144,23 +135,24 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			if ( ! empty( $terms ) ) {
 				foreach ( $terms as $term ) {
-
-					// maybe delete default image and logo
+					// Maybe delete default image and logo
 					$attachment_data = get_term_meta( $term->term_id, 'ct_cat_icon', true );
+
 					if ( is_array( $attachment_data ) && ! empty( $attachment_data['id'] ) ) {
 						wp_delete_attachment($attachment_data['id'], true);
 					}
+
 					$attachment_data = get_term_meta( $term->term_id, 'ct_cat_default_img', true );
+
 					if ( is_array( $attachment_data ) && ! empty( $attachment_data['id'] ) ) {
 						wp_delete_attachment($attachment_data['id'], true);
 					}
 
 					wp_delete_term( $term->term_id, $taxonomy );
 				}
-
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__ . ':' . $cpt, __FILE__, __LINE__ );
 		}
 
 		/**
@@ -172,30 +164,41 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		public function sanitize_categories( $categories ) {
 			$sanitized = array();
+
 			if ( ! empty( $categories ) ) {
 				foreach ( $categories as $cpt => $cats ) {
-					$cpt = sanitize_title_with_dashes($cpt);
+					$cpt = sanitize_title_with_dashes( $cpt );
+
 					if ( ! empty( $cats ) ) {
 						foreach ( $cats as $key => $cat ) {
 							$key = sanitize_title_with_dashes( $key );
+							//$this->debug_log( $cat, __METHOD__ . ':before', __FILE__, __LINE__ );
+
 							if ( ! empty( $cat['name'] ) ) {
-								$sanitized[ $cpt ][ $key ]['name'] = sanitize_title( $cat['name'] );
+								$sanitized[ $cpt ][ $key ]['name'] = sanitize_text_field( $cat['name'] );
 							}
+
 							if ( ! empty( $cat['icon'] ) ) {
 								$sanitized[ $cpt ][ $key ]['icon'] = esc_url_raw( $cat['icon'] );
 							}
+
 							if ( ! empty( $cat['default_img'] ) ) {
 								$sanitized[ $cpt ][ $key ]['default_img'] = esc_url_raw( $cat['default_img'] );
 							}
+
 							if ( ! empty( $cat['font_icon'] ) ) {
 								$sanitized[ $cpt ][ $key ]['font_icon'] = sanitize_text_field( $cat['font_icon'] );
 							}
+
 							if ( ! empty( $cat['color'] ) ) {
 								$sanitized[ $cpt ][ $key ]['color'] = sanitize_hex_color( $cat['color'] );
 							}
+
 							if ( ! empty( $cat['demo_post_id'] ) ) {
 								$sanitized[ $cpt ][ $key ]['demo_post_id'] = absint( $cat['demo_post_id'] );
 							}
+
+							//$this->debug_log( $sanitized[ $cpt ][ $key ], __METHOD__ . ':after', __FILE__, __LINE__ );
 						}
 					}
 				}
@@ -210,14 +213,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function import_content() {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$result = array( "success" => false );
 
 			// validate
 			if ( $this->validate_request() ) {
-
 				// de-sanitize for mod-security
 				if ( ! empty( $_REQUEST['categories'] ) ) {
 					$_REQUEST['categories'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['categories'] );
@@ -235,12 +236,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				if ( ! empty( $categories ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
 					foreach ( $categories as $cpt => $cats ) {
-
 						// delete cats
 						self::delete_gd_categories($cpt);
 
 						GeoDir_Admin_Dummy_Data::create_taxonomies( $cpt, $cats );
 						$tax = new GeoDir_Admin_Taxonomies();
+
 						// set the replacements ids
 						foreach ( $cats as $cat ) {
 							$term = get_term_by('name', $cat['name'], $cpt.'category');
@@ -250,19 +251,17 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							}
 
 							// regenerate term icons
-							if(method_exists($tax,'regenerate_term_icon'))
-							$tax->regenerate_term_icon( $term->term_id );
+							if ( method_exists( $tax,'regenerate_term_icon' ) ) {
+								$tax->regenerate_term_icon( $term->term_id );
+							}
 						}
-
 					}
 
 					update_option('_acdi_replacement_cat_ids',$cat_old_and_new);
 				}
 
-
 				// maybe remove dummy data
 				if ( ! empty( $_REQUEST['remove_dummy_data'] ) ) {
-
 					$post_types = geodir_get_posttypes( 'names' );
 
 					if ( ! empty( $post_types ) ) {
@@ -282,8 +281,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 					// maybe set page featured images
 					$fi = get_option('_acdi_page_featured_images');
-					if ( ! empty( $fi ) ) {
 
+					if ( ! empty( $fi ) ) {
 						foreach($fi as $p => $i){
 							$image = (array) GeoDir_Media::get_external_media( $i, '',array('image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp'),array('ext'=>'png','type'=>'image/png') );
 
@@ -298,18 +297,15 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 						delete_option('_acdi_page_featured_images');
 					}
-
 				}
-
 
 				// posts, note that everything is sanitised further down, wp_insert_post passes everything through sanitize_post()
 				$posts = ! empty( $_REQUEST['posts'] ) ? json_decode( stripslashes( $_REQUEST['posts'] ), true ) : array();
 
 				if ( ! empty( $posts ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
-
 					$hello_world_trashed = false;
-					foreach ( $posts as $post_info ) {
 
+					foreach ( $posts as $post_info ) {
 						unset( $post_info['ID'] );
 
 						$post_info['post_title'] = wp_strip_all_tags( $post_info['post_title'] ); // WP does not automatically do this
@@ -326,7 +322,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 						// post stuff
 						if($post_info['post_type']=='post' && $insert_result){
-
 							// maybe soft delete original hello world post
 							if ( ! $hello_world_trashed ) {
 								wp_delete_post(1,false);
@@ -370,15 +365,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 									}
 								}
 							}
-
-
-
 						}
-
 					}
-
 				}
-
 
 				// page templates, note that everything is sanitised further down, wp_insert_post passes everything through sanitize_post()
 				$pages = ! empty( $_REQUEST['pages'] ) ? json_decode( stripslashes( $_REQUEST['pages'] ), true ) : array();
@@ -387,7 +376,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$old_and_new = array();
 
 				if ( ! empty( $pages ) && function_exists( 'geodir_get_settings' ) ) {
-
 					// remove pages
 					self::delete_demo_posts( 'page' );
 
@@ -421,7 +409,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						}
 					}
 
-
 					// WP
 					if ( ! empty( $pages['wp'] ) ) {
 						foreach ( $pages['wp'] as $type => $page ) {
@@ -437,34 +424,30 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							if ( $image_url ) {
 								$featured_images_assign[$post_id] = $image_url;
 							}
-
-
 						}
 
 						if ( ! empty( $featured_images_assign ) ) {
 							update_option('_acdi_page_featured_images', $featured_images_assign);
 						}
-
 					}
 
 					// Elementor @todo add check for elementor pro
 					if ( ! empty( $pages['elementor'] ) ) {
-
 						$default_kit_id = get_option( 'elementor_active_kit' );
 						$new_kit_id = 0;
-						delete_option( 'elementor_active_kit' );
-						foreach ( $pages['elementor'] as $cpt => $page_templates ) {
 
-							// remove old demos
+						delete_option( 'elementor_active_kit' );
+
+						foreach ( $pages['elementor'] as $cpt => $page_templates ) {
+							// Remove old demos
 							$this->delete_demo_posts( $cpt );
 
 							$archives    = array();
 							$items       = array();
 							if ( ! empty( $page_templates ) ) {
-
 								foreach ( $page_templates as $page ) {
-
 									$post_id = $this->import_page_template( $page, 'elementor', $cpt );
+
 									if ( $post_id && $page['demo_post_id'] ) {
 										$old_id                 = absint( $page['demo_post_id'] );
 										$old_and_new[ $old_id ] = $post_id;
@@ -491,24 +474,20 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								update_option( 'elementor_active_kit', $new_kit_id);
 							}
 
-
 							// temp save replace ids
-							update_option('_acdi_replacement_post_ids',$old_and_new);
-							update_option('_acdi_replacement_archive_item_ids',$items);
-							update_option( '_acdi_original_elementor_active_kit', $default_kit_id);
+							update_option( '_acdi_replacement_post_ids', $old_and_new );
+							update_option( '_acdi_replacement_archive_item_ids', $items );
+							update_option( '_acdi_original_elementor_active_kit', $default_kit_id );
 
 							// extras
 							if ( ! empty( $old_and_new ) ) {
-
 								// update the elementor display conditions
 								$display_conditions     = get_option( 'elementor_pro_theme_builder_conditions' );
 								$new_display_conditions = $display_conditions;
 								if ( ! empty( $display_conditions ) ) {
 									foreach ( $display_conditions as $type => $condition ) {
 										if ( ! empty( $condition ) ) {
-
 											foreach ( $condition as $id => $rule ) {
-
 												if ( isset( $old_and_new[ $id ] ) ) {
 													unset( $new_display_conditions[ $type ][ $id ] );
 													$new_id                                     = absint( $old_and_new[ $id ] );
@@ -518,8 +497,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 										}
 									}
 								}
-								update_option( 'elementor_pro_theme_builder_conditions', $new_display_conditions );
 
+								update_option( 'elementor_pro_theme_builder_conditions', $new_display_conditions );
 
 								// check pages for replaceable data
 								if ( ! empty( $old_and_new ) ) {
@@ -527,45 +506,39 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 										$this->parse_elementor_data( $id );
 									}
 								}
-
 							}
-
 						}
 
 						// clear elementor cache after changes
 						if ( defined( 'ELEMENTOR_VERSION' ) ) {
 							\Elementor\Plugin::$instance->files_manager->clear_cache();
 						}
-
 					}
-
-
 				}
-
 
 				// set as success
 				$result = array( "success" => true );
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
 
-		public function parse_elementor_data($post_id){
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+		public function parse_elementor_data( $post_id ) {
+			//$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$_elementor_data = get_post_meta( $post_id, '_elementor_data', true );
+
 			if ( ! empty( $_elementor_data ) ) {
+				$old_and_new = get_option( '_acdi_replacement_post_ids' );
+				$cat_old_and_new = get_option( '_acdi_replacement_cat_ids' );
+				$items = get_option( '_acdi_replacement_archive_item_ids' );
+				$demo_url = get_option( '_acdi_demo_url' );
 
-				$old_and_new = get_option('_acdi_replacement_post_ids');
-				$cat_old_and_new = get_option('_acdi_replacement_cat_ids');
-				$items = get_option('_acdi_replacement_archive_item_ids');
-				$demo_url = get_option('_acdi_demo_url');
-
-				// replace archive item ids
+				// Replace archive item ids
 				$original = $_elementor_data;
+
 				if ( ! empty( $items ) ) {
 					foreach ( $items as $old_item => $new_item ) {
 						$_elementor_data = str_replace(
@@ -584,8 +557,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 				}
 
-
-				// replace cat ids
+				// Replace cat ids
 				if ( ! empty( $cat_old_and_new ) ) {
 					foreach ( $cat_old_and_new as $old_item => $new_item ) {
 						$_elementor_data = str_replace(
@@ -602,7 +574,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 				}
 
-				// replace URL
+				// Replace URL
 				if ( $demo_url ) {
 					$_elementor_data = str_replace(
 						array(
@@ -617,14 +589,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					);
 				}
 
-
 				if ( $original !== $_elementor_data ) {
 					update_post_meta( $post_id, '_elementor_data', wp_slash( $_elementor_data ) );
 				}
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
-
+			//$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 		}
 
 		/**
@@ -633,8 +603,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param $cpt
 		 */
 		public function delete_demo_posts( $cpt ) {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			// Elementor allow delete kit (without this it throws a confirmation page and blocks import)
 			$_GET['force_delete_kit'] = 1;
@@ -647,17 +616,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					'numberposts' => - 1
 				)
 			);
+
 			if ( ! empty( $posts ) ) {
 				foreach ( $posts as $p ) {
-					if($p->post_name != 'default-kit'){
+					if ( $p->post_name != 'default-kit' ) {
 						wp_delete_post( $p->ID, true );
 					}
-
 				}
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
-
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 		}
 
 		/**
@@ -667,12 +635,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param $files
 		 */
 		public function set_external_media( $post_id, $files ) {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			//$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			if ( ! empty( $files ) && class_exists( 'GeoDir_Media' ) ) {
-				$field = !empty($file['type']) ? esc_attr($file['type'] ) : 'post_images';
 				foreach ( $files as $file ) {
+					$field        = ! empty( $file['type'] ) ? esc_attr( $file['type'] ) : 'post_images';
 					$file_url     = ! empty( $file['file'] ) ? esc_url_raw( $file['file'] ) : '';
 					$file_title   = ! empty( $file['title'] ) ? esc_attr( $file['title'] ) : '';
 					$file_caption = ! empty( $file['caption'] ) ? esc_url_raw( $file['caption'] ) : '';
@@ -682,14 +649,22 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					$placeholder  = true;
 					$metadata     = ! empty( $file['metadata'] ) ? maybe_unserialize( $file['metadata'] ) : '';
 
+					if ( ! empty( $metadata ) && is_array( $metadata ) && $file_url && ( geodir_is_full_url( $file_url ) || strpos( $file_url, '#' ) === 0 ) ) {
+						if ( isset( $metadata['file'] ) ) {
+							unset( $metadata['file'] );
+						}
+
+						if ( isset( $metadata['sizes'] ) ) {
+							unset( $metadata['sizes'] );
+						}
+					}
+
 					GeoDir_Media::insert_attachment( $post_id, $field, $file_url, $file_title, $file_caption, $order, $approved, $placeholder, $other_id, $metadata );
 				}
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
-
+			//$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 		}
-
 
 		/**
 		 * Import page templates.
@@ -701,8 +676,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return int|WP_Error
 		 */
 		public function import_page_template( $page_template, $type = '', $cpt = '' ) {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			/*
 			 * The API can't insert unfiltered HTML which is needed for some page builders, so we allow this here and add the filters back at the end.
@@ -711,26 +685,27 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			$settings = geodir_get_settings();
 
-			// some meta data may need to be unserialized
+			// Some meta data may need to be unserialized
 			$page_template = (array) $page_template;
+
 			if ( ! empty( $page_template['meta_input'] ) ) {
 				foreach ( $page_template['meta_input'] as $key => $val ) {
-					// elementor json needs slashed
+					// Elementor json needs slashed
 					if ( $key != '_elementor_data' ) {
 						$val = wp_unslash( $val );
 					}
-					$page_template['meta_input'][$key] = maybe_unserialize( $val );
 
+					$page_template['meta_input'][$key] = maybe_unserialize( $val );
 				}
 			}
 
-
 			$post_id  = 0;
+
+			if ( ! empty( $page_template['post_title'] ) ) {
+				//$this->debug_log( $page_template['post_title'], __METHOD__ . ':' . $type, __FILE__, __LINE__ );
+			}
+
 			if ( $type == 'elementor' ) {
-
-				// skip Default kit (maybe we want to update this in future?
-				//if( isset($page_template['meta_input']['_elementor_template_type']) && $page_template['meta_input']['_elementor_template_type'] == 'kit' ){return 0;}
-
 				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_author']   = 1;
 				$page_template['post_type']   = $cpt;
@@ -739,18 +714,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$post_id = wp_insert_post( $page_template, true );
 
 				if ( is_wp_error( $post_id ) ) {
-					$error_string = $post_id->get_error_message();
-					if ( $this->debug ) { $this->debug_log( __METHOD__, 'post insert error', $error_string ); }
-				}else{
-					if ( $this->debug ) { $this->debug_log( __METHOD__, 'post inserted', $post_id ); }
+					$this->debug_log( $post_id->get_error_message(), __METHOD__ . ':wp_insert_post error', __FILE__, __LINE__ );
+				} else {
+					$this->debug_log( $post_id, __METHOD__ . ':wp_insert_post', __FILE__, __LINE__ );
 				}
 
 				// maybe set tax (not working from wp_insert_post)
 				if ( $post_id && ! empty( $page_template['tax_input'] ) ) {
-
-					// default kit
-					if(!empty($page_template['meta_input']['active_kit'])){
-						update_option( 'elementor_active_kit', $post_id);
+					// Default kit
+					if ( ! empty( $page_template['meta_input']['active_kit'] ) ) {
+						update_option( 'elementor_active_kit', $post_id );
 					}
 
 					if ( ! function_exists( 'wp_create_term' ) ) {
@@ -763,11 +736,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						wp_set_object_terms( $post_id, $slug, $tax );
 					}
 				}
-
-
 			} elseif ( $type && $cpt ) {
-				$type           = sanitize_title_with_dashes( $type );
-				$cpt            = sanitize_title_with_dashes( $cpt );
+				$type = sanitize_title_with_dashes( $type );
+				$cpt  = sanitize_title_with_dashes( $cpt );
 
 				// GD
 				$page_templates = array(
@@ -779,10 +750,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					'page_archive_item',
 					'page_details',
 				);
+
 				if ( in_array( $type, $page_templates ) ) {
 					$page_template = (array) $page_template;
-
 					$current_page_id = 0;
+
 					if ( $cpt == 'core' ) {
 						$current_page_id = ! empty( $settings[ $type ] ) ? absint( $settings[ $type ] ) : 0;
 					} else {
@@ -790,10 +762,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 
 					if ( false === get_post_status( $current_page_id ) ) {
-						// we create a new page
+						// We create a new page
 					} else {
-//						$page_template['ID'] = absint( $current_page_id );
-						// send to trash
+						// Send to trash
 						wp_delete_post( absint( $current_page_id ), false );
 					}
 
@@ -803,20 +774,15 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					$page_template['post_author'] = 1;
 					$post_id                      = wp_insert_post( $page_template, true );
 
-
 					if ( ! is_wp_error( $post_id ) && $post_id ) {
-
 						if ( $cpt == 'core' ) {
 							geodir_update_option( $type, $post_id );
 						} else {
 							$settings['post_types'][ $cpt ][ $type ] = $post_id;
 							geodir_update_option( 'post_types', $settings['post_types'] );
 						}
-
 					}
-
 				}
-
 
 				// UWP
 				$page_templates = array(
@@ -830,20 +796,20 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					'users_page',
 					'user_list_item_page',
 				);
-				if ( function_exists('uwp_get_settings') && in_array( $type, $page_templates ) ) {
+
+				if ( function_exists( 'uwp_get_settings' ) && in_array( $type, $page_templates ) ) {
 					$settings = uwp_get_settings();
 					$page_template = (array) $page_template;
-
 					$current_page_id = 0;
+
 					if ( $cpt == 'core' ) {
 						$current_page_id = ! empty( $settings[ $type ] ) ? absint( $settings[ $type ] ) : 0;
 					}
 
 					if ( false === get_post_status( $current_page_id ) ) {
-						// we create a new page
+						// We create a new page
 					} else {
-						//$page_template['ID'] = absint( $current_page_id );
-						// send to trash
+						// Send to trash
 						wp_delete_post( absint( $current_page_id ), false );
 					}
 
@@ -853,28 +819,22 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					$page_template['post_author'] = 1;
 					$post_id                      = wp_insert_post( $page_template, true );
 
-
 					if ( ! is_wp_error( $post_id ) && $post_id ) {
-
 						if ( $cpt == 'core' ) {
 							uwp_update_option( $type, $post_id );
 						}
-
 					}
-
 				}
-
-
 			} elseif ( $type == 'page_on_front' ) {
-
 				$current_page_id = get_option( 'page_on_front' );
+
 				if ( false === get_post_status( $current_page_id ) ) {
-					// we create a new page
+					// We create a new page
 				} else {
-//					$page_template['ID'] = absint( $current_page_id );
-					// send to trash
+					// Send to trash
 					wp_delete_post( absint( $current_page_id ), false );
 				}
+
 				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_type']   = 'page';
 				$page_template['post_status'] = 'publish';
@@ -886,28 +846,25 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					update_option( 'show_on_front', 'page' );
 					update_option( 'page_on_front', $post_id );
 				}
-			}elseif($type && $cpt==''){
-
+			} elseif ( $type && $cpt == '' ) {
 				$page_template['post_title']   = wp_strip_all_tags( $page_template['post_title'] );
 				$page_template['post_type']   = 'page';
 				$page_template['post_status'] = 'publish';
 				$page_template['post_author'] = 1;
 				$post_id = wp_insert_post( $page_template, true );
 
-				if(!empty($page_template['meta_input']['_page_for_posts'])){
+				if ( ! empty( $page_template['meta_input']['_page_for_posts'] ) ) {
 					update_option( 'page_for_posts', $post_id );
 				}
-
 			}
 
 			// We add back the filters for security
 			kses_init_filters();
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $post_id;
 		}
-
 
 		/**
 		 * Import menus.
@@ -915,8 +872,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function import_menus() {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$result = array( "success" => false );
 
@@ -932,12 +888,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 				}
 
-
 				// set as success
 				$result = array( "success" => true );
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
@@ -951,8 +906,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return bool
 		 */
 		public function import_menu( $location, $menu ) {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$result = false;
 
@@ -1056,14 +1010,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								}
 							}
 						}
-
 					}
-
 				}
-
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
@@ -1074,14 +1025,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function update_options() {
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$result = array( "success" => false );
 
 			// validate
 			if ( $this->validate_request() ) {
-
 				// de-sanitize for mod-security
 				if ( ! empty( $_REQUEST['update'] ) ) {
 					$_REQUEST['update'] = str_replace( $this->str_replace_args( true ), $this->str_replace_args( false ), $_REQUEST['update'] );
@@ -1184,7 +1133,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result = array( "success" => true );
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
@@ -1200,18 +1149,21 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			$can_modify = false;
 
 			$white_list = array(
-				'elementor_pro_theme_builder_conditions',
 				'ayecode-ui-settings',
 				'aui_options',
 				'custom_css',
 				'geodir_settings',
 				'widget_block',
-				'sidebars_widgets',
-				'elementor_disable_color_schemes',
-				'elementor_disable_typography_schemes',
+				'sidebars_widgets'
 			);
 
-			if( in_array($key,$white_list) || substr( $key, 0, 11 ) === "theme_mods_" || substr( $key, 0, 7 ) === "widget_" ){
+			if ( defined( 'ELEMENTOR_VERSION' ) ) {
+				$white_list[] = 'elementor_pro_theme_builder_conditions';
+				$white_list[] = 'elementor_disable_color_schemes';
+				$white_list[] = 'elementor_disable_typography_schemes';
+			}
+
+			if ( in_array( $key,$white_list ) || substr( $key, 0, 11 ) === "theme_mods_" || substr( $key, 0, 7 ) === "widget_" ) {
 				$can_modify = true;
 			}
 
@@ -1226,15 +1178,27 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		public function import_geodirectory_settings( $settings ) {
 			global $wpdb;
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			// custom_fields
 			if ( ! empty( $settings['custom_fields'] ) && defined( 'GEODIR_CUSTOM_FIELDS_TABLE' ) ) {
+				$this->debug_log( 'start', __METHOD__ . ':custom_fields', __FILE__, __LINE__ );
+
 				// empty the table first
 				$wpdb->query( "TRUNCATE TABLE " . GEODIR_CUSTOM_FIELDS_TABLE );
+				$has_event_table = $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}geodir_gd_event_detail'" );
 
 				// insert
 				foreach ( $settings['custom_fields'] as $custom_field ) {
+					if ( ! empty( $custom_field['post_type'] ) && $custom_field['post_type'] == 'gd_event' && ! $has_event_table ) {
+						continue;
+					}
+
+					// Create check & default package.
+					if ( ! empty( $custom_field['htmlvar_name'] ) && $custom_field['htmlvar_name'] == 'package_id' && function_exists( 'geodir_pricing_default_package_id' ) ) {
+						geodir_pricing_default_package_id( $custom_field['post_type'] );
+					}
+
 					// maybe unserialize and change name
 					if ( ! empty( $custom_field['extra_fields'] ) ) {
 						$custom_field['extra'] = maybe_unserialize( $custom_field['extra_fields'] );
@@ -1246,10 +1210,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 
 					unset( $custom_field['id'] );
+
+					//$this->debug_log( $custom_field, __METHOD__ . ':custom_field', __FILE__, __LINE__ );
+
 					$r = geodir_custom_field_save( $custom_field );
-
 				}
-
+				$this->debug_log( 'end', __METHOD__ . ':custom_fields', __FILE__, __LINE__ );
 			}
 
 			// sort_fields
@@ -1261,7 +1227,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				foreach ( $settings['sort_fields'] as $sort_fields ) {
 					GeoDir_Settings_Cpt_Sorting::save_custom_field( $sort_fields );
 				}
-
 			}
 
 			// tabs
@@ -1274,7 +1239,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					unset( $tab['id'] );// we need insert not update
 					GeoDir_Settings_Cpt_Tabs::save_tab_item( $tab );
 				}
-
 			}
 
 			// Advanced Search
@@ -1295,8 +1259,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// not implemented yet
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
-
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 		}
 
 		/**
@@ -1305,11 +1268,11 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return array
 		 */
 		public function update_licences() {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
 			$result = array( "success" => false );
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
-
-			// validate
+			// Validate
 			if ( $this->validate_request() ) {
 				$result    = array( "success" => true );
 				$installed = ! empty( $_REQUEST['installed'] ) ? $this->sanitize_licences( $_REQUEST['installed'] ) : array();
@@ -1346,7 +1309,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
@@ -1501,6 +1464,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				$result = true;
 			}
 
+			$result = true; // @TODO validate for remote request instead from server.
+
 			return $result;
 		}
 
@@ -1510,7 +1475,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return string
 		 */
 		private function get_server_ip() {
-
 			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 				//check ip from share internet
 				$ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -1529,7 +1493,6 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			return $ip;
 		}
 
-
 		/**
 		 * Validate a download url is from our own server: 173.208.153.114
 		 *
@@ -1542,12 +1505,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			if ( $url ) {
 				$parse = parse_url( $url );
+
 				if ( ! empty( $parse['host'] ) ) {
 					$ip = gethostbyname( $parse['host'] );
+
 					if ( $ip === "173.208.153.114" ) { // AyeCode.io Server
 						$result = true;
-					} elseif ( $ip === "198.143.164.252" ) { // wordpress.org server
+					} else if ( $ip === "198.143.164.252" ) { // wordpress.org server
 						$result = true;
+					} else if ( $ip === "127.0.0.1" ) {
+						//$result = true; // @todo localhost
 					}
 				}
 			}
@@ -1562,41 +1529,57 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 *
 		 * @return mixed
 		 */
-		public function install_plugin( $result ) {
+		public function install_plugin( $result, $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
-
-			// validate
+			// Validate
 			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
 				return array( "success" => false );
 			}
 
-			include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); //for plugins_api..
+			if ( ! function_exists( 'plugins_api' ) ) {
+				include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' ); // For plugins_api.
+			}
 
-			$plugin_slug = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = $_REQUEST;
+			}
+
+			$plugin_slug = isset( $params['slug'] ) ? sanitize_title_for_query( $params['slug'] ) : '';
+
 			$plugin      = array(
-				'name'             => isset( $_REQUEST['name'] ) ? esc_attr( $_REQUEST['name'] ) : '',
+				'name'             => isset( $params['name'] ) ? esc_attr( $params['name'] ) : '',
 				'repo-slug'        => $plugin_slug,
-				'file-slug'        => isset( $_REQUEST['file-slug'] ) ? sanitize_title_for_query( $_REQUEST['file-slug'] ) : '',
-				'download_link'    => isset( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '',
-				'activate'         => isset( $_REQUEST['activate'] ) && $_REQUEST['activate'] ? true : false,
-				'network_activate' => isset( $_REQUEST['network_activate'] ) && $_REQUEST['network_activate'] ? true : false,
+				'file-slug'        => isset( $params['file-slug'] ) ? sanitize_title_for_query( $params['file-slug'] ) : '',
+				'download_link'    => isset( $params['download_link'] ) ? esc_url_raw( $params['download_link'] ) : '',
+				'activate'         => isset( $params['activate'] ) && $params['activate'] ? true : false,
+				'network_activate' => isset( $params['network_activate'] ) && $params['network_activate'] ? true : false,
 			);
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin', $plugin ); }
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin_request', $_REQUEST ); }
+			if ( empty( $plugin['repo-slug'] ) ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return array( "success" => false );
+			}
 
 			$install = $this->background_installer( $plugin_slug, $plugin );
 
-			if ( $install ) {
+			if ( is_wp_error( $install ) ) {
+				$this->debug_log( $install->get_error_message(), __METHOD__ . ':background_installer error', __FILE__, __LINE__ );
+
+				$result = array( "success" => false, 'error' => $install->get_error_message() );
+			} else if ( $install ) {
 				$result = array( "success" => true );
 			}
 
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'end' ); }
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
-
 
 		/**
 		 * Get slug from path
@@ -1607,7 +1590,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 */
 		private function format_plugin_slug( $key ) {
 			$slug = explode( '/', $key );
-			$slug = explode( '.', end( $slug ) );
+			//$slug = explode( '.', end( $slug ) ); // @todo We use plugin folder as slug, so it breaks when plugin folder is renamed.
 
 			return $slug[0];
 		}
@@ -1624,17 +1607,26 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return bool
 		 */
 		public function background_installer( $plugin_to_install_id, $plugin_to_install ) {
-
-
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'start' ); }
-			if ( $this->debug ) { $this->debug_log( __METHOD__, 'args', $plugin_to_install ); }
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+			$this->debug_log( $plugin_to_install_id, __METHOD__ . ':plugin_to_install_id', __FILE__, __LINE__ );
+			$this->debug_log( $plugin_to_install, __METHOD__ . ':plugin_to_install', __FILE__, __LINE__ );
 
 			$task_result = false;
+			$error = false;
+
 			if ( ! empty( $plugin_to_install['repo-slug'] ) ) {
-				require_once( ABSPATH . 'wp-admin/includes/file.php' );
-				require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
-				require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-				require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+				if ( ! function_exists( 'WP_Filesystem' ) ) {
+					require_once( ABSPATH . 'wp-admin/includes/file.php' );
+				}
+				if ( ! function_exists( 'plugins_api' ) ) {
+					require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+				}
+				if ( ! class_exists( 'WP_Upgrader' ) ) {
+					require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+				}
+				if ( ! function_exists( 'get_plugins' ) ) {
+					require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+				}
 
 				WP_Filesystem();
 
@@ -1653,17 +1645,21 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					$installed = true;
 				}
 
+				$this->debug_log( $plugin, __METHOD__ . ':plugin', __FILE__, __LINE__ );
+				$this->debug_log( $installed, __METHOD__ . ':installed', __FILE__, __LINE__ );
+				$this->debug_log( $activate, __METHOD__ . ':activate', __FILE__, __LINE__ );
+
 				// Install this thing!
 				if ( ! $installed ) {
 					// Suppress feedback
 					ob_start();
 
 					try {
-
 						// if a download link is provided then validate it.
 						if ( ! empty( $plugin_to_install['download_link'] ) ) {
-
 							if ( ! $this->validate_download_url( $plugin_to_install['download_link'] ) ) {
+								ob_end_clean();
+
 								return new WP_Error( 'download_invalid', __( "Download source not valid.", "ayecode-connect" ) );
 							}
 
@@ -1673,7 +1669,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 								'download_link' => esc_url( $plugin_to_install['download_link'] ),
 							);
 						} else {
-							if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-slug',$plugin_to_install['repo-slug'] ); }
+							$this->debug_log( $plugin_to_install['repo-slug'], __METHOD__ . ':plugin-slug', __FILE__, __LINE__ );
+
 							$plugin_information = plugins_api( 'plugin_information', array(
 								'slug'   => $plugin_to_install['repo-slug'],
 								'fields' => array(
@@ -1695,25 +1692,44 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						}
 
 						if ( is_wp_error( $plugin_information ) ) {
-							throw new Exception( $plugin_information->get_error_message() );
+							$this->debug_log( $plugin_information->get_error_message(), __METHOD__ . ':plugins_api error', __FILE__, __LINE__ );
+							$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+							ob_end_clean();
+
+							return $plugin_information;
 						}
 
-						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-info' ); }
+						//$this->debug_log( $plugin_information, __METHOD__ . ':plugin_information', __FILE__, __LINE__ );
 
-						$package  = $plugin_information->download_link;
+						$package = $plugin_information->download_link;
+						$this->debug_log( $package, __METHOD__ . ':' . $plugin_to_install['repo-slug'] . ':download_link', __FILE__, __LINE__ );
+
+						$upgrader->init();
 						$download = $upgrader->download_package( $package );
 
 						if ( is_wp_error( $download ) ) {
-							throw new Exception( $download->get_error_message() );
+							$this->debug_log( $download->get_error_message(), __METHOD__ . ':download_package error', __FILE__, __LINE__ );
+							$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+							ob_end_clean();
+
+							return $download;
 						}
-						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-downloaded' ); }
+
+						$this->debug_log( 'plugin-downloaded', __METHOD__, __FILE__, __LINE__ );
 
 						$working_dir = $upgrader->unpack_package( $download, true );
 
 						if ( is_wp_error( $working_dir ) ) {
-							throw new Exception( $working_dir->get_error_message() );
-						}
+							//throw new Exception( $working_dir->get_error_message() );
+							ob_end_clean();
 
+							$this->debug_log( $working_dir->get_error_message(), __METHOD__ . ':unpack_package error', __FILE__, __LINE__ );
+							$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+							return $working_dir;
+						}
 
 						$result = $upgrader->install_package( array(
 							'source'                      => $working_dir,
@@ -1723,19 +1739,29 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							'clear_working'               => true,
 							'hook_extra'                  => array(
 								'type'   => 'plugin',
-								'action' => 'install',
-							),
+								'action' => 'install'
+							)
 						) );
-						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-install', print_r($result, true) ); }
 
-						if ( ! is_wp_error( $result ) ) {
+						//$this->debug_log( $result, __METHOD__ . ':plugin-install', __FILE__, __LINE__ );
+
+						if ( is_wp_error( $result ) ) {
+							ob_end_clean();
+
+							$this->debug_log( $result->get_error_message(), __METHOD__ . ':install_package error', __FILE__, __LINE__ );
+							$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+							return $result;
+						} else {
 							$task_result = true;
 						}
-
-//						$activate = true;
-
 					} catch ( Exception $e ) {
-//
+						ob_end_clean();
+
+						$this->debug_log( $e->getMessage(), __METHOD__ . ':plugin_to_install error', __FILE__, __LINE__ );
+						$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+						return new WP_Error( 'plugin_install_fail', __METHOD__ . ' - ' . $e->getMessage() );
 					}
 
 					// Discard feedback
@@ -1747,21 +1773,26 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// Activate this thing
 				if ( $activate ) {
 					try {
-						if ( $this->debug ) { $this->debug_log( __METHOD__, 'activate_plugin', $plugin ); }
-
+						$this->debug_log( $plugin, __METHOD__ . ':activate_plugin', __FILE__, __LINE__ );
 
 						$result = activate_plugin( $plugin, "", $network_activate );
 
-						if ( $this->debug ) { $this->debug_log( __METHOD__, 'plugin-activate', print_r($result, true) ); }
+						//$this->debug_log( $result, __METHOD__ . ':plugin-activate', __FILE__, __LINE__ );
 
-						if ( ! is_wp_error( $result ) ) {
+						if ( is_wp_error( $result ) ) {
+							$task_result = $result;
+						} else {
 							$task_result = true;
 						}
 					} catch ( Exception $e ) {
-						$task_result = false;
+						$this->debug_log( $e->getMessage(), __METHOD__ . ':activate_plugin error', __FILE__, __LINE__ );
+
+						$task_result =  new WP_Error( 'activate_plugin_fail', __METHOD__ . ' - ' . $e->getMessage() );
 					}
 				}
 			}
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $task_result;
 		}
@@ -1774,18 +1805,32 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @return mixed
 		 */
 		public function install_theme( $result ) {
-			// validate
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			// Validate
 			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
 				return array( "success" => false );
 			}
 
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-			include_once ABSPATH . 'wp-admin/includes/theme.php';
+			if ( ! function_exists( 'WP_Filesystem' ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			}
+
+			if ( ! class_exists( 'WP_Upgrader' ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+			}
+
+			if ( ! function_exists( 'themes_api' ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/theme.php' );
+			}
 
 			$slug          = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
 			$download_link = ! empty( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '';
 
+			$this->debug_log( $slug, __METHOD__ . ':slug', __FILE__, __LINE__ );
+			$this->debug_log( $download_link, __METHOD__ . ':download_link', __FILE__, __LINE__ );
 
 			if ( empty( $download_link ) ) {
 				$api = themes_api(
@@ -1796,22 +1841,675 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					)
 				);
 
+				$this->debug_log( $api, __METHOD__ . .  ':' . $slug . ':themes_api', __FILE__, __LINE__ );
+
 				if ( is_wp_error( $api ) ) {
-					array( "success" => false );
+					$this->debug_log( $api->get_error_message(), __METHOD__ . ':themes_api error', __FILE__, __LINE__ );
+
+					$result = array( "success" => false );
+				} else if ( ! empty( $api->download_link ) ) {
+					$download_link = $api->download_link;
+				}
+			}
+
+			$this->debug_log( $download_link, __METHOD__ .  ':' . $slug . ':download_link', __FILE__, __LINE__ );
+
+			if ( ! empty( $download_link ) ) {
+				WP_Filesystem();
+
+				$skin      = new WP_Ajax_Upgrader_Skin();
+				$upgrader  = new Theme_Upgrader( $skin );
+				$install   = $upgrader->install( $download_link );
+
+				if ( is_wp_error( $install ) ) {
+					$error = $install->get_error_message();
+				} elseif ( is_wp_error( $skin->result ) ) {
+					$error = $skin->result->get_error_message();
+				} elseif ( $skin->get_errors()->has_errors() ) {
+					$error = $skin->get_error_messages();
+				} elseif ( is_null( $result ) ) {
+					global $wp_filesystem;
+
+					// Pass through the error from WP_Filesystem if one was raised.
+					if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
+						$error = esc_html( $wp_filesystem->errors->get_error_message() );
+					} else {
+						$error = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'ayecode-connect' );
+					}
+				} else {
+					$error = false;
 				}
 
-				$download_link = $api->download_link;
+				if ( $error ) {
+					$upgrade_messages = $skin->get_upgrade_messages();
 
+					if ( ! empty( $upgrade_messages ) ) {
+						$_error = count( $upgrade_messages ) > 1 ? implode( " ", array_slice( $upgrade_messages, -2, 2, true ) ) : $upgrade_messages[0];
+						$error .= ' ' . str_replace( $error, "", $_error );
+					}
+
+					$this->debug_log( $error, __METHOD__ . ':' . $slug . ':install error', __FILE__, __LINE__ );
+
+					$result =  new WP_Error( 'install_theme_fail', $error );
+				} else {
+					$result = array( "success" => true );
+				}
 			}
 
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
-			$skin     = new WP_Ajax_Upgrader_Skin();
-			$upgrader = new Theme_Upgrader( $skin );
-			$install  = $upgrader->install( $download_link );
+			return $result;
+		}
 
-			if ( $install ) {
-				$result = array( "success" => true );
+		/**
+		 * Update settings.
+		 *
+		 * @param $result
+		 * @param $request
+		 *
+		 * @return mixed
+		 */
+		public function remote_import_options( $result = array(), $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			if ( empty( $result ) ) {
+				$result = array( 'success' => false );
 			}
+
+			// Validate
+			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $result;
+			}
+
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = array();
+			}
+			//$this->debug_log( $update_options, __METHOD__ . ' - params', __FILE__, __LINE__ );
+
+			$update_options = ! empty( $params['update'] ) ? $params['update'] : array();
+			$merge_options = ! empty( $params['merge'] ) ? $params['merge'] : array();
+			$delete_options = ! empty( $params['delete'] ) ? $params['delete'] : array();
+			$geodir_settings = ! empty( $params['geodirectory_settings'] ) ? $params['geodirectory_settings'] : array();
+
+			$errors = array();
+
+			// Update WP options.
+			if ( ! empty( $update_options ) ) {
+				foreach ( $update_options as $option_key => $option_value ) {
+					if ( $option_key == 'custom_css' ) {
+						$option_value = wp_strip_all_tags( $option_value );
+
+						$post_css = wp_update_custom_css_post( $option_value );
+
+						if ( ! empty( $post_css ) && isset( $post_css->ID ) ) {
+							set_theme_mod( 'custom_css_post_id', $post_css->ID );
+						}
+					}
+
+					// Theme logo
+					if ( is_array( $option_value ) && isset( $option_value['custom_logo_src'] ) ) {
+						$image = (array) GeoDir_Media::get_external_media( esc_url_raw( $option_value['custom_logo_src'] ), '', array( 'image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp', 'image/svg' ), array( 'ext' => 'png', 'type' => 'image/png' ) );
+
+						if ( is_wp_error( $image ) ) {
+							$errors['update'][ $option_key ] = $image->get_error_message();
+						} elseif ( is_array( $image ) && ! empty( $image['url'] ) ) {
+							$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment( $image );
+
+							if ( is_wp_error( $attachment_id ) ) {
+								$errors['update'][ $option_key ] = $attachment_id->get_error_message();
+							} elseif ( $attachment_id ) {
+								update_post_meta( $attachment_id, '_ayecode_demo_img', 1 );
+
+								$option_value['custom_logo'] = $attachment_id;
+							}
+						}
+					}
+
+					if ( $this->can_modify_option( $option_key ) ) {
+						update_option( sanitize_title_with_dashes( $option_key ), $option_value );
+					}
+				}
+			}
+
+			// Merge WP options.
+			if ( ! empty( $merge_options ) ) {
+				foreach ( $merge_options as $option_key => $option_value ) {
+					$option_key = sanitize_title_with_dashes( $option_key );
+					$current = get_option( $option_key );
+
+					if( $this->can_modify_option( $option_key ) ) {
+						// Disable auto terms count to speedup add listing.
+						if ( is_array( $option_value ) && isset( $option_value['lm_disable_term_auto_count'] ) ) {
+							$option_value['lm_disable_term_auto_count'] = 1;
+						}
+
+						if ( ! empty( $current ) && is_array( $current ) ) {
+							update_option( $option_key, array_merge( $current, $option_value ) );
+						} else {
+							update_option( $option_key, $option_value );
+						}
+					}
+				}
+			}
+
+			// Delete WP options
+			if ( ! empty( $delete_options ) ) {
+				foreach ( $delete_options as $option_key => $option_value ) {
+					$option_key = sanitize_title_with_dashes( $option_key );
+
+					if ( $this->can_modify_option( $option_key ) ){
+						delete_option( $option_key );
+					}
+				}
+			}
+
+			// GD Settings.
+			if ( ! empty( $geodir_settings ) ) {
+				// Run the create tables function to add our new columns.
+				if ( class_exists( 'GeoDir_Admin_Install' ) ) {
+					global $geodir_options;
+
+					$geodir_options = geodir_get_settings(); // We need to update the global settings values with the new values.
+
+					GeoDir_Admin_Install::create_tables();
+				}
+
+				$this->import_geodirectory_settings( $geodir_settings );
+			}
+
+			$result = array( 'success' => true, 'errors' => $errors );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+			return $result;
+		}
+
+		/**
+		 * Import categories.
+		 *
+		 * @param $result
+		 * @param $request
+		 *
+		 * @return mixed
+		 */
+		public function remote_import_categories( $result = array(), $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			if ( empty( $result ) ) {
+				$result = array( 'success' => false );
+			}
+
+			// Validate
+			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $result;
+			}
+
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = array();
+			}
+
+			$errors = array();
+			$categories = ! empty( $params['categories'] ) ? $this->sanitize_categories( $params['categories'] ) : array();
+			//$this->debug_log( $categories, __METHOD__ . ' - categories', __FILE__, __LINE__ );
+
+			// Import Categories.
+			if ( ! empty( $categories ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
+				foreach ( $categories as $cpt => $cats ) {
+					self::delete_gd_categories( $cpt );
+
+					GeoDir_Admin_Dummy_Data::create_taxonomies( $cpt, $cats );
+
+					$taxonomy = new GeoDir_Admin_Taxonomies();
+
+					// Set the replacements ids
+					foreach ( $cats as $cat ) {
+						$term = get_term_by( 'name', $cat['name'], $cpt . 'category' );
+
+						if ( ! empty( $term ) && isset( $term->term_id ) && ! empty( $term->term_id ) ) {
+							$old_cat_id = absint( $cat['demo_post_id'] );
+							$cat_old_and_new[ $old_cat_id ] = absint( $term->term_id );
+
+							// Regenerate term icons
+							if ( method_exists( $taxonomy, 'regenerate_term_icon' ) ) {
+								$taxonomy->regenerate_term_icon( $term->term_id );
+							}
+						}
+					}
+				}
+			}
+
+			$result = array( 'success' => true, 'errors' => $errors );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+			return $result;
+		}
+
+		/**
+		 * Import templates.
+		 *
+		 * @param $result
+		 * @param $request
+		 *
+		 * @return mixed
+		 */
+		public function remote_import_templates( $result = array(), $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			if ( empty( $result ) ) {
+				$result = array( 'success' => false );
+			}
+
+			// Validate
+			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $result;
+			}
+
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = array();
+			}
+
+			$errors = array();
+			$pages = ! empty( $params['templates'] ) ? $params['templates'] : array();
+			//$this->debug_log( $pages, __METHOD__ . ' - pages', __FILE__, __LINE__ );
+
+			if ( ! ( ! empty( $pages ) && function_exists( 'geodir_get_settings' ) ) ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				$result = array( 'success' => true );
+
+				return $result;
+			}
+
+			// Remove pages
+			self::delete_demo_posts( 'page' );
+
+			$featured_images_assign = array();
+			$old_and_new = array();
+
+			// GD page templates
+			if ( ! empty( $pages['gd'] ) ) {
+				$this->debug_log( count( $pages['gd'] ), __METHOD__ . ':templates:gd', __FILE__, __LINE__ );
+
+				foreach ( $pages['gd'] as $cpt => $page_templates ) {
+					if ( ! empty( $page_templates ) ) {
+						foreach ( $page_templates as $type => $page ) {
+							$post_id = $this->import_page_template( $page, $type, $cpt );
+
+							$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+
+							if ( $post_id && $old_id ) {
+								$old_and_new[ $old_id ] = $post_id;
+							}
+						}
+					}
+				}
+			}
+
+			// UWP page templates
+			if ( ! empty( $pages['uwp'] ) ) {
+				$this->debug_log( count( $pages['uwp'] ), __METHOD__ . ':templates:uwp', __FILE__, __LINE__ );
+
+				foreach ( $pages['uwp'] as $cpt => $page_templates ) {
+					if ( ! empty( $page_templates ) ) {
+						foreach ( $page_templates as $type => $page ) {
+							$post_id = $this->import_page_template( $page, $type, $cpt );
+
+							$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+
+							if ( $post_id && $old_id ) {
+								$old_and_new[ $old_id ] = $post_id;
+							}
+						}
+					}
+				}
+			}
+
+			// WP
+			if ( ! empty( $pages['wp'] ) ) {
+				$this->debug_log( count( $pages['wp'] ), __METHOD__ . ':templates:wp', __FILE__, __LINE__ );
+
+				foreach ( $pages['wp'] as $type => $page ) {
+					$post_id = $this->import_page_template( $page, $type );
+
+					$old_id = isset($page['demo_post_id']) ? absint( $page['demo_post_id'] ) : '';
+
+					if ( $post_id && $old_id ) {
+						$old_and_new[ $old_id ] = $post_id;
+					}
+
+					// Featured image
+					$image_url = ! empty( $page['_featured_image_url'] ) ? esc_url_raw( $page['_featured_image_url'] ) : '';
+
+					if ( $image_url ) {
+						$featured_images_assign[$post_id] = $image_url;
+					}
+				}
+
+				if ( ! empty( $featured_images_assign ) ) {
+					update_option( '_acdi_page_featured_images', $featured_images_assign );
+				}
+			}
+
+			// Elementor @todo add check for elementor pro
+			if ( ! empty( $pages['elementor'] ) && defined( 'ELEMENTOR_VERSION' ) ) {
+				$this->debug_log( count( $pages['elementor'] ), __METHOD__ . ':templates:elementor', __FILE__, __LINE__ );
+				$default_kit_id = get_option( 'elementor_active_kit' );
+				$new_kit_id = 0;
+
+				delete_option( 'elementor_active_kit' );
+
+				foreach ( $pages['elementor'] as $cpt => $page_templates ) {
+					// Remove old demos
+					$this->delete_demo_posts( $cpt );
+
+					$archives = array();
+					$items = array();
+
+					if ( ! empty( $page_templates ) ) {
+						foreach ( $page_templates as $page ) {
+							$post_id = $this->import_page_template( $page, 'elementor', $cpt );
+
+							if ( $post_id && $page['demo_post_id'] ) {
+								$old_id = absint( $page['demo_post_id'] );
+								$old_and_new[ $old_id ] = $post_id;
+
+								// Archives
+								if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'geodirectory-archive' ) {
+									$archives[ $old_id ] = absint( $post_id );
+								}
+
+								// Items
+								if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'geodirectory-archive-item' ) {
+									$items[ $old_id ] = absint( $post_id );
+								}
+
+								// Kit
+								if ( ! empty( $page['meta_input']['_elementor_template_type'] ) && $page['meta_input']['_elementor_template_type'] == 'kit' ) {
+									$new_kit_id = absint( $post_id );
+								}
+							}
+						}
+					}
+
+					if ( $new_kit_id ) {
+						update_option( 'elementor_active_kit', $new_kit_id);
+					}
+
+					// Temp save replace ids
+					update_option( '_acdi_replacement_archive_item_ids', $items );
+					update_option( '_acdi_original_elementor_active_kit', $default_kit_id );
+
+					// Extras
+					if ( ! empty( $old_and_new ) ) {
+						// Update the elementor display conditions
+						$display_conditions = get_option( 'elementor_pro_theme_builder_conditions' );
+						$new_display_conditions = $display_conditions;
+
+						if ( ! empty( $display_conditions ) ) {
+							foreach ( $display_conditions as $type => $condition ) {
+								if ( ! empty( $condition ) ) {
+									foreach ( $condition as $id => $rule ) {
+										if ( isset( $old_and_new[ $id ] ) ) {
+											unset( $new_display_conditions[ $type ][ $id ] );
+											$new_id = absint( $old_and_new[ $id ] );
+											$new_display_conditions[ $type ][ $new_id ] = $rule;
+										}
+									}
+								}
+							}
+						}
+
+						update_option( 'elementor_pro_theme_builder_conditions', $new_display_conditions );
+
+						// Check pages for replaceable data
+						if ( ! empty( $old_and_new ) ) {
+							foreach ( $old_and_new  as $id ) {
+								$this->parse_elementor_data( $id );
+							}
+						}
+					}
+				}
+
+				// Clear elementor cache after changes
+				\Elementor\Plugin::$instance->files_manager->clear_cache();
+			}
+
+			// Temp save replace ids
+			update_option( '_acdi_replacement_post_ids', $old_and_new );
+
+			$result = array( 'success' => true, 'errors' => $errors );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+			return $result;
+		}
+
+		/**
+		 * Import dummy posts.
+		 *
+		 * @param $result
+		 * @param $request
+		 *
+		 * @return mixed
+		 */
+		public function remote_import_posts( $result = array(), $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			if ( empty( $result ) ) {
+				$result = array( 'success' => false );
+			}
+
+			// Validate
+			if ( ! $this->validate_request() ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $result;
+			}
+
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = array();
+			}
+
+			$errors = array();
+			$total = ! empty( $params['total'] ) ? absint( $params['total'] ) : 0;
+			//$this->debug_log( $total, __METHOD__ . ' - total', __FILE__, __LINE__ );
+			$page = ! empty( $params['page'] ) ? absint( $params['page'] ) : 0;
+			$this->debug_log( $page, __METHOD__ . ' - page', __FILE__, __LINE__ );
+			$offset = ! empty( $params['offset'] ) ? absint( $params['offset'] ) : 0;
+			//$this->debug_log( $offset, __METHOD__ . ' - offset', __FILE__, __LINE__ );
+			$remove_dummy_data = ! empty( $params['remove_dummy_data'] ) ? true : false;
+			//$this->debug_log( $remove_dummy_data, __METHOD__ . ' - remove_dummy_data', __FILE__, __LINE__ );
+			$posts = ! empty( $params['posts'] ) ? $params['posts'] : array();
+			//$this->debug_log( $posts, __METHOD__ . ' - posts', __FILE__, __LINE__ );
+
+			// Maybe remove dummy data
+			if ( ! empty( $remove_dummy_data ) ) {
+				$post_types = geodir_get_posttypes( 'names' );
+
+				if ( ! empty( $post_types ) ) {
+					foreach ( $post_types as $post_type ) {
+						$table = geodir_db_cpt_table( $post_type );
+
+						if ( $table ) {
+							geodir_add_column_if_not_exist( $table, 'post_dummy', "TINYINT(1) NULL DEFAULT '0'" );
+						}
+
+						GeoDir_Admin_Dummy_Data::delete_dummy_posts( $post_type );
+					}
+				}
+
+				// Delete any previous posts
+				self::delete_demo_posts( 'post' );
+				self::delete_demo_posts( 'attachment' );
+
+				// Maybe set page featured images
+				$featured_images = get_option('_acdi_page_featured_images');
+
+				if ( ! empty( $featured_images ) ) {
+					foreach( $featured_images as $p => $i ) {
+						$image = (array) GeoDir_Media::get_external_media( $i, '',array( 'image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp' ), array( 'ext' => 'png', 'type' => 'image/png' ) );
+
+						if ( ! empty( $image['url'] ) ) {
+							$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment( $image );
+
+							if ( is_wp_error( $attachment_id ) ) {
+								$this->debug_log( $attachment_id->get_error_message(), __METHOD__ . ' - set_uploaded_image_as_attachment - ' . $i, __FILE__, __LINE__ );
+							} elseif ( $attachment_id ) {
+								set_post_thumbnail( $p, $attachment_id ); // This will not set if there are dummy posts.
+								update_post_meta( $attachment_id, '_ayecode_demo', 1 );
+							}
+						}
+					}
+
+					delete_option('_acdi_page_featured_images');
+				}
+			}
+
+			if ( ! empty( $posts ) && class_exists( 'GeoDir_Admin_Dummy_Data' ) ) {
+				$hello_world_trashed = false;
+
+				foreach ( $posts as $post_info ) {
+					$this->debug_log( $post_info['post_title'], __METHOD__ . ':' . $post_info['post_type'] . ':wp_insert_post', __FILE__, __LINE__ );
+
+					unset( $post_info['ID'] );
+
+					$post_info['post_title'] = wp_strip_all_tags( $post_info['post_title'] ); // WP does not automatically do this
+					$post_info['post_status'] = 'publish';
+					$post_info['post_dummy'] = '1';
+					$post_info['post_author'] = 1;
+					// Set post data
+					$insert_result = wp_insert_post( $post_info, true ); // We hook into the save_post hook
+
+					// Maybe insert attachments
+					if ( is_wp_error( $insert_result ) ) {
+						$this->debug_log( $insert_result->get_error_message(), __METHOD__ . ':wp_insert_post:' . $post_info['post_title'], __FILE__, __LINE__ );
+					} elseif ( ! is_wp_error( $insert_result ) && ! empty( $insert_result ) && ! empty( $post_info['_raw_post_images'] ) ) {
+						$this->set_external_media( $insert_result, $post_info['_raw_post_images'] );
+					}
+
+					// Post stuff
+					if ( $post_info['post_type'] == 'post' && ! empty( $insert_result ) && ! is_wp_error( $insert_result ) ) {
+						// Maybe soft delete original hello world post
+						if ( ! $hello_world_trashed ) {
+							wp_delete_post( 1, false );
+
+							$hello_world_trashed = true;
+						}
+
+						// Set cats
+						$terms = isset( $post_info['_cats'] ) ? $post_info['_cats'] : array();
+						$post_terms = array();
+
+						if ( ! empty( $terms ) ) {
+							if ( ! function_exists( 'wp_create_category' ) ) {
+								require_once( ABSPATH . '/wp-admin/includes/taxonomy.php' );
+							}
+
+							foreach( $terms as $term_name ) {
+								$term = get_term_by( 'name', $term_name, 'category' );
+
+								if ( ! empty( $term->term_id ) ) {
+									$post_terms[] = absint( $term->term_id );
+								} else {
+									$term_name = sanitize_title( $term_name );
+									$term_id = wp_create_category( $term_name );
+
+									if ( is_wp_error( $term_id ) ) {
+										$this->debug_log( $term_id->get_error_message(), __METHOD__ . ' - wp_create_category - ' . $term_name, __FILE__, __LINE__ );
+									} elseif ( $term_id ) {
+										$post_terms[] = absint( $term_id );
+									}
+								}
+							}
+
+							if ( ! empty( $post_terms ) ) {
+								wp_set_post_categories( $insert_result, $post_terms, false );
+							}
+						}
+
+						// Featured image
+						$image_url = ! empty( $post_info['_featured_image_url'] ) ? esc_url_raw( $post_info['_featured_image_url'] ) : '';
+
+						if ( $image_url ) {
+							$image = (array) GeoDir_Media::get_external_media( $image_url, '', array( 'image/jpg', 'image/jpeg', 'image/gif', 'image/png', 'image/webp' ), array( 'ext' => 'png', 'type' => 'image/png' ) );
+
+							if ( ! empty( $image['url'] ) ) {
+								$attachment_id = GeoDir_Media::set_uploaded_image_as_attachment( $image );
+
+								if ( is_wp_error( $attachment_id ) ) {
+									$this->debug_log( $attachment_id->get_error_message(), __METHOD__ . ' - set_uploaded_image_as_attachment - ' . $image['url'], __FILE__, __LINE__ );
+								} elseif ( $attachment_id ){
+									set_post_thumbnail( $insert_result, $attachment_id );
+
+									update_post_meta( $attachment_id, '_ayecode_demo', 1 );
+								}
+							}
+						}
+					}
+				}
+			}
+
+			$result = array( 'success' => true, 'errors' => $errors, 'total' => $total, 'page' => $page, 'offset' => $offset );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+			return $result;
+		}
+
+		/**
+		 * Import menus.
+		 *
+		 * @param $result
+		 * @param $request
+		 *
+		 * @return mixed
+		 */
+		public function remote_import_menus( $result = array(), $request = array() ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			if ( empty( $result ) ) {
+				$result = array( 'success' => false );
+			}
+
+			// Validate
+			if ( ! $this->validate_request() ) {
+				return $result;
+			}
+
+			if ( ! empty( $request ) && is_object( $request ) && is_a( $request, 'WP_REST_Request' ) ) {
+				$params = $request->get_params();
+			} else {
+				$params = array();
+			}
+
+			$menus = ! empty( $params['menus'] ) ? $params['menus'] : array();
+			//$this->debug_log( $menus, __METHOD__ . ' - menus', __FILE__, __LINE__ );
+			$errors = array();
+
+			if ( ! empty( $menus ) ) {
+				foreach ( $menus as $location => $menu ) {
+					$import = $this->import_menu( $location, $menu );
+				}
+			}
+
+			$result = array( 'success' => true, 'errors' => $errors );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
 			return $result;
 		}
@@ -1884,7 +2582,43 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			return $values ? array_values( $args ) : array_keys( $args );
 		}
 
+		public function debug_log( $log, $title = '', $file = '', $line = '', $exit = false ) {
+			$should_log = $this->debug;
 
+			if ( defined( 'AYECODE_CONNECT_DEBUG' ) ) {
+				$should_log = AYECODE_CONNECT_DEBUG;
+			}
+
+			$should_log = apply_filters( 'ayecode_connect_debug_log', $should_log );
+
+			if ( $should_log ) {
+				$label = '';
+				if ( $file && $file !== '' ) {
+					$label .= basename( $file ) . ( $line ? '(' . $line . ')' : '' );
+				}
+
+				if ( $title && $title !== '' ) {
+					$label = $label !== '' ? $label . ' ' : '';
+					$label .= $title . ' ';
+				}
+
+				$label = $label !== '' ? trim( $label ) . ' : ' : '';
+
+				$append = '';
+				if ( is_scalar( $log ) && ( $log === 'start' || $log === 'end' ) ) {
+					$append = " " . memory_get_usage();
+				}
+
+				if ( is_array( $log ) || is_object( $log ) ) {
+					error_log( $label . print_r( $log, true ) );
+				} else {
+					error_log( $label . $log . $append );
+				}
+
+				if ( $exit ) {
+					exit;
+				}
+			}
+		}
 	}
-
 }

@@ -4,7 +4,7 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.2.19
+ * Version: 1.3.0
  * Author: AyeCode
  * Author URI: https://ayecode.io
  * Requires at least: 4.7
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-    define( 'AYECODE_CONNECT_VERSION', '1.2.19' );
+    define( 'AYECODE_CONNECT_VERSION', '1.3.0' );
 }
 
 if ( !defined( 'AYECODE_CONNECT_SSL_VERIFY' ) ) {
@@ -65,18 +65,19 @@ function ayecode_connect() {
  *
  * @return array
  */
-function ayecode_connect_args(){
-    $base_url = 'https://ayecode.io';
-    return array(
-        'remote_url'            => $base_url, //URL to the WP site containing the WP_Service_Provider class
-        'connection_url'        => $base_url.'/connect', //This should be a custom page the authinticates a user the calls the WP_Service_Provider::connect_site() method
-        'api_url'               => $base_url.'/wp-json/', //Might be different for you
-        'api_namespace'         => 'ayecode/v1',
-        'local_api_namespace'   => 'ayecode-connect/v1', //Should be unique for each client implementation
-        'prefix'                => 'ayecode_connect', //A unique prefix for things (accepts alphanumerics and underscores). Each client on a given site should have it's own unique prefix
-        'textdomain'            => 'ayecode-connect',
-        'version'               => AYECODE_CONNECT_VERSION,
-    );
+function ayecode_connect_args() {
+	$base_url = 'https://ayecode.io';
+
+	return array(
+		'remote_url'            => $base_url, //URL to the WP site containing the WP_Service_Provider class
+		'connection_url'        => $base_url . '/connect', //This should be a custom page the authinticates a user the calls the WP_Service_Provider::connect_site() method
+		'api_url'               => $base_url . '/wp-json/', //Might be different for you
+		'api_namespace'         => 'ayecode/v1',
+		'local_api_namespace'   => 'ayecode-connect/v1', //Should be unique for each client implementation
+		'prefix'                => 'ayecode_connect', //A unique prefix for things (accepts alphanumerics and underscores). Each client on a given site should have it's own unique prefix
+		'textdomain'            => 'ayecode-connect',
+		'version'               => AYECODE_CONNECT_VERSION,
+	);
 }
 
 /**
