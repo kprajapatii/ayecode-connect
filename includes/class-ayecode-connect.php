@@ -74,18 +74,23 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public $version = '';
 
 		/**
+		 * If debugging is enabled.
+		 *
+		 * @var
+		 */
+		public $debug = false;
+
+		/**
 		 * Class constructor
 		 *
 		 */
 		public function __construct( array $args = array() ) {
-
 			foreach ( $args as $key => $value ) {
 				$this->{$key} = $value;
 			}
 
 			$this->api_url       = trailingslashit( $this->api_url );
 			$this->api_namespace = ltrim( $this->api_namespace, '/' );
-
 		}
 
 		/**
@@ -93,11 +98,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function init() {
-
-
-            if ( $this->is_active() ) {
-
-				//Connected
+			if ( $this->is_active() ) {
+				// Connected
 				do_action( $this->prefix . '_connected_to_remote' );
 				add_action( 'rest_api_init', array( $this, 'register_connected_routes' ) );
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
@@ -105,8 +107,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				add_filter( 'upgrader_post_install',array( $this, 'maybe_sync_licenses'),10,3);
 
 				// Support Widget
-				if(is_admin()){
+				if ( is_admin() ) {
 					require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-support.php';
+
 					$support_args = array(
 						'prefix'=>$this->prefix,
 						'name'  => $this->get_connected_name(),
@@ -114,122 +117,106 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 						'enabled'  => get_option( $this->prefix . '_support', true ),
 						'support_user'  => get_option( $this->prefix . '_support_user', true ),
 					);
-					new AyeCode_Connect_Support($support_args);
+
+					new AyeCode_Connect_Support( $support_args );
 				}
 
-				// maybe show connected notice
+				// Maybe show connected notice
 				if ( is_admin() && isset( $_REQUEST['ayecode-connected'] ) ) {
 					add_action( 'admin_notices', array( $this, 'connected_notice' ) );
 				}
-
-
 			} else {
-
-				//Not Connected
+				// Not Connected
 				add_action( 'rest_api_init', array( $this, 'register_connection_routes' ) );
 				add_action( 'init', array( $this, 'maybe_redirect_to_connection_page' ) );
 				add_action( 'admin_notices', array( $this, 'website_url_change_error') );
 				do_action( $this->prefix . '_not_connected_to_remote' );
-
 			}
 
-			// register test route
+			// Register test route
 			add_action( 'rest_api_init', array( $this, 'register_test_routes' ) );
 
-            // register blocks
-            add_action( 'widgets_init', array( $this, 'register_blocks' ) );
-            add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+			// Register blocks
+			add_action( 'widgets_init', array( $this, 'register_blocks' ) );
+			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
 
-
-            if ( is_admin() ){
-				// add AUI on our backend pages
+			if ( is_admin() ) {
+				// Add AUI on our backend pages
 				add_filter( 'aui_screen_ids', array( $this, 'add_aui_screens') );
 
-				// check for demo site redirect
+				// Check for demo site redirect
 				add_action( 'current_screen', array( $this, 'demo_site_redirect' ) );
 			}
-
 		}
 
-        /**
-         * Enqueue editor JS required for blocks.
-         *
-         * @return void
-         */
-        public function enqueue_editor_assets()
-        {
-            if ($this->maybe_load_blocks()) {
-                global $pagenow,$wp_version;
-                $AyeCode_Connect_Settings = AyeCode_Connect_Settings::instance();
-                $deps = ( $pagenow == 'widgets.php' || ( $pagenow == 'site-editor.php' && ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ) ) && version_compare( $wp_version, '5.8', '>=' ) ? array( 'wp-blocks', 'wp-element') : array( 'wp-blocks', 'wp-element', 'wp-editor' );
-                wp_enqueue_script(
-                    'ayecode-editor',
-                    $AyeCode_Connect_Settings->base_url  . 'assets/js/blocks.js',
-                    $deps,
-                    AYECODE_CONNECT_VERSION
-                );
-            }
-        }
+		/**
+		 * Enqueue editor JS required for blocks.
+		 *
+		 * @return void
+		 */
+		public function enqueue_editor_assets() {
+			if ( $this->maybe_load_blocks() ) {
+				global $pagenow,$wp_version;
 
-        /**
-         * Check if we should load our blocks, check if one of our plugin are active.
-         *
-         * @return mixed|null
-         */
-        public function maybe_load_blocks()
-        {
-            $load = false;
+				$AyeCode_Connect_Settings = AyeCode_Connect_Settings::instance();
+				$deps = ( $pagenow == 'widgets.php' || ( $pagenow == 'site-editor.php' && ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ) ) && version_compare( $wp_version, '5.8', '>=' ) ? array( 'wp-blocks', 'wp-element') : array( 'wp-blocks', 'wp-element', 'wp-editor' );
+				wp_enqueue_script(
+					'ayecode-editor',
+					$AyeCode_Connect_Settings->base_url  . 'assets/js/blocks.js',
+					$deps,
+					AYECODE_CONNECT_VERSION
+				);
+			}
+		}
 
-            if(
-                    defined('GEODIRLOCATION_VERSION')
-                    || defined('USERSWP_VERSION')
-//                    || defined('WPINV_VERSION') // not currently used
-            ){
-                $load = true;
-            }
+		/**
+		 * Check if we should load our blocks, check if one of our plugin are active.
+		 *
+		 * @return mixed|null
+		 */
+		public function maybe_load_blocks() {
+			$load = false;
 
-            return apply_filters( $this->prefix . '_load_blocks', $load );
-
-        }
-
-        /**
-         * Register blocks if one of our plugins active.
-         *
-         * @return void
-         */
-        public function register_blocks()
-        {
-
-            if ($this->maybe_load_blocks()) {
-                require_once plugin_dir_path(__FILE__) . '../blocks/class-ayecode-wp-nav.php';
-                register_widget( 'AyeCode_WP_Nav' );
-            }
-
-        }
-
-        /**
-         * @return void
-         */
-		public function demo_site_redirect(){
-
-			$currentScreen = get_current_screen();
-
-			if( $currentScreen->id === "plugin-install" && !empty($_REQUEST['ac-demo-import']) ) {
-				// if installed and active then open the correct demo importer
-				if ( $this->is_active() ) {
-					$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
-					wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=".$demo ));
-				}
+			if ( 
+				defined( 'GEODIRLOCATION_VERSION' )
+				|| defined( 'USERSWP_VERSION' )
+				//|| defined( 'WPINV_VERSION' ) // not currently used
+			) {
+				$load = true;
 			}
 
+			return apply_filters( $this->prefix . '_load_blocks', $load );
 		}
 
-        /**
-         * @param $screen_ids
-         * @return mixed
-         */
-		public function add_aui_screens($screen_ids){
+		/**
+		 * Register blocks if one of our plugins active.
+		 *
+		 * @return void
+		 */
+		public function register_blocks() {
+			if ( $this->maybe_load_blocks() ) {
+				require_once plugin_dir_path( __FILE__ ) . '../blocks/class-ayecode-wp-nav.php';
+				register_widget( 'AyeCode_WP_Nav' );
+			}
+		}
 
+		public function demo_site_redirect(){
+			$currentScreen = get_current_screen();
+
+			if ( $currentScreen->id === "plugin-install" && ! empty( $_REQUEST['ac-demo-import'] ) ) {
+				// If installed and active then open the correct demo importer
+				if ( $this->is_active() ) {
+					$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
+					wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=" . $demo ));
+				}
+			}
+		}
+
+		/**
+		 * @param $screen_ids
+		 * @return mixed
+		 */
+		public function add_aui_screens( $screen_ids ) {
 			// AC screens that need AUI
 			$screen_ids[] = 'toplevel_page_ayecode-connect';
 			$screen_ids[] = 'ayecode_page_ayecode-demo-content';
@@ -253,8 +240,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			return $result;
 		}
 
-
-
 		/**
 		 * A notice to show that the site is now connected.
 		 */
@@ -274,13 +259,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed
 		 */
 		public function edd_api_button_args( $button_args ) {
-
 			if ( defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
-
 				if ( ! empty( $button_args['licensing'] ) && ! empty( $button_args['update_url'] ) && ! empty( $button_args['id'] ) && empty( $button_args['license'] ) ) {
 					$update_url = esc_url_raw( $button_args['update_url'] );
 					$item_id    = absint( $button_args['id'] );
 					$domain     = '';
+
 					if ( trailingslashit( $update_url ) == "https://wpgeodirectory.com/" || trailingslashit( $update_url ) == "http://wpgeodirectory.com/" ) {
 						$domain = 'wpgeodirectory.com';
 					} elseif ( trailingslashit( $update_url ) == "https://userswp.io/" || trailingslashit( $update_url ) == "http://userswp.io/" ) {
@@ -298,7 +282,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 							}
 						}
 					}
-
 				}
 			}
 
@@ -323,12 +306,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return bool
 		 */
 		public function is_registered() {
-
 			$blog_id   = (bool) $this->get_blog_id();
 			$has_token = $this->is_active();
 
 			return $blog_id && $has_token;
-
 		}
 
 		/**
@@ -339,10 +320,25 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return String API URL.
 		 */
 		public function get_api_url( $relative_url ) {
-
 			$api_url = $this->api_url;
 
 			$api_base     = trailingslashit( $api_url . $this->api_namespace );
+			$relative_url = ltrim( $relative_url, '/' );
+
+			return $api_base . $relative_url;
+		}
+
+		/**
+		 * Returns the requested local API URL.
+		 *
+		 * @param String $relative_url the relative API path.
+		 *
+		 * @return String API URL.
+		 */
+		public function get_local_api_url( $relative_url ) {
+			$api_url = $this->api_url;
+
+			$api_base     = trailingslashit( $api_url . $this->local_api_namespace );
 			$relative_url = ltrim( $relative_url, '/' );
 
 			return $api_base . $relative_url;
@@ -357,7 +353,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return int
 		 **/
 		public function get_max_execution_time() {
-
 			$timeout = (int) ini_get( 'max_execution_time' );
 
 			// Ensure exec time set in php.ini.
@@ -366,7 +361,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			return $timeout;
-
 		}
 
 		/**
@@ -379,15 +373,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return int The timeout value.
 		 **/
 		public function set_min_time_limit( $min_timeout ) {
-
 			$timeout = $this->get_max_execution_time();
+
 			if ( $timeout < $min_timeout ) {
 				$timeout = $min_timeout;
+
 				set_time_limit( $timeout );
 			}
 
 			return $timeout;
-
 		}
 
 		/**
@@ -436,7 +430,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * Deletes secret tokens in case they, for example, have expired.
 		 */
 		public function delete_secrets() {
-
 			delete_option( $this->prefix . '_blog_id' );
 			delete_option( $this->prefix . '_blog_token' );
 			delete_option( $this->prefix . '_connected_username' );
@@ -453,7 +446,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_transient( $this->prefix . '_activation_secret' );
 			delete_transient( $this->prefix . '_support_user_key' );
 			delete_transient( $this->prefix . '_site_moved' );
-
 		}
 
 		/**
@@ -474,7 +466,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return new WP_Error( 'invalid_secret', __( 'Invalid Secret', 'ayecode-connect' ), 401 );
 			}
 
-
 			update_option( $this->prefix . '_connected_username', $username );
 			update_option( $this->prefix . '_connected_email', $user_email );
 			update_option( $this->prefix . '_connected_name', $user_display_name);
@@ -492,12 +483,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				delete_option( $this->prefix . '_activation_secret' );
 			}
 
-
-			// make the licence sync run on next load
-//			wp_schedule_single_event( time(), $this->prefix . "_callback" );
+			// Make the licence sync run on next load
+			//wp_schedule_single_event( time(), $this->prefix . "_callback" );
 
 			return rest_ensure_response( true );
-
 		}
 
 		/**
@@ -506,16 +495,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|string
 		 */
 		public function get_activation_secret() {
-
 			//Prepare transient name
 			$transient = $this->prefix . '_activation_secret';
 
 			// Persistent cache hates transients, either not changing or always changing.
 			if ( wp_using_ext_object_cache() ) {
-                // Fetch its value
+				// Fetch its value
 				$secret = get_option( $transient );
 			}else{
-                // Fetch its value
+				// Fetch its value
 				$secret = get_transient( $transient );
 			}
 
@@ -535,26 +523,24 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				set_transient( $transient, $secret, 3 * HOUR_IN_SECONDS );
 			}
 
-
 			//Return the new activation secret
 			return $secret;
-
 		}
 
 		/**
-         * Our own non-cached version.
-         *
+		 * Our own non-cached version.
+		 *
 		 * @param $transient
 		 *
 		 * @return false|mixed|void
 		 */
-        public function get_transient( $transient ){
-            global $wpdb;
+		public function get_transient( $transient ){
+			global $wpdb;
 
-            $transient_option = '_transient_' . $transient;
+			$transient_option = '_transient_' . $transient;
 
-	        return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->prefix}options WHERE option_name = %s", $transient_option ) );
-        }
+			return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->prefix}options WHERE option_name = %s", $transient_option ) );
+		}
 
 		/**
 		 * Builds a URL to the remote connection auth page.
@@ -566,7 +552,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string Connect URL
 		 */
 		public function build_connect_url( $redirect = true ) {
-
 			$user       = wp_get_current_user();
 			$admin_page = esc_url_raw( admin_url( "admin.php?page=ayecode-connect" ) );
 
@@ -575,10 +560,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				? wp_validate_redirect( esc_url_raw( $redirect ), $admin_page )
 				: $admin_page;
 
-			//Build the connection URL
+			// Build the connection URL
 			$args = urlencode_deep(
 				array(
 					'redirect_uri'      => urlencode( $redirect ),
+					'remote_user_id'    => $user->ID,
 					'remote_user_id'    => $user->ID,
 					'user_email'        => $user->user_email,
 					'user_login'        => $user->user_login,
@@ -596,15 +582,13 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			);
 
 			return add_query_arg( $args, $this->connection_url );
-
 		}
 
 		/**
 		 * Disconnects from the remote servers.
 		 * Forgets all connection details and tells the remote servers to do the same.
 		 */
-		public function disconnect_site($disconnect_remote = true) {
-
+		public function disconnect_site( $disconnect_remote = true ) {
 			$site_id = $this->get_blog_id();
 
 			//Abort early if it is not connected
@@ -622,8 +606,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}else{
 				$response = true;
 			}
-
-
 
 			//Then delete local secrets
 			$this->delete_secrets();
@@ -655,7 +637,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			return $response;
-
 		}
 
 		/**
@@ -664,15 +645,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|mixed|void|WP_Error
 		 */
 		public function request_licences( $site = '' ) {
-
 			$site_id = $this->get_blog_id();
 
-			//Abort early if it is not connected
+			// Abort early if it is not connected
 			if ( ! $site_id ) {
 				return;
 			}
 
-			//Disconnect from remote...
+			// Disconnect from remote...
 			$args = array(
 				'url'    => $this->get_api_url( '/licenses' ),
 				'method' => 'GET'
@@ -680,7 +660,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$response = self::remote_request( $args );
 
-			//in case the request failed...
+			// In case the request failed...
 			if ( is_wp_error( $response ) ) {
 				return $response;
 			}
@@ -696,8 +676,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|bool|mixed|WP_Error
 		 */
 		public function sync_licences() {
-			error_log('sync_licenses');
-			// only run if WPEU is active
+			error_log( 'sync_licenses' );
+
+			// Only run if WPEU is active
 			if ( ! defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
 				return false;
 			}
@@ -716,27 +697,29 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			);
 
 			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 			$plugins = get_plugins();
 
-			// remove any non AyeCode plugins.
+			// Remove any non AyeCode plugins.
 			foreach ( $plugins as $slug => $plugin ) {
 				if ( empty( $plugin['Update URL'] ) ) {
-					// check if a main plugin
+					// Check if a main plugin
 					if ( isset( $plugin['TextDomain'] ) && in_array( $plugin['TextDomain'], array(
 							"geodirectory",
 							"userswp",
 							"invoicing"
 						) )
 					) {
-						// don't remove
+						// Don't remove
 					} else {
 						unset( $plugins[ $slug ] ); // remove
 					}
 				}
 			}
 
-			// maybe add current licence keys
+			// Maybe add current licence keys
 			$keys = get_option( 'exup_keys', array() );
+
 			if ( ! empty( $keys ) ) {
 				foreach ( $keys as $plugin_slug => $key_info ) {
 					if ( isset( $plugins[ $plugin_slug ] ) && isset( $key_info->key ) ) {
@@ -752,17 +735,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$response = self::remote_request( $args, $body );
 
-
-			//in case the request failed...
+			// In case the request failed...
 			if ( is_wp_error( $response ) ) {
 				return $response;
 			}
 
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 
-
 			return $body;
-
 		}
 
 		/**
@@ -816,7 +796,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			/**
-			 * Skips the usuable domain check when connecting a site.
+			 * Skips the usable domain check when connecting a site.
 			 *
 			 * Allows site administrators with domains that fail gethostname-based checks to pass the request to remote
 			 *
@@ -875,11 +855,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string|false
 		 */
 		public function get_access_token() {
-
 			$option_name = $this->prefix . '_blog_token';
 
 			return get_option( $option_name, false );
-
 		}
 
 		/**
@@ -888,7 +866,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_username() {
-
 			$option_name = $this->prefix . '_connected_username';
 
 			return get_option( $option_name, false );
@@ -900,7 +877,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_name() {
-
 			$option_name = $this->prefix . '_connected_name';
 
 			$value = get_option( $option_name, false );
@@ -926,7 +902,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_email() {
-
 			$option_name = $this->prefix . '_connected_email';
 
 			$value = get_option( $option_name, false );
@@ -952,18 +927,20 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_user_id() {
-
 			$option_name = $this->prefix . '_connected_user_id';
 
 			$value = get_option( $option_name, false );
 
 			// if no value maybe try and get it.
-			if($value === false){
+			if ( $value === false ) {
 				$username = $this->get_connected_username();
-				if($username){
+
+				if ( $username ) {
 					$user = $this->get_remote_user_info();
-					if(!empty($user->ID)){
-						$value = sanitize_text_field($user->ID);
+
+					if ( ! empty( $user->ID ) ) {
+						$value = sanitize_text_field( $user->ID );
+
 						update_option( $option_name, $value );
 					}
 				}
@@ -978,7 +955,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_user_signatures($type = '') {
-
 			$option_name = $this->prefix . '_connected_user_signatures';
 
 			$value = get_option( $option_name, false );
@@ -992,7 +968,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return mixed|void
 		 */
 		public function get_connected_user_sites() {
-
 			$option_name = $this->prefix . '_connected_user_sites';
 
 			$value = get_option( $option_name, false );
@@ -1003,7 +978,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$site_id = $this->get_blog_id();
 				//unset($value[$site_id]);
 			}
-			
 
 			return $value;
 		}
@@ -1059,14 +1033,13 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return array|mixed|void|WP_Error
 		 */
-		public function set_remote_support_user($enable = false){
+		public function set_remote_support_user( $enable = false ) {
 			$site_id = $this->get_blog_id();
 
 			//Abort early if it is not connected
 			if ( ! $site_id ) {
 				return;
 			}
-
 
 			// enable support user
 			if($enable){
@@ -1098,15 +1071,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 				$body = json_decode( wp_remote_retrieve_body( $response ) );
 
-
 				// Set a transient
 				set_transient( $this->prefix . "_support_user_key", $hash, $valid_seconds );
 				update_option( $this->prefix . "_support_user", $expires );
-			}
-			// disable support user
-			else{
-
-				// remove info early incase remote request fails
+			} else {
+				// Disable support user
+				// Remove info early incase remote request fails
 				delete_transient( $this->prefix . "_support_user_key" );
 				update_option( $this->prefix . "_support_user", false );
 
@@ -1143,17 +1113,13 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 				$response = self::remote_request( $args, $body );
 
-				// in case the request failed...
+				// In case the request failed...
 				if ( is_wp_error( $response ) ) {
 					return $response;
 				}
 
 				$body = json_decode( wp_remote_retrieve_body( $response ) );
-
 			}
-
-//			print_r($body);exit;
-
 
 			return $body;
 		}
@@ -1164,11 +1130,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string|false
 		 */
 		public function get_blog_id() {
-
 			$option_name = $this->prefix . '_blog_id';
 
 			return get_option( $option_name, false );
-
 		}
 
 		/**
@@ -1177,27 +1141,26 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return void
 		 */
 		public function maybe_redirect_to_connection_page() {
-
-			//Only admins have the capability to connect
+			// Only admins have the capability to connect
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
 
-			//Ensure that this is an admin page
+			// Ensure that this is an admin page
 			if ( ! is_admin() ) {
 				return;
 			}
 
-			//And that the user wants to be redirected
+			// And that the user wants to be redirected
 			$action = $this->prefix . '_redirect_to_activation_url';
 			if ( empty( $_GET['action'] ) || $action != $_GET['action'] ) {
 				return;
 			}
 
-			//Prepare the connect URL
+			// Prepare the connect URL
 			$url = $this->build_connect_url();
 
-			//Then redirect the user to the URL
+			// Then redirect the user to the URL
 			wp_redirect( esc_url( $url ) );
 			exit;
 		}
@@ -1210,49 +1173,47 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @since    1.0.0
 		 */
 		public function is_api_request_authenticated( $request ) {
-
 			$headers = $request->get_header_as_array( 'Authorization' );
+
 			if ( empty( $headers ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
 			$jwt = '';
 			foreach ( $headers as $header ) {
-
 				$header = trim( $header );
+
 				if ( strpos( $header, 'X_AUTH' ) === 0 ) {
 					$jwt = trim( substr( $header, 7 ) );
 					break;
 				}
-
 			}
 
-			//Ensure the jwt auth is set...
+			// Ensure the jwt auth is set...
 			if ( empty( $jwt ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//And is valid
+			// And is valid
 			$tokens = explode( '.', $jwt );
 			if ( count( $tokens ) != 3 ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Invalid Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//The key used to authenticate the request
+			// The key used to authenticate the request
 			$key = $this->get_access_token();
 
 			if ( empty( $key ) ) {
 				return new WP_Error( 'missing_token', esc_html__( 'Missing blog token.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//Use it to decode the jwt token
+			// Use it to decode the jwt token
 			if ( false === self::decode( $jwt, $key ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'You are not authorized to do that.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//This request is authentic
+			// This request is authentic
 			return true;
-
 		}
 
 		/**
@@ -1264,7 +1225,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return false|object The JWT's payload as a PHP object
 		 */
 		public static function decode( $jwt, $key ) {
-
 			$tokens = explode( '.', $jwt );
 			if ( count( $tokens ) != 3 ) {
 				return false;
@@ -1272,22 +1232,22 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			list( $header_64, $body_64, $hash_64 ) = $tokens;
 
-			//Header contains the algorithym used to encode the jwt
+			// Header contains the algorithym used to encode the jwt
 			if ( null === ( $header = json_decode( self::url_safe_base64_decode( $header_64 ) ) ) ) {
 				return false;
 			}
 
-			//Payload contains the blog id etc
+			// Payload contains the blog id etc
 			if ( null === $payload = json_decode( self::url_safe_base64_decode( $body_64 ) ) ) {
 				return false;
 			}
 
-			//Signature is a hs256 encoding of the header and the payload
+			// Signature is a hs256 encoding of the header and the payload
 			if ( false === ( $signature = self::url_safe_base64_decode( $hash_64 ) ) ) {
 				return false;
 			}
 
-			//Only HS256 is supported
+			// Only HS256 is supported
 			if ( empty( $header->alg ) || 'HS256' != $header->alg ) {
 				return false;
 			}
@@ -1299,7 +1259,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			return $payload;
-
 		}
 
 		/**
@@ -1313,7 +1272,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public static function encode( $payload, $key ) {
-
 			$header = array( 'typ' => 'JWT', 'alg' => 'HS256' );
 
 			$segments      = array();
@@ -1324,7 +1282,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$segments[]    = self::url_safe_base64_encode( $signature );
 
 			return implode( '.', $segments );
-
 		}
 
 		/**
@@ -1335,8 +1292,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string A decoded string
 		 */
 		public static function url_safe_base64_decode( $input ) {
-
 			$remainder = strlen( $input ) % 4;
+
 			if ( $remainder ) {
 				$padlen = 4 - $remainder;
 				$input .= str_repeat( '=', $padlen );
@@ -1366,6 +1323,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|WP_Error WP HTTP response on success
 		 */
 		public function remote_request( $args, $body = null ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$defaults = array(
 				'url'         => '',
@@ -1386,7 +1344,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$token = $this->get_access_token();
 
 			if ( ! $token ) {
-				return new WP_Error( 'missing_token' );
+				$error = new WP_Error( 'missing_token', __( 'Missing token', 'ayecode-connect' ) );
+
+				$this->debug_log( $error->get_error_message(), __METHOD__ . ':get_access_token error', __FILE__, __LINE__ );
+
+				return $error;
 			}
 
 			$method = strtoupper( $args['method'] );
@@ -1400,8 +1362,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$request = compact( 'method', 'body', 'timeout', 'redirection', 'stream', 'filename', 'sslverify' );
 
-
 			$url = esc_url( $args['url'] );
+
+			$this->debug_log( $url, __METHOD__ . ':url', __FILE__, __LINE__ );
 
 			$signature = self::encode( array( 'blog_id' => $args['blog_id'] ), $token );
 
@@ -1413,8 +1376,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				)
 			);
 
-			return wp_remote_request( $url, $request );
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
+			return wp_remote_request( $url, $request );
 		}
 
 		/**
@@ -1422,7 +1386,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function register_connected_routes() {
-
 			// Initiates a given action
 			register_rest_route(
 				$this->local_api_namespace,
@@ -1433,7 +1396,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					'permission_callback' => array( $this, 'has_permission' ),
 				)
 			);
-
 		}
 
 		/**
@@ -1442,28 +1404,27 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @since    1.0.0
 		 */
 		public function has_permission( $request ) {
-
-			//Retrieve the jwt for the request
+			// Retrieve the jwt for the request
 			$jwt = $this->get_jwt( $request );
 
-			//Ensure the jwt auth is set...
+			// Ensure the jwt auth is set...
 			if ( empty( $jwt ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//And is valid
+			// And is valid
 			$tokens = explode( '.', $jwt );
 			if ( count( $tokens ) != 3 ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Invalid Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//Ensure the body is not empty
+			// Ensure the body is not empty
 			$body = json_decode( self::url_safe_base64_decode( $tokens[1] ) );
 			if ( empty( $body ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Invalid Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
 
-			//Retrieve the secret key associated with the blog id
+			// Retrieve the secret key associated with the blog id
 			$key = $this->get_access_token();
 
 			//... then use it to decrypt the jwt
@@ -1472,7 +1433,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			return true;
-
 		}
 
 		/**
@@ -1481,8 +1441,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @since    1.0.0
 		 */
 		public function get_jwt( $request ) {
-
-			//Prepare authorization headers
+			// Prepare authorization headers
 			$auth_headers = $request->get_header_as_array( 'Authorization' );
 
 			// If empty this might be because of the server removes the auth header https://github.com/WP-API/WP-API/issues/2512
@@ -1490,10 +1449,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$auth_headers = $request->get_header_as_array( 'X-AYE-Authorization' );
 			}
 
-			//The provided json web token
+			// The provided json web token
 			$jwt = '';
 
-			//Loop through them and retrieve our auth header
+			// Loop through them and retrieve our auth header
 			if ( ! empty( $auth_headers ) ) {
 				foreach ( $auth_headers as $header ) {
 
@@ -1502,7 +1461,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 						$jwt = trim( substr( $header, 7 ) );
 						break;
 					}
-
 				}
 			}
 
@@ -1514,26 +1472,30 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function do_action( $request ) {
-//			wp_mail("stiofansisland@gmail.com","update settings debug request",print_r($request ,true));
+			//$this->debug_log( $request, __METHOD__ . ':request', __FILE__, __LINE__ );
+			//wp_mail("stiofansisland@gmail.com","update settings debug request", print_r( $request, true ) );
 			$prefix = $this->prefix;
 			$action = sanitize_title_with_dashes( $request->get_param( 'action' ) );
+			$this->debug_log( $action, __METHOD__ . ':action', __FILE__, __LINE__ );
 
 			if ( empty( $action ) ) {
 				return new WP_Error( 'missing_action', __( 'Specify an action', 'ayecode-connect' ) );
 			}
 
-			/**
-			 * Run the remote actions class.
-			 *
-			 * This is only loaded if authenticated.
-			 */
-			require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';
-			AyeCode_Connect_Remote_Actions::instance( $prefix, $this );
+			if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
+				/**
+				 * Run the remote actions class.
+				 *
+				 * This is only loaded if authenticated.
+				 */
+				require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';
 
-			$response = apply_filters( "{$prefix}_remote_action_{$action}", array( "success" => false ) );
+				AyeCode_Connect_Remote_Actions::instance( $prefix, $this );
+			}
+
+			$response = apply_filters( "{$prefix}_remote_action_{$action}", array( "success" => false ), $request );
 
 			return rest_ensure_response( $response );
-
 		}
 
 		/**
@@ -1541,7 +1503,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 */
 		public function register_connection_routes() {
-
 			// Verifies registration
 			register_rest_route(
 				$this->local_api_namespace,
@@ -1563,14 +1524,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					'permission_callback' => '__return_true'
 				)
 			);
-
 		}
 
 		/**
 		 * Register routes used for testing.
 		 */
 		public function register_test_routes() {
-
 			// Returns a url to the connection page.
 			register_rest_route(
 				$this->local_api_namespace,
@@ -1581,9 +1540,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					'permission_callback' => '__return_true'
 				)
 			);
-
 		}
-
 
 		/**
 		 * Allow our server to reply to a test connection request.
@@ -1593,8 +1550,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array
 		 */
 		public function test_connection( $request  ) {
-
-			// validate
+			// Validate
 			if ( ! $this->validate_request() ) {
 				return array( "success" => false );
 			}
@@ -1602,13 +1558,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$hash = esc_attr( $request['hash'] );
 			$stored_hash = esc_attr( get_transient('ac_test_connection') );
 			$success = false;
-			if(!$stored_hash || !$hash){
+
+			if ( ! $stored_hash || ! $hash ) {
 				$success = false;
 				$code = "no_hash";
-			}elseif($hash && $stored_hash && $stored_hash!=$hash){
+			} elseif ( $hash && $stored_hash && $stored_hash != $hash ) {
 				$success = false;
 				$code = "hash_not_equal";
-			}elseif($hash && $stored_hash && $stored_hash == $hash){
+			} elseif ( $hash && $stored_hash && $stored_hash == $hash ) {
 				$success = true;
 				$code = "success";
 			}
@@ -1617,7 +1574,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				"success" => $success,
 				"code" => $code
 				);
-
 
 			return $result;
 		}
@@ -1645,7 +1601,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string
 		 */
 		private function get_server_ip() {
-
 			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 				//check ip from share internet
 				$ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -1692,8 +1647,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string|WP_Error
 		 */
 		public function verify_registration( WP_REST_Request $request ) {
-
-			// delete the URL change transient if set
+			// Delete the URL change transient if set
 			delete_transient( $this->prefix . '_site_moved');
 
 			//Prepare the registration data
@@ -1707,9 +1661,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$request['user_display_name'],
 			);
 
-			//Then (maybe) save it
+			// Then (maybe) save it
 			return $this->handle_registration( $registration_data );
-
 		}
 
 		/**
@@ -1722,45 +1675,41 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return string|WP_Error
 		 */
 		public function connection_page( WP_REST_Request $request ) {
-
 			$action = $this->prefix . '_redirect_to_activation_url';
 			$url    = add_query_arg( 'action', $action, get_admin_url() );
 
 			return rest_ensure_response( $url );
-
 		}
-
 
 		/**
 		 * Check if the website URL changes and disconnect the site and show re-connect notice if so.
 		 */
-		public function check_for_url_change($connected_site_url = ''){
-
-			// if WPML is installed then bail as this can dynamically change the URL
-			if(defined('ICL_LANGUAGE_CODE')){
+		public function check_for_url_change( $connected_site_url = '' ) {
+			// If WPML is installed then bail as this can dynamically change the URL
+			if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
 				return false;
 			}
 
 			$result = false;
 
-			// get current site URL
-			$connected_site_url = $connected_site_url ? trailingslashit( str_replace( array("http://","https://"),"", $connected_site_url ) ): get_option( $this->prefix . "_url" );
+			// Get current site URL
+			$connected_site_url = $connected_site_url ? trailingslashit( str_replace( array( "http://", "https://" ), "", $connected_site_url ) ): get_option( $this->prefix . "_url" );
 
-			// get the current site URL
-			$site_url = trailingslashit( str_replace( array("http://","https://"),"", site_url() ) );
+			// Get the current site URL
+			$site_url = trailingslashit( str_replace( array( "http://","https://" ),"", site_url() ) );
 
-			// if current site URL is empty then add it
-			if(empty($connected_site_url)){
+			// If current site URL is empty then add it
+			if ( empty( $connected_site_url ) ) {
 				$connected_site_url = $site_url;
-				update_option($this->prefix . "_url", $connected_site_url);
+				update_option( $this->prefix . "_url", $connected_site_url );
 			}
 
-			// check for site URL change, disconnect site and add warning
-			if( $site_url && $site_url !== '/' && $connected_site_url && $connected_site_url != $site_url ){
-				// disconnect site but not from remote (that would invalidate the other site)
+			// Check for site URL change, disconnect site and add warning
+			if ( $site_url && $site_url !== '/' && $connected_site_url && $connected_site_url != $site_url ) {
+				// Disconnect site but not from remote (that would invalidate the other site)
 				$this->disconnect_site(false);
 
-				// set a transient for 1 month so we can show a warning
+				// Set a transient for 1 month so we can show a warning
 				set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
 
 				$result = true;
@@ -1782,9 +1731,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				</div>
 				<?php
 			}
-
 		}
-
 
 		/**
 		 * Request to install plugins.
@@ -1792,7 +1739,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|mixed|void|WP_Error
 		 */
 		public function request_plugins( $plugins = array() ) {
-
 			$site_id = $this->get_blog_id();
 
 			//Abort early if it is not connected
@@ -1822,7 +1768,95 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 
 			return $body;
+		}
 
+		/**
+		 * Request to download demo data.
+		 *
+		 * @return array|mixed|void|WP_Error
+		 */
+		public function download_demo_content( $demo, $args, $site ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+
+			$type = 'download-data';
+			$site_id = $this->get_blog_id();
+
+			$this->debug_log( $site_id, __METHOD__ . ':site_id', __FILE__, __LINE__ );
+			$this->debug_log( $demo, __METHOD__ . ':demo', __FILE__, __LINE__ );
+
+			// Abort early if it is not connected
+			if ( ! $site_id ) {
+				$error = new WP_Error( 'missing_site_id', __( 'Missing site id.', 'ayecode-connect' ) );
+
+				$this->debug_log( $error->get_error_message(), __METHOD__ . ':remote_request error', __FILE__, __LINE__ );
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $error;
+			}
+
+			// Remote args...
+			$args = array(
+				'url' => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type ) ),
+				'method' => 'POST'
+			);
+
+			$params = array(
+				'site_id' => $site_id,
+			);
+
+			// 1. Theme
+			$slug = $site->theme->slug;
+			$theme_found = wp_get_theme( $slug );
+
+			$this->debug_log( $slug, __METHOD__ . ':theme slug', __FILE__, __LINE__ );
+
+			$params['theme'] = array(
+				'action' => 'activate',
+				'slug' => $slug,
+				'parent_theme' => ! empty( $site->theme->Template ) ? $site->theme->Template : ''
+			);
+
+			if ( ! $theme_found->exists() ) {
+				$params['theme']['action'] = 'install';
+			} else if ( $slug == get_option( 'stylesheet' ) ) {
+				$params['theme']['action'] = 'skip';
+			}
+
+			// 2. Plugins
+			$params['plugins'] = array();
+
+			// 3. Settings
+			$params['settings'] = array();
+
+			// 4. Categories
+			$params['categories'] = array();
+
+			// 5. Templates
+			$params['templates'] = array();
+
+			// 6. Dummy posts
+			$params['dummy_posts'] = array();
+
+			// 7. Widgets
+			$params['widgets'] = array();
+
+			// 8. Menus
+			$params['menus'] = array();
+
+			$response = self::remote_request( $args, $params );
+
+			if ( is_wp_error( $response ) ) {
+				$this->debug_log( $response->get_error_message(), __METHOD__ . ':remote_request error', __FILE__, __LINE__ );
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+				return $response;
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
+			return $body;
 		}
 
 		/**
@@ -1831,38 +1865,85 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return array|mixed|void|WP_Error
 		 */
 		public function request_demo_content( $demo, $type, $page = 0 ) {
+			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 
 			$site_id = $this->get_blog_id();
 
+			$this->debug_log( $demo, __METHOD__ . ':demo', __FILE__, __LINE__ );
+			$this->debug_log( $type, __METHOD__ . ':type', __FILE__, __LINE__ );
+			$this->debug_log( $site_id, __METHOD__ . ':site_id', __FILE__, __LINE__ );
+
 			// Abort early if it is not connected
 			if ( ! $site_id ) {
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
 				return;
 			}
 
-            $version = !empty($this->version ) ? esc_attr($this->version ) : '';
-			$page_arg =  $page ? "?page=".absint( $page ) : '';
+			$version = ! empty( $this->version ) ? esc_attr( $this->version ) : '';
+			$page_arg = $page ? "?page=" . absint( $page ) : '';
 			$page_arg .= $page_arg ? '&ver=' . esc_attr( $version ) : '?ver=' . esc_attr( $version );
+
 			// Remote args...
 			$args = array(
-				'url'    => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type  )  ).$page_arg,
+				'url' => $this->get_api_url( sprintf( '/request_demo_content/%s/%s', $demo, $type ) ) . $page_arg,
 				'method' => 'POST'
 			);
 
 			$response = self::remote_request( $args );
 
-//			print_r( $args  );exit;
-
 			// in case the request failed...
 			if ( is_wp_error( $response ) ) {
+				$this->debug_log( $response->get_error_message(), __METHOD__ . ':remote_request error', __FILE__, __LINE__ );
+				$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+
 				return $response;
 			}
 
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 
-			return $body;
+			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
+			return $body;
 		}
 
+		public function debug_log( $log, $title = '', $file = '', $line = '', $exit = false ) {
+			$should_log = $this->debug;
 
+			if ( defined( 'AYECODE_CONNECT_DEBUG' ) ) {
+				$should_log = AYECODE_CONNECT_DEBUG;
+			}
+
+			$should_log = apply_filters( 'ayecode_connect_debug_log', $should_log );
+
+			if ( $should_log ) {
+				$label = '';
+				if ( $file && $file !== '' ) {
+					$label .= basename( $file ) . ( $line ? '(' . $line . ')' : '' );
+				}
+
+				if ( $title && $title !== '' ) {
+					$label = $label !== '' ? $label . ' ' : '';
+					$label .= $title . ' ';
+				}
+
+				$label = $label !== '' ? trim( $label ) . ' : ' : '';
+
+				$append = '';
+				if ( is_scalar( $log ) && ( $log == 'start' || $log == 'end' ) ) {
+					$append = " " . memory_get_usage();
+				}
+
+				if ( is_array( $log ) || is_object( $log ) ) {
+					error_log( $label . print_r( $log, true ) );
+				} else {
+					error_log( $label . $log . $append );
+				}
+
+				if ( $exit ) {
+					exit;
+				}
+			}
+		}
 	}
 endif;
