@@ -10,7 +10,7 @@ Tested up to: 6.5
 Stable tag: 1.3.0
 
 
-AyeCode Connect once linked to our site allows you to install any purchased AyeCode Ltd product add-ons without a zip file. It also installs and activates licences automatically, so there is no need to copy/paste licenses.
+Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
 
 == Description ==
 
@@ -79,6 +79,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.3.0 - TBD =
 * Import demo import - CHANGED
+* Demo Import screen improvements - CHANGED
 
 = 1.2.19 - 2024-06-06 =
 * Function auto_detect_line_endings is deprecated - FIXED
@@ -212,3 +213,26 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.0.0 =
 * First release - YAY
+
+
+= Resources used to build this plugin =
+
+* Image for Demo Import Screen ( kadencewp-icon-dark.svg ), Copyright Kadence WP
+  License: CC0 Public Domain
+  Source: https://www.kadencewp.com/brand-assets/
+
+* Image for Demo Import Screen ( blockstrap-logo.jpg ), Copyright AyeCode Ltd
+  License: CC0 Public Domain
+  Source: https://ayecode.io/
+
+* Image for Connection Screen ( connect-site.png ), Copyright AyeCode Ltd
+  License: CC0 Public Domain
+  Source: https://ayecode.io/
+
+* Image for Plugins screens ( ayeccode.png ), Copyright AyeCode Ltd
+  License: CC0 Public Domain
+  Source: https://ayecode.io/
+
+* Image for Plugins screens ( ayeccode.svg ), Copyright AyeCode Ltd
+  License: CC0 Public Domain
+  Source: https://ayecode.io/

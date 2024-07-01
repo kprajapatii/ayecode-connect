@@ -229,27 +229,21 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 
 			<div class="bsui" style="<?php if(!$wizard){ ?>margin-left: -20px; display: flex<?php } ?>">
-				<div class="<?php if(!$wizard){ ?>container<?php } ?>">
+				<div class="<?php if(!$wizard){ ?>containerx bg-white w-100 p-4 m-4 border rounded<?php } ?>">
 					<?php
-					echo aui()->alert(array(
-							'type'=> 'info',
-                            'class' => 'mt-4',
+                    $sites = $this->get_sites();
+
+                    echo aui()->alert(array(
+							'type'=> 'danger',
+//                            'class' => 'mt-4',
 							'content'=> __("This importer should only be used on NEW sites, it will change the whole look and appearance of your site.","ayecode-connect")
 						)
 					);
+
+                    echo $this->get_demo_tabs_head( $sites );
+                    echo $this->get_demo_tabs_body( $sites );
+
 					?>
-					<div class="row row-cols-1 row-cols-sm-2  row-cols-md-2 mt-4">
-
-						<?php
-						foreach ($this->get_sites() as $site){
-							global $ac_site_args,$ac_prefix;
-							$ac_prefix = $this->client->prefix;
-							$ac_site_args = $site;
-							load_template( dirname( __FILE__ )."/../templates/import/site.php", false ); // $args only introduced in wp 5.5 so lets use a more backwards compat way
-						}
-						?>
-
-					</div>
 				</div>
 
 				<!-- Modal -->
@@ -543,31 +537,150 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			}
 		}
 
+        public function get_demo_site_types($sites)
+        {
+            // define the types
+            $types = array(
+                'blockstrap' => array(),
+                'elementor' => array(),
+                'kadence' => array(),
+                'legacy' => array(),
+            );
+
+            foreach ($sites as $site ){
+                // check if string contains
+
+                $desc = !empty( $site->desc ) ? $site->desc : '';
+
+                if ( !empty( $desc ) && strpos($desc, 'BlockStrap' ) !== false) {
+                    $types['blockstrap'][] = $site;
+                }elseif ( !empty( $desc ) && strpos($desc,  'Kadence' ) !== false) {
+                    $types['kadence'][] = $site;
+                }elseif ( !empty( $desc ) && strpos($desc, 'elementor' ) !== false) {
+                    $types['elementor'][] = $site;
+                }else{
+                    $types['legacy'][] = $site;
+                }
+
+            }
+
+            return $types;
+
+        }
+
+        public function get_demo_tabs_body( $sites )
+        {
+
+
+            $types = $this->get_demo_site_types($sites);
+
+            ob_start();
+
+            echo '<div class="tab-content" id="ayecode-connect-demo-tabsContent">';
+
+            foreach ( $types as $type => $sites ){
+
+                // maybe open
+                if (!empty($sites)) {
+                    $active = 'blockstrap'==$type ? 'show active' : '';
+                    echo '<div class="tab-pane fade '.esc_attr($active).'" id="ayecode-demo-'.esc_attr($type).'-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">';
+
+                    if ('legacy'==$type) {
+                        echo aui()->alert(array(
+                                'type'=> 'warning',
+                                'class' => 'mt-4',
+                                'content'=> __("These are legacy themes which are no longer supported and will be removed soon.","ayecode-connect")
+                            )
+                        );
+                    }
+
+                    echo '<div class="row row-cols-1 row-cols-sm-2  row-cols-md-2 mt-4">';
+
+
+                    foreach ( $sites as $site ){
+                        global $ac_site_args,$ac_prefix;
+                        $ac_prefix = $this->client->prefix;
+                        $ac_site_args = $site;
+                        load_template( dirname( __FILE__ )."/../templates/import/site.php", false ); // $args only introduced in wp 5.5 so lets use a more backwards compat way
+                    }
+
+                    echo '</div></div>';
+                }
+            }
+
+            echo '</div>';
+
+
+            return ob_get_clean();
+
+        }
+
+        public function get_demo_tabs_head($sites)
+        {
+
+            $types = $this->get_demo_site_types($sites);
+            ob_start();
+
+            echo '<ul class="nav nav-tabs mb-3" id="ayecode-connect-demo-tabs" role="tablist">';
+
+            $names = array(
+                'blockstrap' => 'BlockStrap',
+                'elementor' => 'Elementor',
+                'kadence' => 'Kadence WP',
+                'legacy' => 'legacy',
+            );
+
+            foreach ( $types as $type => $sites ){
+                if (!empty($sites)) {
+                    $active = 'blockstrap'==$type ? 'active' : '';
+                    $selected = 'blockstrap' == $type ? 'true' : 'false';
+
+
+
+                    echo  '<li class="nav-item" role="presentation">';
+                    echo '<button class="nav-link '.esc_attr($active).'" id="ayecode-demo-'.esc_attr($type).'" data-bs-toggle="pill" data-bs-target="#ayecode-demo-'.esc_attr($type).'-pane" type="button" role="tab" aria-controls="pills-home" aria-selected="'.esc_attr($selected).'">';
+                    if('kadence'===$type) {
+                        echo '<img width="22px" src = "'.$this->base_url .'assets/img/kadencewp-icon-dark.svg" alt="Kadence WP"/>';
+                    }elseif('elementor'===$type) {
+                        echo '<i style="color:#db3157;font-size: 22px;float: left;margin-bottom: -6px;padding-top: 1px;" class="fab fa-elementor me-1" ></i>';
+                    }elseif('blockstrap'===$type) {
+                        echo '<img width="22px" class="me-1" src = "'.$this->base_url .'assets/img/blockstrap-logo.jpg" alt="BlockStrap"/>';
+                    }
+                    echo esc_html($names[$type]);
+                    echo '</button>';
+                    echo '</li>';
+                }
+            }
+
+            echo '</ul>';
+
+            return ob_get_clean();
+        }
+
 		/**
 		 * Get demo site info.
 		 *
 		 * @return mixed
 		 */
-		public function get_sites() {
-			$sites = get_transient( 'ayecode_connect_demos' );
+		public function get_sites(){
 
+			$sites = get_transient( 'ayecode_connect_demos' );
 			if ( empty( $demos ) ) {
 				$args = array(
 					'timeout'     => 30,
 					'redirection' => 0,
 					'sslverify'   => AYECODE_CONNECT_SSL_VERIFY,
 				);
-
-				$url = $this->client->get_api_url( '/demos' );
-
+				$url  = $this->client->get_api_url( '/demos' );
 				$data = wp_remote_get( $url, $args );
 
 				if ( ! is_wp_error( $data ) && $data['response']['code'] == 200 ) {
 					$responseBody = wp_remote_retrieve_body( $data );
-					$sites = json_decode( $responseBody );
+					$sites        = json_decode( $responseBody );
 					set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS );
 				}
 			}
+
 
 			return $sites;
 		}
@@ -1572,7 +1685,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					if ( false === $file ) {
 						return new WP_Error( 'demo_download_protect_failed', __( 'Unable to protect demo data download folder from browsing.' ) );
 					}
-			
+
 					fwrite( $file, "<?php\n// Silence is golden.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite
 					fclose( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
 				}
