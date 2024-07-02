@@ -702,7 +702,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			$post_id  = 0;
 
 			if ( ! empty( $page_template['post_title'] ) ) {
-				//$this->debug_log( $page_template['post_title'], __METHOD__ . ':' . $type, __FILE__, __LINE__ );
+				$this->debug_log( $page_template['post_title'], __METHOD__ . ':' . $type, __FILE__, __LINE__ );
 			}
 
 			if ( $type == 'elementor' ) {
@@ -1841,7 +1841,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					)
 				);
 
-				$this->debug_log( $api, __METHOD__ . .  ':' . $slug . ':themes_api', __FILE__, __LINE__ );
+				$this->debug_log( $api, __METHOD__ . ':' . $slug . ':themes_api', __FILE__, __LINE__ );
 
 				if ( is_wp_error( $api ) ) {
 					$this->debug_log( $api->get_error_message(), __METHOD__ . ':themes_api error', __FILE__, __LINE__ );
@@ -2583,6 +2583,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		}
 
 		public function debug_log( $log, $title = '', $file = '', $line = '', $exit = false ) {
+			global $aye_usage;
+
+			if ( empty( $aye_usage ) ) {
+				$aye_usage = array();
+			}
+
 			$should_log = $this->debug;
 
 			if ( defined( 'AYECODE_CONNECT_DEBUG' ) ) {
@@ -2606,7 +2612,27 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				$append = '';
 				if ( is_scalar( $log ) && ( $log === 'start' || $log === 'end' ) ) {
-					$append = " " . memory_get_usage();
+					$usage = memory_get_usage();
+
+					$append = " " . $usage;
+
+					$_label = '';
+
+					if ( $file && $file !== '' ) {
+						$_label .= basename( $file ) . ':';
+					}
+
+					if ( $title && $title !== '' ) {
+						$_label .= $title;
+					}
+
+					if ( $_label ) {
+						$aye_usage[ $_label ][ $log ] = $usage;
+
+						if ( $log === 'end' && ! empty( $aye_usage[ $_label ][ 'start' ] ) ) {
+							$append .= " - " . ( $usage - $aye_usage[ $_label ][ 'start' ] );
+						}
+					}
 				}
 
 				if ( is_array( $log ) || is_object( $log ) ) {
