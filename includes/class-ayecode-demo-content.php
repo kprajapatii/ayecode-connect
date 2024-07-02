@@ -615,13 +615,13 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
         }
 
-        public function get_demo_tabs_head($sites)
-        {
+        public function get_demo_tabs_head( $sites ) {
+            global $aui_bs5;
 
             $types = $this->get_demo_site_types($sites);
             ob_start();
 
-            echo '<ul class="nav nav-tabs mb-3" id="ayecode-connect-demo-tabs" role="tablist">';
+            echo '<ul class="nav nav-tabs mb-4" id="ayecode-connect-demo-tabs" role="tablist">';
 
             $names = array(
                 'blockstrap' => 'BlockStrap',
@@ -630,23 +630,23 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
                 'legacy' => 'legacy',
             );
 
-            foreach ( $types as $type => $sites ){
-                if (!empty($sites)) {
-                    $active = 'blockstrap'==$type ? 'active' : '';
-                    $selected = 'blockstrap' == $type ? 'true' : 'false';
+            foreach ( $types as $type => $sites ) {
+                if ( ! empty( $sites ) ) {
+                    $active = 'blockstrap' == $type ? 'active' : '';
+                    $selected = 'blockstrap' ==  $type ? 'true' : 'false';
 
+                    echo  '<li class="nav-item mb-0" role="presentation">';
+                    echo '<button class="nav-link ' . esc_attr( $active ) . '" id="ayecode-demo-' . esc_attr( $type ) . '" data-' . ( $aui_bs5 ? 'bs-' : '' ) . 'toggle="pill" data-' . ( $aui_bs5 ? 'bs-' : '' ) . 'target="#ayecode-demo-' . esc_attr( $type ) . '-pane" type="button" role="tab" aria-controls="pills-home" aria-selected="' . esc_attr( $selected ) . '">';
 
-
-                    echo  '<li class="nav-item" role="presentation">';
-                    echo '<button class="nav-link '.esc_attr($active).'" id="ayecode-demo-'.esc_attr($type).'" data-bs-toggle="pill" data-bs-target="#ayecode-demo-'.esc_attr($type).'-pane" type="button" role="tab" aria-controls="pills-home" aria-selected="'.esc_attr($selected).'">';
-                    if('kadence'===$type) {
-                        echo '<img width="22px" src = "'.$this->base_url .'assets/img/kadencewp-icon-dark.svg" alt="Kadence WP"/>';
-                    }elseif('elementor'===$type) {
-                        echo '<i style="color:#db3157;font-size: 22px;float: left;margin-bottom: -6px;padding-top: 1px;" class="fab fa-elementor me-1" ></i>';
-                    }elseif('blockstrap'===$type) {
-                        echo '<img width="22px" class="me-1" src = "'.$this->base_url .'assets/img/blockstrap-logo.jpg" alt="BlockStrap"/>';
+                    if ( 'kadence' === $type ) {
+                        echo '<img width="22px" class="me-1 mr-1" src="' . $this->base_url . 'assets/img/kadencewp-icon-dark.svg" alt="Kadence WP"/>';
+                    } else if ( 'elementor' === $type ) {
+                        echo '<i style="color:#db3157;font-size:22px" class="fab fa-elementor me-1 mr-1" ></i>';
+                    } else if ( 'blockstrap' === $type ) {
+                        echo '<img width="22px" class="me-1 mr-1" src = "' . $this->base_url . 'assets/img/blockstrap-logo.jpg" alt="BlockStrap"/>';
                     }
-                    echo esc_html($names[$type]);
+
+                    echo esc_html( $names[ $type ] );
                     echo '</button>';
                     echo '</li>';
                 }
@@ -1585,6 +1585,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		}
 
 		public function debug_log( $log, $title = '', $file = '', $line = '', $exit = false ) {
+			global $aye_usage;
+
+			if ( empty( $aye_usage ) ) {
+				$aye_usage = array();
+			}
+
 			$should_log = $this->debug;
 
 			if ( defined( 'AYECODE_CONNECT_DEBUG' ) ) {
@@ -1608,7 +1614,27 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 				$append = '';
 				if ( is_scalar( $log ) && ( $log === 'start' || $log === 'end' ) ) {
-					$append = " " . memory_get_usage();
+					$usage = memory_get_usage();
+
+					$append = " " . $usage;
+
+					$_label = '';
+
+					if ( $file && $file !== '' ) {
+						$_label .= basename( $file ) . ':';
+					}
+
+					if ( $title && $title !== '' ) {
+						$_label .= $title;
+					}
+
+					if ( $_label ) {
+						$aye_usage[ $_label ][ $log ] = $usage;
+
+						if ( $log === 'end' && ! empty( $aye_usage[ $_label ][ 'start' ] ) ) {
+							$append .= " - " . ( $usage - $aye_usage[ $_label ][ 'start' ] );
+						}
+					}
 				}
 
 				if ( is_array( $log ) || is_object( $log ) ) {

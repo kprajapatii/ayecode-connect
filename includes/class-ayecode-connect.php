@@ -1908,6 +1908,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		}
 
 		public function debug_log( $log, $title = '', $file = '', $line = '', $exit = false ) {
+			global $aye_usage;
+
+			if ( empty( $aye_usage ) ) {
+				$aye_usage = array();
+			}
+
 			$should_log = $this->debug;
 
 			if ( defined( 'AYECODE_CONNECT_DEBUG' ) ) {
@@ -1930,8 +1936,28 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$label = $label !== '' ? trim( $label ) . ' : ' : '';
 
 				$append = '';
-				if ( is_scalar( $log ) && ( $log == 'start' || $log == 'end' ) ) {
-					$append = " " . memory_get_usage();
+				if ( is_scalar( $log ) && ( $log === 'start' || $log === 'end' ) ) {
+					$usage = memory_get_usage();
+
+					$append = " " . $usage;
+
+					$_label = '';
+
+					if ( $file && $file !== '' ) {
+						$_label .= basename( $file ) . ':';
+					}
+
+					if ( $title && $title !== '' ) {
+						$_label .= $title;
+					}
+
+					if ( $_label ) {
+						$aye_usage[ $_label ][ $log ] = $usage;
+
+						if ( $log === 'end' && ! empty( $aye_usage[ $_label ][ 'start' ] ) ) {
+							$append .= " - " . ( $usage - $aye_usage[ $_label ][ 'start' ] );
+						}
+					}
 				}
 
 				if ( is_array( $log ) || is_object( $log ) ) {

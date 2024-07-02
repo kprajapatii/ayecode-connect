@@ -77,7 +77,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.3.0 - TBD =
+= 1.3.0 - 2024-07-02 =
 * Import demo import - CHANGED
 * Demo Import screen improvements - CHANGED
 
