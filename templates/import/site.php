@@ -1,5 +1,5 @@
 <?php
-global $ac_site_args,$ac_prefix;
+global $aui_bs5, $ac_site_args,$ac_prefix;
 $licences = get_option( $ac_prefix . "_licences" );
 ?>
 <div class="col mb-4" >
@@ -30,9 +30,12 @@ $licences = get_option( $ac_prefix . "_licences" );
 				$flex_wrap = '';
 				if ( $paid_theme ) {
 					$theme_active = get_template() == $ac_site_args->theme->slug;
-					$badge_class = $theme_active ? 'badge-success' : 'badge-danger';
+					if ( $aui_bs5 ) {
+						$badge_class = $theme_active ? 'bg-success' : 'bg-danger';
+					} else {
+						$badge_class = $theme_active ? 'badge-success' : 'badge-danger';
+					}
 					$type_badge = '<span class="badge ' . $badge_class . '">'.__("Paid","ayecode-connect").'</span>';
-
 
 					// warning
 					if ( !$theme_active ) {
@@ -42,9 +45,8 @@ $licences = get_option( $ac_prefix . "_licences" );
 						$type_badge .= '<div class="alert alert-warning p-2 mx-0 mb-0 mt-2" role="alert">'.$warning.'</div>';
 					}
 				}else{
-					$type_badge = '<span class="badge badge-success">'.__("Free","ayecode-connect").'</span>';
+					$type_badge = '<span class="badge ' . ( $aui_bs5 ? 'bg-success' : 'badge-success' ) . '">'.__("Free","ayecode-connect").'</span>';
 				}
-
 				?>
 				<h4 class="h5"><?php _e("Theme","ayecode-connect");?></h4>
 				<ul class="list-group">
@@ -72,10 +74,14 @@ $licences = get_option( $ac_prefix . "_licences" );
 					$type_badge = '';
 					$flex_wrap = '';
 					if( $product_id ){
-						$valid_class = $has_license ? 'badge-success' : 'badge-danger';
+						if ( $aui_bs5 ) {
+							$valid_class = $has_license ? 'bg-success' : 'bg-danger';
+						} else {
+							$valid_class = $has_license ? 'badge-success' : 'badge-danger';
+						}
 						$type_badge = ' <span class="badge '.$valid_class.'">'.__("Paid","ayecode-connect").'</span>';
 					}else{
-						$type_badge = ' <span class="badge badge-success">'.__("Free","ayecode-connect").'</span>';
+						$type_badge = ' <span class="badge ' . ( $aui_bs5 ? 'bg-success' : 'badge-success' ) . '">'.__("Free","ayecode-connect").'</span>';
 					}
 
 					// paid external check
@@ -83,9 +89,9 @@ $licences = get_option( $ac_prefix . "_licences" );
 						$url = !empty($plugin->AuthorURI) ? esc_url($plugin->AuthorURI) : '';
 						$warning = '';
 						if ( is_plugin_active( $slug ) ) {
-							$valid_class = 'badge-success';
+							$valid_class = $aui_bs5 ? 'bg-success' : 'badge-success';
 						}else{
-							$valid_class = 'badge-danger';
+							$valid_class = $aui_bs5 ? 'bg-danger' : 'badge-danger';
 							$warning = sprintf( __("This is a 3rd party paid product, please install and activate this plugin FIRST. %sGet Product%s","ayecode-connect"),"<br><a href='$url' target='_blank'>","</a>" );
 						}
 						$type_badge = ' <a href="'.$url.'" target="_blank" ><span class="badge '.$valid_class.'">'.__("Paid 3rd Party","ayecode-connect").'</span></a>';
@@ -96,13 +102,10 @@ $licences = get_option( $ac_prefix . "_licences" );
 							$type_badge .= '<div class="alert alert-warning p-2 mx-0 mb-0 mt-2" role="alert">'.$warning.'</div>';
 						}
 					}
-
 					?>
 					<li class="list-group-item d-flex justify-content-between align-items-center mb-0 p-2 <?php echo $flex_wrap;?>">
-						<?php echo esc_attr( $plugin->Name );
-
-
-
+						<?php 
+						echo esc_attr( $plugin->Name );
 						echo $type_badge;
 						?>
 					</li>
@@ -110,10 +113,7 @@ $licences = get_option( $ac_prefix . "_licences" );
 				}
 				?>
 				</ul>
-				<?php
-
-			}
-			?>
+				<?php } ?>
 		</div>
 
 		<div class="card-footer text-muted bg-white">
@@ -123,21 +123,18 @@ $licences = get_option( $ac_prefix . "_licences" );
 						<?php
 						echo esc_attr( $ac_site_args->title );
 
-
 						if ( isset( $ac_site_args->requires ) ) {
 							if ( in_array( 'elementor-pro', $ac_site_args->requires ) ) {
-								echo '<span class="ml-2 h4"><i style="color:#db3157;" class="fab fa-elementor" data-toggle="tooltip" title="'.__('Requires Elementor Pro','ayecode-connect').'"></i></span>';
+								echo '<span class="ml-2 ms-2 h4"><i style="color:#db3157;" class="fab fa-elementor" data-toggle="tooltip" title="'.__('Requires Elementor Pro','ayecode-connect').'"></i></span>';
 							}
 						}
-//						print_r($ac_site_args);
 						?>
 					</div>
 				</div>
 				<div class="col-2">
-					<a href="https://demos.ayecode.io/<?php echo esc_attr($ac_site_args->slug); ?>" onclick="ac_preview_site(this);return false;" class="btn btn-primary btn-sm ml-auto float-right" role="button" aria-pressed="true"><?php _e("View","ayecode-connect");?></a>
+					<a href="https://demos.ayecode.io/<?php echo esc_attr($ac_site_args->slug); ?>" onclick="ac_preview_site(this);return false;" class="btn btn-primary btn-sm ml-auto ms-auto float-right float-end" role="button" aria-pressed="true"><?php _e("View","ayecode-connect");?></a>
 				</div>
 			</div>
-
 		</div>
 	</div>
 </div>

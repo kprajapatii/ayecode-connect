@@ -371,7 +371,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			if ( $success ) {
 				$data = array(
-					'message' => sprintf( __( "Auto expires in %s", "ayecode-connect" ), human_time_diff( time(), time() + 3 * DAY_IN_SECONDS ) )
+					'message' => sprintf( __( "Auto expires in %s", "ayecode-connect" ), human_time_diff( time(), time() + 7 * DAY_IN_SECONDS ) )
 				);
 				wp_send_json_success( $data );
 			} else {
@@ -605,7 +605,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 											class=" mr-2 me-2 <?php echo $status_text_class; ?> text-muted ac-support-user-status"
 											role="status">
 											<span
-												class="badge badge-warning font-weight-normal"><?php echo sprintf( __( "Auto expires in %s", "ayecode-connect" ), human_time_diff( time(), $expires ) ); ?></span>
+												class="badge <?php echo ( $aui_bs5 ? 'bg-warning fw-normal' : 'badge-warning font-weight-normal' ); ?>"><?php echo wp_sprintf( __( "Auto expires in %s", "ayecode-connect" ), human_time_diff( time(), $expires ) ); ?></span>
 										</div>
 										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"
 										     role="status">
@@ -636,14 +636,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								</p>
 
 								<?php
-
-
 								// fix for other plugins calling get_plugins() too early.
 								if ( defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
 									$plugins = get_plugins();
 									$first   = reset( $plugins );
 									if ( ( ! empty( $plugins ) && ! isset( $first['Update URL'] ) ) || isset( $_REQUEST['ayemu'] ) || isset( $_REQUEST['ayedebug'] ) ) {
-										echo '<div class="ac-get-plugins-fix"><div class="alert alert-danger w-50 mx-auto " role="alert"><span class="badge badge-pill badge-light">!</span> ';
+										echo '<div class="ac-get-plugins-fix"><div class="alert alert-danger w-50 mx-auto " role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
 										_e( "Another plugin is calling the get_plugins() function too early which may block updates. We can try to fix this by calling our filter first with a must use plugin.", "ayecode-connect" );
 										echo "<button class='btn btn-white d-block mt-2 mx-auto' onclick='ayecode_connect_install_must_use_plugin();'>" . __( "Install now", "ayecode-connect" ) . "</button>";
 										echo '<div class="spinner-border spinner-border-sm mt-2 d-none text-white"  role="status">
@@ -651,15 +649,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									</div></div></div>';
 									}
 								}
-
-
 							} else {
-
 								$connect_url = esc_url( $this->client->build_connect_url() );
 
 								// check if alert message
 								if ( ! empty( $_REQUEST['alert'] ) && $_REQUEST['alert'] == 'connect' ) {
-									echo '<div class="alert alert-warning w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
 									_e( "You must connect your site before you can import demo content.", "ayecode-connect" );
 									echo "</div>";
 								}
@@ -675,7 +670,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								}
 
 								if ( $coming_soon_warn ) {
-									echo '<div class="alert alert-warning w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
 									_e( "It looks like you might have a coming soon or maintenance plugin active? This may block our connection server.", "ayecode-connect" );
 									echo "</div>";
 								}
@@ -691,7 +686,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								// check for url change
 								$url_change_disconnection_notice = get_transient( $this->client->prefix . '_site_moved' );
 								if ( $url_change_disconnection_notice ) {
-									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
 									_e( "Your website URL has changed, please re-connect with your new URL.", "ayecode-connect" );
 									echo "</div>";
 								}
@@ -700,21 +695,14 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$host      = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
 								$localhost = $this->client->is_usable_domain( $host );
 								if ( is_wp_error( $localhost ) ) {
-									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge badge-pill badge-light">!</span> ';
+									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
 									_e( "It looks like you might be running on localhost, AyeCode Connect will only work on a live website.", "ayecode-connect" );
 									echo "</div>";
 								}
-
-
 							}
-
-
 							?>
-
 						</div>
-
-						<img src="<?php echo $this->base_url; ?>assets/img/connect-site.png" class="img-fluid mt-4"
-						     alt="AyeCode Connect">
+						<img src="<?php echo $this->base_url; ?>assets/img/connect-site.png" class="img-fluid mt-4" alt="AyeCode Connect">
 					</div>
 					<div class="ac-footer border-top mt-5">
 						<p class="text-muted h6 mt-4"><?php _e( 'AyeCode Ltd are the creators of:', 'ayecode-connect' ); ?>
@@ -881,12 +869,10 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			return $slug[0];
 		}
-
 	}
 
 	/**
 	 * Run the class if found.
 	 */
 	AyeCode_Connect_Settings::instance();
-
 }

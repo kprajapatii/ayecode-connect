@@ -251,7 +251,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					<div class="modal-dialog mw-100  p-0 m-0">
 						<div class="modal-content vh-100 rounded-0">
 							<div class="row overflow-hidden">
-								<div class="col-3 border-right pr-0 vh-100 d-flex flex-column">
+								<div class="col-3 border-right border-end pr-0 pe-0 vh-100 d-flex flex-column">
 									<div class="modal-header">
 										<h5 class="modal-title" id="staticBackdropLabel"></h5>
 										<button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
@@ -323,6 +323,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 												</div>
 											</li>
 										</ul>
+										<div class="ac-import-stats alert alert-info mt-3 mb-0 py-2 d-none" role="alert"></div>
 									</div>
 									<div class="modal-body overflow-auto bg-light scrollbars-ios ac-item-info">
 										<div class="ac-item-img shadow-sm"></div>
@@ -408,6 +409,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 							} else {
 								aci_error($aci_step, data.data);
 							}
+
+							try {
+								if (data && data.data && data.data.log_data) {
+									jQuery('.ac-import-progress .ac-import-stats').removeClass('d-none').append('<div class="my-2 ac-import-stat">' + data.data.log_data + '</div>');
+								}
+							} catch(err) {}
 						},
 						error: function(xhr, textStatus, errorThrown) {
 							alert(textStatus + ': ' + errorThrown);
@@ -865,7 +872,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'percent' => 25,
 						'data_file' => $data_file,
 						'message' => $message,
-						'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+						'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array(),
+						'log_data' => ! empty( $result['errors'] ) ? __( 'Could not install plugins:', 'ayecode-connect' ) . '<div class="d-inline-block my-1">- ' .  implode( '</div><div class="d-inline-block my-1">- ', array_values( $result['errors'] ) ) . '<div>' : ''
 					);
 				}
 			} else if ( $step === 3 ) {
@@ -881,7 +889,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'step'  => $step + 1,
 						'percent' => 40,
 						'data_file' => $data_file,
-						'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+						'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array(),
+						'log_data' => ! empty( $result['errors'] ) ? __( 'Categories:', 'ayecode-connect' ) . '<div class="d-inline-block mt-1">- ' .  implode( '</div><div class="d-inline-block mt-1">- ', array_values( $result['errors'] ) ) . '<div>' : ''
 					);
 				}
 			} else if ( $step === 4 ) {
@@ -897,7 +906,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'step' => $step + 1,
 						'percent' => 50,
 						'data_file' => $data_file,
-						'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+						'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array()
 					);
 				}
 			} else if( $step === 5 ) {
@@ -913,7 +922,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'step' => $step + 1,
 						'percent' => 60,
 						'data_file' => $data_file,
-						'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+						'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array(),
+						'log_data' => ! empty( $result['errors'] ) ? __( 'Page Templates:', 'ayecode-connect' ) . '<div class="d-inline-block mt-1">- ' .  implode( '</div><div class="d-inline-block mt-1">- ', array_values( $result['errors'] ) ) . '<div>' : ''
 					);
 				}
 			} else if ( $step === 6 ) {
@@ -936,14 +946,14 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 							'total' => $result['total'],
 							'offset' => $result['offset'],
 							'data_file' => $data_file,
-							'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+							'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array()
 						);
 					} else {
 						$data = array(
 							'step' => $step + 1,
 							'percent' => 80,
 							'data_file' => $data_file,
-							'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+							'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array()
 						);
 					}
 				}
@@ -960,7 +970,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'step' => $step + 1,
 						'percent' => 90,
 						'data_file' => $data_file,
-						'log_data' => ! empty( $result['errors'] ) ? $result['errors'] : array()
+						'errors' => ! empty( $result['errors'] ) ? $result['errors'] : array(),
+						'log_data' => ! empty( $result['errors'] ) ? __( 'Widgets:', 'ayecode-connect' ) . '<div class="d-inline-block mt-1">- ' .  implode( '</div><div class="d-inline-block mt-1">- ', array_values( $result['errors'] ) ) . '<div>' : ''
 					);
 				}
 			} else if ( $step === 8 ) {
@@ -1252,6 +1263,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					$args['slug'] = $slug_parts[0];
 				}
 
+				$_errors = '';
+
 				// Check errors
 				if ( ! empty( $args['errors'] ) && empty( $_args['slug'] ) ) {
 					$status = false;
@@ -1263,7 +1276,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						}
 					}
 
-					$errors[ $args['slug'] ] = '[' . $args['slug'] . '] ' . implode( ' ', $args_errors );
+					$_errors = implode( ' ', $args_errors );
 				} else {
 					$request = new WP_REST_Request( 'POST' );
 					$request->set_body_params( $args );
@@ -1272,7 +1285,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					//$this->debug_log( $_response, __METHOD__ . ':response', __FILE__, __LINE__ );
 
 					if ( is_wp_error( $_response ) ) {
-						$errors[ $args['slug'] ] = '[' . $args['slug'] . '] ' . $_response->get_error_message();
+						$_errors = $_response->get_error_message();
 
 						$status = false;
 					} else {
@@ -1282,7 +1295,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 						if ( is_array( $_response ) ) {
 							if ( ! empty( $_response['error'] ) ) {
-								$errors[ $args['slug'] ] = $_response['error'];
+								$_errors = $_response['error'];
 							}
 
 							$status = $_response['success'] ? true : false;
@@ -1301,6 +1314,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					$installed[ $args['slug'] ] = $plugin_title;
 				} else {
 					$not_installed[ $args['slug'] ] = $plugin_title;
+				}
+
+				if ( $_errors ) {
+					$errors[ $args['slug'] ] = $plugin_title . ' ' . $_errors;
 				}
 			}
 
