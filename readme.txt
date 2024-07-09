@@ -77,6 +77,10 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.3.1 - TBD =
+* BootStrap 5 compatibility chnages - CHANGED
+* Show message when plugin not installed due to inactive licence - CHANGED
+
 = 1.3.0 - 2024-07-02 =
 * Import demo import - CHANGED
 * Demo Import screen improvements - CHANGED
