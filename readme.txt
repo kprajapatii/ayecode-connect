@@ -6,8 +6,8 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 6.5
-Stable tag: 1.3.0
+Tested up to: 6.6
+Stable tag: 1.3.1
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -77,7 +77,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.3.1 - TBD =
+= 1.3.1 - 2024-07-16 =
 * BootStrap 5 compatibility chnages - CHANGED
 * Show message when plugin not installed due to inactive licence - CHANGED
 
