@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.6
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -77,8 +77,11 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.3.2 - 2024-07-17 =
+* Super Duper lib updated to latest - UPDATED
+
 = 1.3.1 - 2024-07-16 =
-* BootStrap 5 compatibility chnages - CHANGED
+* BootStrap 5 compatibility changes - CHANGED
 * Show message when plugin not installed due to inactive licence - CHANGED
 
 = 1.3.0 - 2024-07-02 =
