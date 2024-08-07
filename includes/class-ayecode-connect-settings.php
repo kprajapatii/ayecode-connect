@@ -133,8 +133,20 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 		public function install_mu_plugin() {
 			$result = false;
+
+			if ( ! class_exists( 'WP_Filesystem_Base' ) ) {
+				require_once( ABSPATH . '/wp-admin/includes/class-wp-filesystem-base.php' );
+			}
+
 			if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
 				require_once( ABSPATH . '/wp-admin/includes/class-wp-filesystem-direct.php' );
+			}
+
+			if ( class_exists( 'WP_Filesystem_Direct' ) ) {
+				$wp_filesystem_direct = new WP_Filesystem_Direct( true );
+				$src                  = dirname( __FILE__ ) . "/../assets/wpmu/ayecode-connect-filter-fix.php";
+				$des                  = WPMU_PLUGIN_DIR . "/ayecode-connect-filter-fix.php";
+				$result               = $wp_filesystem_direct->move( $src, $des, true );
 			}
 
 			if ( class_exists( 'WP_Filesystem_Direct' ) ) {
