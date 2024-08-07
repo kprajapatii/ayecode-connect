@@ -77,6 +77,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.3.3 - TBD =
+* Sometimes MU plugin install shows class WP_Filesystem_Base not found - FIXED
+
 = 1.3.2 - 2024-07-17 =
 * Super Duper lib updated to latest - UPDATED
 
