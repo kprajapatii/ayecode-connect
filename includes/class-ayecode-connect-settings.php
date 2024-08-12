@@ -204,6 +204,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			// remove WPEU licences
 			delete_option( 'exup_keys' );
+
+
+            // remove the user info transient also so it will fetch fresh data
+            delete_transient( $this->client->prefix . '_remote_user_info' );
+
+            $this->client->get_remote_user_info();
 		}
 
 		/**
@@ -733,6 +739,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 						$blog_id  = get_option( $this->client->prefix . '_blog_id', false );
 						$site_url = get_option( $this->client->prefix . '_url', false );
+                        $signatures =  get_option( $this->client->prefix .'_connected_user_signatures');
+                        $signatures_print = !empty($signatures) ? print_r($signatures, true) : '';
 //						$aui_bs5 = 0;
                         $bs5_prefix = $aui_bs5 ? '-bs' : '';
 						?>
@@ -753,7 +761,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										<div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?> ">
 											<?php
 											echo '<h5>blog id ' . absint( $blog_id ) . '</h5>';
-											echo '<h5>Site URL ' . esc_attr( $site_url ) . '</h5>';
+                                            echo '<h5>Site URL ' . esc_attr( $site_url ) . '</h5>';
+                                            echo '<h5>Name ' . esc_attr( get_option( $this->client->prefix .'_connected_name', false) ) . '</h5>';
+                                            echo '<h5>Username ' . esc_attr( get_option( $this->client->prefix .'_connected_username', false) ) . '</h5>';
+                                            echo '<h5>Email ' . esc_attr( get_option( $this->client->prefix .'_connected_email', false) ) . '</h5>';
+                                            echo '<h5>User ID ' . esc_attr( get_option( $this->client->prefix .'_connected_user_id', false) ) . '</h5>';
+                                            echo '<h5>Signatures ' . esc_attr( $signatures_print ) . '</h5>';
 											?>
 										</div>
 									</div>

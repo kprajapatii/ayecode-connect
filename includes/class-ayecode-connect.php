@@ -178,7 +178,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$load = false;
 
 			if ( 
-				defined( 'GEODIRLOCATION_VERSION' )
+				defined( 'GEODIRECTORY_VERSION' )
 				|| defined( 'USERSWP_VERSION' )
 				//|| defined( 'WPINV_VERSION' ) // not currently used
 			) {
