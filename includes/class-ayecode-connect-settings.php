@@ -205,8 +205,11 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			// remove WPEU licences
 			delete_option( 'exup_keys' );
 
+
             // remove the user info transient also so it will fetch fresh data
             delete_transient( $this->client->prefix . '_remote_user_info' );
+
+            $this->client->get_remote_user_info();
 		}
 
 		/**

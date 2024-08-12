@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.6
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -77,7 +77,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.3.3 - 2024-08-12 =
+= 1.3.4 - 2024-08-12 =
 * Sometimes MU plugin install shows class WP_Filesystem_Base not found - FIXED
 * Better debugging info - ADDED
 * Nav block not showing without GD addon - FIXED
