@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.3.1\n"
+"Project-Id-Version: AyeCode Connect 1.3.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-16 11:10+0530\n"
-"PO-Revision-Date: 2024-07-16 11:10+0530\n"
+"POT-Creation-Date: 2024-09-03 13:57+0530\n"
+"PO-Revision-Date: 2024-09-03 13:57+0530\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -26,8 +26,8 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-4: vendor/ayecode/wp-font-awesome-settings/"
 "assets\n"
 
-#: ayecode-connect.php:103 includes/class-ayecode-demo-content.php:288
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3143
+#: ayecode-connect.php:102 includes/class-ayecode-demo-content.php:290
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3146
 msgid "Settings"
 msgstr ""
 
@@ -437,165 +437,165 @@ msgstr ""
 msgid "Unable to connect to the filesystem. Please confirm your credentials."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:148
+#: includes/class-ayecode-connect-settings.php:160
 msgid ""
 "Plugin installed, this should resolve any update issues, if you still have "
 "issues please contact support."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:150
+#: includes/class-ayecode-connect-settings.php:162
 msgid "Something went wrong, please contact support."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:285
+#: includes/class-ayecode-connect-settings.php:303
 msgid "Plugin and theme update notifications must be enabled first"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:374
-#: includes/class-ayecode-connect-settings.php:608
+#: includes/class-ayecode-connect-settings.php:392
+#: includes/class-ayecode-connect-settings.php:626
 #, php-format
 msgid "Auto expires in %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:422
-#: includes/class-ayecode-demo-content.php:179
+#: includes/class-ayecode-connect-settings.php:440
+#: includes/class-ayecode-demo-content.php:181
 msgid "Something went wrong, try refreshing the page and trying again."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:423
-#: includes/class-ayecode-demo-content.php:180
+#: includes/class-ayecode-connect-settings.php:441
+#: includes/class-ayecode-demo-content.php:182
 msgid "Are you sure you with to disconnect your site?"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:486
+#: includes/class-ayecode-connect-settings.php:504
 msgid "Licenses cleared, refresh page to confirm."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:528
+#: includes/class-ayecode-connect-settings.php:546
 msgid ""
 "One click addon installs, live documentation search, support right from your "
 "WordPress Dashboard"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:536
+#: includes/class-ayecode-connect-settings.php:554
 #, php-format
 msgid "You are connected to AyeCode Connect as user: %s"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:543
+#: includes/class-ayecode-connect-settings.php:561
 msgid "Plugin and theme update notifications"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:546
 #: includes/class-ayecode-connect-settings.php:564
 #: includes/class-ayecode-connect-settings.php:582
-#: includes/class-ayecode-connect-settings.php:612
+#: includes/class-ayecode-connect-settings.php:600
 #: includes/class-ayecode-connect-settings.php:630
 #: includes/class-ayecode-connect-settings.php:648
+#: includes/class-ayecode-connect-settings.php:666
 msgid "Loading..."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:561
+#: includes/class-ayecode-connect-settings.php:579
 msgid "One click addon installs, no more license keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:579
+#: includes/class-ayecode-connect-settings.php:597
 msgid "Documentation and Support Widget"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:603
+#: includes/class-ayecode-connect-settings.php:621
 msgid "Temporary Support User Access"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:635
+#: includes/class-ayecode-connect-settings.php:653
 msgid "Disconnect site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:645
+#: includes/class-ayecode-connect-settings.php:663
 msgid ""
 "Another plugin is calling the get_plugins() function too early which may "
 "block updates. We can try to fix this by calling our filter first with a "
 "must use plugin."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:646
+#: includes/class-ayecode-connect-settings.php:664
 msgid "Install now"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:658
+#: includes/class-ayecode-connect-settings.php:676
 msgid "You must connect your site before you can import demo content."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:674
+#: includes/class-ayecode-connect-settings.php:692
 msgid ""
 "It looks like you might have a coming soon or maintenance plugin active? "
 "This may block our connection server."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:680
+#: includes/class-ayecode-connect-settings.php:698
 msgid ""
 "By clicking the <b>Connect Site</b> button, you agree to our <a "
 "href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-"
 "muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:683
+#: includes/class-ayecode-connect-settings.php:701
 #: vendor/ayecode/ayecode-connect-helper/ayecode-connect-helper.php:39
 msgid "Connect Site"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:690
+#: includes/class-ayecode-connect-settings.php:708
 msgid "Your website URL has changed, please re-connect with your new URL."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:699
+#: includes/class-ayecode-connect-settings.php:717
 msgid ""
 "It looks like you might be running on localhost, AyeCode Connect will only "
 "work on a live website."
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:708
+#: includes/class-ayecode-connect-settings.php:726
 msgid "AyeCode Ltd are the creators of:"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:728
+#: includes/class-ayecode-connect-settings.php:748
 msgid "Debug Info"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:735
+#: includes/class-ayecode-connect-settings.php:755
 msgid "Connection Info"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:754
+#: includes/class-ayecode-connect-settings.php:779
 msgid "Activation Secret"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:771
+#: includes/class-ayecode-connect-settings.php:796
 msgid "Debug Tools"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:778
+#: includes/class-ayecode-connect-settings.php:803
 msgid "Clear all licenses"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:779
+#: includes/class-ayecode-connect-settings.php:804
 msgid "Test Connection ability"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:791
+#: includes/class-ayecode-connect-settings.php:816
 msgid "All User Licenses Found"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:800
-#: includes/class-ayecode-connect-settings.php:822
+#: includes/class-ayecode-connect-settings.php:825
+#: includes/class-ayecode-connect-settings.php:847
 msgid "No licenses found"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:813
+#: includes/class-ayecode-connect-settings.php:838
 msgid "All Installed Licenses"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:835
+#: includes/class-ayecode-connect-settings.php:860
 msgid ""
 "get_plugins() return <small>(if Update ID is missing from out,  install "
 "helper plugin below)</small>"
@@ -674,180 +674,186 @@ msgstr ""
 msgid "Missing site id."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:239
+#: includes/class-ayecode-demo-content.php:241
 msgid ""
 "This importer should only be used on NEW sites, it will change the whole "
 "look and appearance of your site."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:262
+#: includes/class-ayecode-demo-content.php:264
 msgid "Importing Demo"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:270
+#: includes/class-ayecode-demo-content.php:272
 msgid "Downloading Data"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:276 templates/import/site.php:51
+#: includes/class-ayecode-demo-content.php:278 templates/import/site.php:51
 msgid "Theme"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:282 templates/import/site.php:66
+#: includes/class-ayecode-demo-content.php:284 templates/import/site.php:66
 msgid "Plugins"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:294
+#: includes/class-ayecode-demo-content.php:296
 msgid "Categories"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:300
+#: includes/class-ayecode-demo-content.php:302
 msgid "Page Templates"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:306
+#: includes/class-ayecode-demo-content.php:308
 msgid "Dummy Posts"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:315
+#: includes/class-ayecode-demo-content.php:317
 msgid "Widgets"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:321
+#: includes/class-ayecode-demo-content.php:323
 msgid "Menus"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:335
+#: includes/class-ayecode-demo-content.php:337
 msgid "Import"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:356
+#: includes/class-ayecode-demo-content.php:358
 msgid ""
 "This import may remove all current GeoDirectory data, please only proceed if "
 "you are ok with this."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:366
+#: includes/class-ayecode-demo-content.php:368
 msgid "Importing..."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:439
+#: includes/class-ayecode-demo-content.php:441
 msgid "ERROR"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:475
+#: includes/class-ayecode-demo-content.php:477
 msgid "View Site"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:599
+#: includes/class-ayecode-demo-content.php:601
 msgid ""
 "These are legacy themes which are no longer supported and will be removed "
 "soon."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:707
+#: includes/class-ayecode-demo-content.php:710
 msgid "Fail to request download package."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:715
+#: includes/class-ayecode-demo-content.php:718
 msgid "Fail to generate download package."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:761
+#: includes/class-ayecode-demo-content.php:764
 msgid "Could not unpack demo data file."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:854
-#: includes/class-ayecode-demo-content.php:863
+#: includes/class-ayecode-demo-content.php:859
+#: includes/class-ayecode-demo-content.php:868
 #, php-format
 msgid "Could not install plugins: %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:859
+#: includes/class-ayecode-demo-content.php:864
 #, php-format
 msgid "Plugins installed: %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:867
+#: includes/class-ayecode-demo-content.php:872
 #, php-format
 msgid "Errors: %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:876
+#: includes/class-ayecode-demo-content.php:881
 msgid "Could not install plugins:"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:893
+#: includes/class-ayecode-demo-content.php:902
 msgid "Categories:"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:926
+#: includes/class-ayecode-demo-content.php:935
 msgid "Page Templates:"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:974
+#: includes/class-ayecode-demo-content.php:983
 msgid "Widgets:"
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1046
+#: includes/class-ayecode-demo-content.php:1055
 msgid "The theme installation failed."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1104
+#: includes/class-ayecode-demo-content.php:1113
 msgid "Could not access to the filesystem."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1114
+#: includes/class-ayecode-demo-content.php:1123
 msgid "Could not access to the data file."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1121
+#: includes/class-ayecode-demo-content.php:1130
 msgid "No demo data found."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1128
+#: includes/class-ayecode-demo-content.php:1137
 msgid "Invalid demo data."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1135
+#: includes/class-ayecode-demo-content.php:1144
 #, php-format
 msgid "No demo data found for %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1157
+#: includes/class-ayecode-demo-content.php:1166
+#: includes/class-ayecode-demo-content.php:1170
+#, php-format
+msgid "Theme Install Error: %s"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1170
 msgid "Invalid demo data found for theme."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1207
+#: includes/class-ayecode-demo-content.php:1220
 #, php-format
 msgid "Could not install theme %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1228
+#: includes/class-ayecode-demo-content.php:1241
 #, php-format
 msgid "Could not set theme %s."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1248
+#: includes/class-ayecode-demo-content.php:1261
 msgid "Could not set plugins due to invalid data."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1349
+#: includes/class-ayecode-demo-content.php:1362
 msgid "Could not set settings due to invalid data."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1385
+#: includes/class-ayecode-demo-content.php:1398
 msgid "Could not import categories due to invalid data."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1424
+#: includes/class-ayecode-demo-content.php:1437
 msgid "Could not import templates due to invalid data."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1729
+#: includes/class-ayecode-demo-content.php:1742
 msgid "Unable to protect demo data download folder from browsing."
 msgstr ""
 
-#: includes/class-ayecode-demo-content.php:1738
+#: includes/class-ayecode-demo-content.php:1751
 msgid "Unable to create demo data download folder."
 msgstr ""
 
@@ -1473,7 +1479,7 @@ msgid "Please give us any feedback that could help us improve"
 msgstr ""
 
 #: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:64
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3764
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3767
 msgid "Cancel"
 msgstr ""
 
@@ -2573,12 +2579,12 @@ msgid "Letter case"
 msgstr ""
 
 #: vendor/ayecode/wp-super-duper/sd-functions.php:1552
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:235
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:236
 msgid "No"
 msgstr ""
 
 #: vendor/ayecode/wp-super-duper/sd-functions.php:1553
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:235
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:236
 msgid "Yes"
 msgstr ""
 
@@ -2799,127 +2805,127 @@ msgid "Select Page..."
 msgstr ""
 
 #: vendor/ayecode/wp-super-duper/sd-functions.php:3224
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5177
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5180
 msgid "Select Template Part..."
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:288
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:289
 msgid "Select shortcode"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:308
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:309
 msgid "Insert shortcode"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:311
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:312
 msgid "Copy shortcode"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:531
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1179
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:532
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1180
 msgid "Advanced Settings"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1472
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1473
 #, php-format
 msgid "Placeholder for: %s"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1694
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:1695
 msgid "General"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:2923
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:2926
 msgid "Placeholder for:"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3764
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3767
 msgid "Are you sure?"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3764
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3767
 msgid "Delete"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3915
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3918
 msgid "Reset"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3915
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3918
 msgid "Close"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3915
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:3918
 msgid "Save Rules"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5018
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5021
 msgid "Remove Rule"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5023
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5026
 msgid "Rule"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5024
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5027
 msgid "Select Rule..."
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5031
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5034
 msgid "Rule:"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5047
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5048
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5050
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5051
 msgid "FIELD"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5069
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5070
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5072
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5073
 msgid "CONDITION"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5092
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5094
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5095
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5097
 msgid "VALUE TO MATCH"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5106
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5109
 msgid "Select User Roles:"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5134
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5137
 msgid "Add Rule"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5140
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5143
 msgid "What should happen if rules met."
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5141
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5144
 msgid "Default Output"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5160
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5163
 msgid "Page Content"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5161
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5164
 msgid "Select Page ID..."
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5176
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5179
 msgid "Template Part"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5195
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5198
 msgid "Custom Message Type"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5196
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5199
 msgid "Default (none)"
 msgstr ""
 
-#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5219
+#: vendor/ayecode/wp-super-duper/wp-super-duper.php:5222
 msgid "CUSTOM MESSAGE TO SHOW"
 msgstr ""
