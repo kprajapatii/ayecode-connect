@@ -77,6 +77,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.3.5 - TBD =
+* Import on fresh site broken when import data contains UsersWP plugin - FIXED
+
 = 1.3.4 - 2024-08-12 =
 * Sometimes MU plugin install shows class WP_Filesystem_Base not found - FIXED
 * Better debugging info - ADDED

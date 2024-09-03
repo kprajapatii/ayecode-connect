@@ -603,7 +603,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 * @param $cpt
 		 */
 		public function delete_demo_posts( $cpt ) {
-			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
+			$this->debug_log( 'start', __METHOD__ . ':' . $cpt, __FILE__, __LINE__ );
 
 			// Elementor allow delete kit (without this it throws a confirmation page and blocks import)
 			$_GET['force_delete_kit'] = 1;
@@ -625,7 +625,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 			}
 
-			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
+			$this->debug_log( 'end', __METHOD__ . ':' . $cpt, __FILE__, __LINE__ );
 		}
 
 		/**
@@ -1841,14 +1841,14 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					)
 				);
 
-				$this->debug_log( $api, __METHOD__ . ':' . $slug . ':themes_api', __FILE__, __LINE__ );
-
 				if ( is_wp_error( $api ) ) {
-					$this->debug_log( $api->get_error_message(), __METHOD__ . ':themes_api error', __FILE__, __LINE__ );
+					$this->debug_log( $api->get_error_message(), __METHOD__ . ':' . $slug . ':themes_api error', __FILE__, __LINE__ );
 
 					$result = array( "success" => false );
 				} else if ( ! empty( $api->download_link ) ) {
 					$download_link = $api->download_link;
+				} else {
+					$this->debug_log( $api, __METHOD__ . ':' . $slug . ':themes_api', __FILE__, __LINE__ );
 				}
 			}
 
