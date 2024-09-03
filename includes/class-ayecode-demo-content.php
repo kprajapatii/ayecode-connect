@@ -110,6 +110,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// prevent some transient redirects
 				delete_transient( '_gd_activation_redirect' );
 				delete_transient( 'gd_social_importer_redirect' );
+				delete_option( 'uwp_activation_redirect' );
+				delete_option( 'uwp_setup_wizard_notice' );
 			}
 		}
 
@@ -231,7 +233,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			<div class="bsui" style="<?php if(!$wizard){ ?>margin-left: -20px; display: flex<?php } ?>">
 				<div class="<?php if(!$wizard){ ?>containerx bg-white w-100 p-4 m-4 border rounded<?php } ?>">
 					<?php
-                    $sites = $this->get_sites();
+                    $sites = $this->get_sites( true );
 
                     echo aui()->alert(array(
 							'type'=> 'danger',
@@ -669,10 +671,10 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 		 *
 		 * @return mixed
 		 */
-		public function get_sites(){
-
+		public function get_sites( $refresh = false ) {
 			$sites = get_transient( 'ayecode_connect_demos' );
-			if ( empty( $demos ) ) {
+
+			if ( empty( $sites ) || $refresh ) {
 				$args = array(
 					'timeout'     => 30,
 					'redirection' => 0,
@@ -683,11 +685,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 
 				if ( ! is_wp_error( $data ) && $data['response']['code'] == 200 ) {
 					$responseBody = wp_remote_retrieve_body( $data );
-					$sites        = json_decode( $responseBody );
+
+					$sites = json_decode( $responseBody );
+
 					set_transient( 'ayecode_connect_demos', $sites, HOUR_IN_SECONDS );
 				}
 			}
-
 
 			return $sites;
 		}
@@ -808,6 +811,8 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 			$error = array();
 
 			if ( $step === 0 ) {
+				$this->debug_log( $site->theme, __METHOD__ . ':demo site' , __FILE__, __LINE__ );
+
 				$result = $this->download_content( $demo );
 				//$result = '49015-kadence-jobs-directory-v5XCrTvqLMGp.html';// Test from remote site. // @todo
 
@@ -831,7 +836,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Theme
 				$result = $this->set_demo_theme( $data_file );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_demo_theme' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_demo_theme' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -846,7 +851,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Plugins
 				$result = $this->set_demo_plugins( $data_file );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_demo_plugins' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_demo_plugins' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -876,11 +881,15 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 						'log_data' => ! empty( $result['errors'] ) ? __( 'Could not install plugins:', 'ayecode-connect' ) . '<div class="d-inline-block my-1">- ' .  implode( '</div><div class="d-inline-block my-1">- ', array_values( $result['errors'] ) ) . '<div>' : ''
 					);
 				}
+
+				// Delete plugin redirect.
+				delete_option( 'uwp_activation_redirect' );
+				delete_option( 'uwp_setup_wizard_notice' );
 			} else if ( $step === 3 ) {
 				// Settings
 				$result = $this->set_demo_settings( $data_file );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_demo_settings' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_demo_settings' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -897,7 +906,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Categories
 				$result = $this->set_demo_categories( $data_file );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_demo_categories' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_demo_categories' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -913,7 +922,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Page templates
 				$result = $this->set_page_templates( $data_file );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_page_templates' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_page_templates' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -930,7 +939,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Dummy posts
 				$result = $this->set_dummy_posts( $data_file, $site );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_dummy_posts:' . $page , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_dummy_posts:' . $page , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -961,7 +970,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Widgets
 				$result = $this->set_widgets( $data_file, $site );
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_widgets' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_widgets' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -978,7 +987,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				// Menus
 				$result = $this->set_menus( $data_file, $site );;
 
-				$this->debug_log( $result, __METHOD__ . ':step:' . $step . ' response - set_menus' , __FILE__, __LINE__ );
+				$this->debug_log( ( is_wp_error( $result ) ? $result->get_error_message() : $result ), __METHOD__ . ':step:' . $step . ' response - set_menus' , __FILE__, __LINE__ );
 
 				if ( is_wp_error( $result ) ) {
 					$error = $result;
@@ -1153,8 +1162,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				return $data;
 			}
 
+			if ( $_errors = $this->parse_error_messages( $data ) ) {
+				return new WP_Error( 'install_theme_error', wp_sprintf( __( 'Theme Install Error: %s', 'ayecode-connect' ), implode( " ", $_errors ) ) );
+			}
+
 			if ( ! ( is_array( $data ) && ! empty( $data['slug'] ) ) ) {
-				return new WP_Error( 'invalid_demo_data', __( 'Invalid demo data found for theme.', 'ayecode-connect' ) );
+				return new WP_Error( 'install_theme_error', wp_sprintf( __( 'Theme Install Error: %s', 'ayecode-connect' ), __( 'Invalid demo data found for theme.', 'ayecode-connect' ) ) );
 			}
 
 			$slug = $data['slug'];
@@ -1736,6 +1749,28 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				return true;
 			} else {
 				return new WP_Error( 'demo_download_folder_error', __( 'Unable to create demo data download folder.' ) );
+			}
+		}
+
+		public function parse_error_messages( $res, $code = '' ) {
+			if ( ! ( is_array( $res ) && ! empty( $res['errors'] ) ) ) {
+				return array();
+			}
+
+			if ( empty( $code ) ) {
+				$all_messages = array();
+
+				foreach ( $res['errors'] as $code => $messages ) {
+					$all_messages = array_merge( $all_messages, $messages );
+				}
+
+				return $all_messages;
+			}
+
+			if ( isset( $res['errors'][ $code ] ) ) {
+				return $res['errors'][ $code ];
+			} else {
+				return array();
 			}
 		}
 	}

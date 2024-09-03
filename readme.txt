@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.6
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -16,7 +16,7 @@ Use this service plugin to easily activate any of our products, open a support t
 
 To take full advantage of this plugin you should have one of our plugins installed.
 
-[GeoDirectory](https://wordpress.org/plugins/geodirectory/) | [UsersWP](https://wordpress.org/plugins/userswp/) | [WP Invoicing](https://wordpress.org/plugins/invoicing/)
+[GeoDirectory](https://wordpress.org/plugins/geodirectory/) | [UsersWP](https://wordpress.org/plugins/userswp/) | [GetPaid](https://wordpress.org/plugins/invoicing/)
 
 AyeCode Connect is a service plugin, meaning that it will have no functionality until you connect your site to ours. This link allows us to provide extra services to your site such as live documentation search and submission of support tickets.
 After connecting your site you can install our update plugin which will give you the ability to automatically sync license keys of purchases and also be able to remotely install and update purchased products.
@@ -76,6 +76,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.3.5 - 2024-09-03 =
+* Import on fresh site broken when import data contains UsersWP plugin - FIXED
 
 = 1.3.4 - 2024-08-12 =
 * Sometimes MU plugin install shows class WP_Filesystem_Base not found - FIXED
