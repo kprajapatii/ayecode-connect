@@ -131,6 +131,12 @@ class AyeCode_WP_Nav extends WP_Super_Duper {
 
 	public function get_pages_array()
 	{
+
+        // if SD option available use it, more memory efficient
+        if(function_exists('sd_template_page_options')){
+            return sd_template_page_options();
+        }
+
 		$options = [ '' => __('Select Page', 'ayecode-connect') ];
 
 		$pages = get_pages();
