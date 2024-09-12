@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.6
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -76,6 +76,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.3.6 - 2024-09-12 =
+* WP Nav block get_pages() function updated to use SD version for better memory use - CHANGED
 
 = 1.3.5 - 2024-09-03 =
 * Import on fresh site broken when import data contains UsersWP plugin - FIXED
