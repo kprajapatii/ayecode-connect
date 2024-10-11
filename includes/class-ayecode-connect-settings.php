@@ -131,41 +131,64 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			return self::$instance;
 		}
 
-		public function install_mu_plugin() {
-			$result = false;
+        /**
+         * Install our MU plugin to add our filter before any other plugin can call get_plugins and break any further filters.
+         *
+         * @return void
+         */
+        public function install_mu_plugin() {
+            global $wp_filesystem;
 
-			if ( ! class_exists( 'WP_Filesystem_Base' ) ) {
-				require_once( ABSPATH . '/wp-admin/includes/class-wp-filesystem-base.php' );
-			}
+            // Include necessary WordPress files
+            if ( ! function_exists( 'WP_Filesystem' ) ) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+            }
 
-			if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
-				require_once( ABSPATH . '/wp-admin/includes/class-wp-filesystem-direct.php' );
-			}
+            // Initialize the WordPress filesystem
+            $creds = request_filesystem_credentials( admin_url() );
 
-			if ( class_exists( 'WP_Filesystem_Direct' ) ) {
-				$wp_filesystem_direct = new WP_Filesystem_Direct( true );
-				$src                  = dirname( __FILE__ ) . "/../assets/wpmu/ayecode-connect-filter-fix.php";
-				$des                  = WPMU_PLUGIN_DIR . "/ayecode-connect-filter-fix.php";
-				$result               = $wp_filesystem_direct->move( $src, $des, true );
-			}
+            if ( false === $creds ) {
+                // If we cannot get credentials, we should return an error
+                wp_send_json_error( __( 'Could not access filesystem. Please ensure your credentials are correct.', 'ayecode-connect' ) );
+                wp_die();
+            }
 
-			if ( class_exists( 'WP_Filesystem_Direct' ) ) {
-				$wp_filesystem_direct = new WP_Filesystem_Direct( true );
-				$src                  = dirname( __FILE__ ) . "/../assets/wpmu/ayecode-connect-filter-fix.php";
-				$des                  = WPMU_PLUGIN_DIR . "/ayecode-connect-filter-fix.php";
-				$result               = $wp_filesystem_direct->move( $src, $des, true );
-			}
+            if ( ! WP_Filesystem( $creds ) ) {
+                // If we cannot initialize the filesystem, return an error
+                wp_send_json_error( __( 'Filesystem initialization failed. Please try again.', 'ayecode-connect' ) );
+                wp_die();
+            }
 
-			if ( $result ) {
-				wp_send_json_success( __( "Plugin installed, this should resolve any update issues, if you still have issues please contact support.", "ayecode-connect" ) );
-			} else {
-				wp_send_json_error( __( "Something went wrong, please contact support.", "ayecode-connect" ) );
-			}
+            // Now we can use the filesystem
+            $src = dirname( __FILE__ ) . '/../assets/wpmu/ayecode-connect-filter-fix.php';
+            $dest = WPMU_PLUGIN_DIR . '/ayecode-connect-filter-fix.php';
 
-			wp_die();
-		}
+            // Ensure the source file exists
+            if ( ! file_exists( $src ) ) {
+                wp_send_json_error( __( 'Source file does not exist.', 'ayecode-connect' ) );
+                wp_die();
+            }
 
-		/**
+            // Create the mu-plugins directory if it doesn't exist
+            if ( ! $wp_filesystem->is_dir( WPMU_PLUGIN_DIR ) ) {
+                if ( ! $wp_filesystem->mkdir( WPMU_PLUGIN_DIR, FS_CHMOD_DIR ) ) {
+                    wp_send_json_error( __( 'Could not create mu-plugins directory.', 'ayecode-connect' ) );
+                    wp_die();
+                }
+            }
+
+            // Copy the file to the mu-plugins directory
+            if ( $wp_filesystem->copy( $src, $dest, true, FS_CHMOD_FILE ) ) {
+                wp_send_json_success( __( 'Plugin installed successfully. This should resolve any update issues. If you still have issues, please contact support.', 'ayecode-connect' ) );
+            } else {
+                wp_send_json_error( __( 'Something went wrong during the installation. Please contact support.', 'ayecode-connect' ) );
+            }
+
+            wp_die();
+        }
+
+
+        /**
 		 * The Cron callback to run checks.
 		 */
 		public function cron_callback() {
