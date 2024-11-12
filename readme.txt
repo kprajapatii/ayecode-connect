@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -76,6 +76,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.3.8 - 2024-11-12 =
+* Composer packages updated - CHANGED
 
 = 1.3.7 - 2024-10-10 =
 * WPMU plugin install fix sometimes fails to install - IMPROVED
