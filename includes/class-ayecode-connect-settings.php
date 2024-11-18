@@ -139,6 +139,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
         public function install_mu_plugin() {
             global $wp_filesystem;
 
+            // security
+            check_ajax_referer( 'ayecode-connect', 'security' );
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( - 1 );
+            }
+
             // Include necessary WordPress files
             if ( ! function_exists( 'WP_Filesystem' ) ) {
                 require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -218,6 +224,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		 * Remove all site licenses.
 		 */
 		public function clear_all_licenses() {
+            // security
+            check_ajax_referer( 'ayecode-connect', 'security' );
 			if ( ! current_user_can( 'manage_options' ) ) {
 				wp_die( - 1 );
 			}
