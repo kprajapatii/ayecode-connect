@@ -3,7 +3,7 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.3.9
+ * Version: 1.4.0
  * Author: AyeCode
  * Author URI: https://ayecode.io
  * Requires at least: 4.7
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-	define( 'AYECODE_CONNECT_VERSION', '1.3.9' );
+	define( 'AYECODE_CONNECT_VERSION', '1.4.0' );
 }
 
 if ( !defined( 'AYECODE_CONNECT_SSL_VERIFY' ) ) {
@@ -45,7 +45,9 @@ function ayecode_connect() {
 
 	//Include the client connection class
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect.php';
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile-settings.php';
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile.php';
 
 	//Prepare client args
 	$args   = ayecode_connect_args();

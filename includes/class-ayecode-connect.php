@@ -219,7 +219,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		public function add_aui_screens( $screen_ids ) {
 			// AC screens that need AUI
 			$screen_ids[] = 'toplevel_page_ayecode-connect';
-			$screen_ids[] = 'ayecode_page_ayecode-demo-content';
+            $screen_ids[] = 'ayecode_page_ayecode-demo-content';
+            $screen_ids[] = 'ayecode_page_ayecode-turnstile';
 
 			return $screen_ids;
 		}
