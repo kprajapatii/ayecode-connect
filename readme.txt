@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -24,6 +24,10 @@ After connecting your site you can install our update plugin which will give you
 You will be able to remotely manage your activated sites and licences all from your account area on our site.
 
 You can also use our one click demo importer.
+
+NEW: Cloudflare Turnstile Captcha feature.  You can now activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
+Our implementation of Turnstile is loaded only when the field is show on the screen which helps with speed and SEO of your site.
+NOTE: Your site does NOT have to be using Cloudflare to be able to use Cloudflare Turnstile.
 
 == Installation ==
 
@@ -76,6 +80,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.4.0 - 2024-12-12 =
+* Cloudflare Turnstile Captcha feature (supports all AyeCode products) - ADDED
 
 = 1.3.9 - 2024-11-18 =
 * MU Helper plugin ajax call missing nonce check - FIXED
