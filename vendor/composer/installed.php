@@ -3,7 +3,7 @@
         'name' => 'ayecode-connect/ayecode-connect',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '7bffe26b109001190d3a73b7a409e136ebcc257c',
+        'reference' => 'af77cde413a69808b68b06913624af6990a4811a',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'ayecode-connect/ayecode-connect' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '7bffe26b109001190d3a73b7a409e136ebcc257c',
+            'reference' => 'af77cde413a69808b68b06913624af6990a4811a',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
