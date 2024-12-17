@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -80,6 +80,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.4.1 - 2024-12-16 =
+* SuperDuper Class includes file missing from last update - FIXED
 
 = 1.4.0 - 2024-12-12 =
 * Cloudflare Turnstile Captcha feature (supports all AyeCode products) - ADDED
