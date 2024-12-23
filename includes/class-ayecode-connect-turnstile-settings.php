@@ -312,9 +312,9 @@ class AyeCode_Connect_Turnstile_Settings {
 
 										$turnstile_protections = apply_filters( 'ayecode_turnstile_protections', $turnstile_protections );
 
-
 										if ( ! empty( $turnstile_protections ) ) {
 											foreach ( $turnstile_protections as $protection_key => $protection_value ) {
+                                                $value = isset($options['protections'][$protection_key]) ? absint($options['protections'][$protection_key]) : absint( $protection_value['default'] );
 												echo aui()->input(
 													array(
 														'id'               => $protection_key,
@@ -323,8 +323,9 @@ class AyeCode_Connect_Turnstile_Settings {
 														'label_type'       => 'horizontal',
 														'label_col'        => '4',
 														'type'             => 'checkbox',
+                                                        'with_hidden'      => true,
 														'label_force_left' => true,
-														'checked'          => (bool) $protection_value['default'],
+														'checked'          => $value,
 														'value'            => '1',
 														'switch'           => 'md',
 													)
