@@ -756,7 +756,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					<div class="ac-footer border-top mt-5">
 						<p class="text-muted h6 mt-4"><?php _e( 'AyeCode Ltd are the creators of:', 'ayecode-connect' ); ?>
 							<a href="https://wpgeodirectory.com/">wpgeodirectory.com</a>,
-							<a href="https://wpinvoicing.com/">wpinvoicing.com</a> &
+							<a href="https://wpgetpaid.com/">wpgetpaid.com</a> &
 							<a href="https://userswp.io/">userswp.io</a>
 						</p>
 					</div>
@@ -769,8 +769,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 						$actual_licences = get_option( "exup_keys" );
 
 						$blog_id  = get_option( $this->client->prefix . '_blog_id', false );
-						$site_url = get_option( $this->client->prefix . '_url', false );
-                        $signatures =  get_option( $this->client->prefix .'_connected_user_signatures');
+						$site_url = $this->client->get_site_url();
+                        $signatures = get_option( $this->client->prefix .'_connected_user_signatures');
                         $signatures_print = !empty($signatures) ? print_r($signatures, true) : '';
 //						$aui_bs5 = 0;
                         $bs5_prefix = $aui_bs5 ? '-bs' : '';

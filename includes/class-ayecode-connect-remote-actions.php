@@ -1287,8 +1287,9 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				}
 
 				// verify site_url
-				if ( $site_url && get_option( $this->prefix . "_url" ) ) {
+				if ( $site_url && $this->client->get_site_url() ) {
 					$changed = $this->client->check_for_url_change( $site_url );
+
 					if ( $changed ) {
 						return array( "success" => false );
 					}

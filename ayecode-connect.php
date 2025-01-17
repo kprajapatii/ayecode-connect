@@ -68,7 +68,7 @@ function ayecode_connect() {
 
 	$locale = apply_filters( 'plugin_locale', $locale, 'ayecode-connect' );
 
-	unload_textdomain( 'ayecode-connect' );
+	unload_textdomain( 'ayecode-connect', true );
 	load_textdomain( 'ayecode-connect', WP_LANG_DIR . '/ayecode-connect/ayecode-connect-' . $locale . '.mo' );
 	load_plugin_textdomain( 'ayecode-connect', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
