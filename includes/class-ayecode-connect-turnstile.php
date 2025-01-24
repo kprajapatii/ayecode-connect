@@ -825,10 +825,9 @@ class AyeCode_Connect_Turnstile {
 	 * @since.1.4.3
 	 *
 	 * @param bool $skip_check Force true for backward compatibility.
-	 * @param bool $update Update when failed to verify.
 	 * @return bool True if validated, else False.
 	 */
-	public function is_verified( $skip_check = false, $update = false ) {
+	public function is_verified( $skip_check = false ) {
 		if ( $skip_check && ! $this->check_verified() ) {
 			return true;
 		}
@@ -850,10 +849,6 @@ class AyeCode_Connect_Turnstile {
 		}
 
 		$is_verified = $option_value === md5( $site_key . '::' . $secret_key ) ? true : false;
-
-		if ( ! $is_verified ) {
-			update_option( 'ayecode_turnstile_verified', 'no' );
-		}
 
 		return $is_verified;
 	}
