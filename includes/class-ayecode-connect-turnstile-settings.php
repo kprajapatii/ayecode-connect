@@ -18,6 +18,7 @@ class AyeCode_Connect_Turnstile_Settings {
 		'secret_key'    => '',
 		'theme'         => 'light',
 		'size'          => 'normal',
+		'check_verified'=> '',
 		'disable_roles' => [],
 		'protections'   => array(
 			'login'            => 1,
@@ -81,9 +82,20 @@ class AyeCode_Connect_Turnstile_Settings {
 	 * Settings page content.
 	 */
 	public function settings_page() {
-		$options             = get_option( 'ayecode_turnstile_options', $this->settings );
+		global $aye_turnstile_setting;
+
+		$options             = $this->get_turnstile_options();
 		$site_key_constant   = defined( 'AYECODE_TURNSTILE_SITE_KEY' );
 		$secret_key_constant = defined( 'AYECODE_TURNSTILE_SECRET_KEY' );
+		$keys_found          = $this->get_site_key() && $this->get_secret_key() ? true : false;
+		$option_verified     = get_option( 'ayecode_turnstile_verified' );
+		$is_verified         = $keys_found && $this->is_verified( false ) ? true : false;
+		$aye_turnstile_setting = true;
+
+		// Set default to know if not set yet.
+		if ( ! $is_verified && $option_verified != 'no' ) {
+			update_option( 'ayecode_turnstile_verified', 'no' );
+		}
 		?>
         <div class="bsui" style="margin-left: -20px;">
             <!-- Clean & Mean UI -->
@@ -136,7 +148,26 @@ class AyeCode_Connect_Turnstile_Settings {
 										)
 									);
 								}
+
+								if ( ! $is_verified && $this->check_verified() ) {
+									echo aui()->alert( array(
+											'type'    => 'danger',
+											'content' => __( 'Turnstile will be added to any frontend forms only after the api keys are successfully verified.', 'ayecode-connect' )
+										)
+									);
+								}
+
+								if ( ! $is_verified && $keys_found ) {
 								?>
+								<?php $this->enqueue_turnstile_script(); ?>
+								<form id="ayecode_turnstile_form" method="POST">
+									<input type="hidden" name="action" value="ayecode_connect_verify_turnstile_keys">
+									<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( "ayecode-turnstile-verify-keys" ) ); ?>">
+									<div class="mb-1" style="height:0;overflow:hidden;width:0">
+									<?php do_action( 'ayecode_verify_turnstile_form_fields' ); ?>
+									</div>
+								</form>
+								<?php } ?>
 
                                 <form method="post" action="options.php">
 									<?php settings_fields( 'ayecode_turnstile_settings' ); ?>
@@ -172,6 +203,20 @@ class AyeCode_Connect_Turnstile_Settings {
 										);
 										?>
                                     </div>
+
+									<input type="hidden" name="ayecode_turnstile_options[check_verified]" id="check_verified" value="1">
+									<?php if ( $keys_found ) { ?>
+									<div class="mb-3 row">
+										<?php if ( $is_verified ) { ?>
+										<div class="col-sm-4"><h3 class="h6"><?php esc_html_e( 'Status', 'ayecode-connect' ); ?></h3></div>
+										<div class="col-sm-8"><button class="btn btn-success btn-sm disabled"><i class="fas fa-check-circle mr-2 me-2"></i><?php esc_html_e( 'Verified', 'ayecode-connect' ); ?></button></div>
+										<?php } else { ?>
+										<div class="col-sm-4"><h3 class="h6"><?php esc_html_e( 'Status', 'ayecode-connect' ); ?></h3></div>
+										<div class="col-sm-8"><button class="btn border-0 disabled text-danger p-0 mr-4 me-4"><i class="fas fa-circle-exclamation mr-2 me-2"></i><?php esc_html_e( 'Not Verified', 'ayecode-connect' ); ?></button><button id="ayecode_turnstile_verify" type="button" data-label-process="<?php esc_html_e( 'Verifying...', 'ayecode-connect' ); ?>" data-label-done="<?php esc_html_e( 'Verified', 'ayecode-connect' ); ?>" class="btn btn-info btn-sm"><?php esc_html_e( 'Verify Keys', 'ayecode-connect' ); ?></button></div>
+										<?php } ?>
+									</div>
+									<div class="aye-turnstile-message mb-3 d-none"></div>
+									<?php } ?>
 
                                     <!-- Appearance -->
                                     <div class="mb-4">
@@ -379,6 +424,177 @@ class AyeCode_Connect_Turnstile_Settings {
             </div>
         </div>
 		<?php
+	}
+
+	/**
+	 * Get turnstile options.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return array Turnstile options.
+	 */
+	public function get_turnstile_options() {
+		$options = get_option( 'ayecode_turnstile_options', $this->settings );
+
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Check keys verification for backward compatibility.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return bool The site key if defined, or an empty string if not available.
+	 */
+	public function check_verified() {
+		$options = $this->get_turnstile_options();
+
+		if ( ! empty( $options['check_verified'] ) ) {
+			return true;
+		}
+
+		// Skip to allow backward compatibility.
+		return false;
+	}
+
+	/**
+	 * Retrieves the site key for the configuration.
+	 *
+	 * This function checks if a predefined constant `AYECODE_TURNSTILE_SITE_KEY` is available and returns its value.
+	 * If the constant is not defined, it retrieves the site key from the options, sanitizes it, and returns the sanitized value.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return string The site key if defined, or an empty string if not available.
+	 */
+	private function get_site_key() {
+		if ( defined( 'AYECODE_TURNSTILE_SITE_KEY' ) ) {
+			return AYECODE_TURNSTILE_SITE_KEY;
+		}
+
+		$options = $this->get_turnstile_options();
+
+		return isset( $options['site_key'] ) ? sanitize_text_field( $options['site_key'] ) : '';
+	}
+
+	/**
+	 * Retrieves the secret key used for authentication or configuration.
+	 *
+	 * This function checks if a constant (`AYECODE_TURNSTILE_SECRET_KEY`) is defined and returns its value if available.
+	 * If the constant is not defined, it attempts to retrieve the secret key from the `options` array, sanitizing the value.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return string Returns the secret key if available; otherwise, returns an empty string.
+	 */
+	private function get_secret_key() {
+		if ( defined( 'AYECODE_TURNSTILE_SECRET_KEY' ) ) {
+			return AYECODE_TURNSTILE_SECRET_KEY;
+		}
+
+		$options = $this->get_turnstile_options();
+
+		return isset( $options['secret_key'] ) ? sanitize_text_field( $options['secret_key'] ) : '';
+	}
+
+	/**
+	 * Enqueue turnstile script.
+	 *
+	 * @since.1.4.3
+	 */
+	public function enqueue_turnstile_script() {
+		add_action( 'admin_footer', array( $this, 'add_turnstile_script' ) );
+	}
+
+	/**
+	 * Check turnstile is verified.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @param bool $skip_check Force true for backward compatibility.
+	 * @return bool True if validated, else False.
+	 */
+	public function is_verified( $skip_check = false ) {
+		if ( $skip_check && ! $this->check_verified() ) {
+			return true;
+		}
+
+		$option_value = get_option( 'ayecode_turnstile_verified' );
+
+		if ( empty( $option_value ) || $option_value == 'no' ) {
+			return false;
+		}
+
+		$site_key = $this->get_site_key();
+		if ( empty( $site_key ) ) {
+			return false;
+		}
+
+		$secret_key = $this->get_secret_key();
+		if ( empty( $secret_key ) ) {
+			return false;
+		}
+
+		$is_verified = $option_value === md5( $site_key . '::' . $secret_key ) ? true : false;
+
+		return $is_verified;
+	}
+
+	/**
+	 * Add turnstile script in footer.
+	 *
+	 * @since.1.4.3
+	 */
+	public function add_turnstile_script() {
+?>
+<script type="text/javascript">
+jQuery(function($){
+	$('input#site_key,input#secret_key').on('change', function() {
+		$('#ayecode_turnstile_verify').hide();
+	});
+	$('#ayecode_turnstile_verify').on('click', function() {
+		var $btn = $(this);
+
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			dataType: 'json',
+			data: $("#ayecode_turnstile_form").serialize(),
+			beforeSend: function() {
+				$btn.prop('disabled', true);
+				$btn.data('label-default', $btn.text());
+				$btn.text($btn.data('label-process'));
+				$('.aye-turnstile-message').addClass('d-none').html('');
+			},
+			success: function(res, textStatus, xhr) {
+				if (res.data) {
+					$('.aye-turnstile-message').removeClass('d-none').html(res.data);
+				}
+
+				if (res.success) {
+					$btn.text($btn.data('label-done'));
+					$btn.removeClass('btn-info').addClass('btn-success');
+					window.location.reload();
+				} else {
+					$btn.prop('disabled', false);
+					$btn.text($btn.data('label-default'));
+				}
+			},
+			error: function(xhr, textStatus, errorThrown) {
+				$btn.prop('disabled', false);
+				$btn.text($btn.data('label-default'));
+				console.log(textStatus);
+				$('.aye-turnstile-message').removeClass('d-none').html(textStatus);
+			}
+		});
+	});
+});
+</script>
+<?php
 	}
 }
 
