@@ -743,6 +743,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 
+			// check if unauthorised, in this case something is wrong and we should disconnect.
+			if ( 401 == wp_remote_retrieve_response_code( $response ) && !empty($body->code) && 'rest_forbidden' === $body->code ) {
+				$this->disconnect_site(false);
+
+				// Set a transient for 1 month so we can show a warning
+				set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
+			}
+
 			return $body;
 		}
 
@@ -1614,7 +1622,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			// Cloudflare can provide a comma separated ip list
 			if ( strpos( $ip, ',' ) !== false ) {
-				$ip = reset( explode( ",", $ip ) );
+				$array = explode( ",", $ip );
+				$ip    = reset( $array );
 			}
 
 			return $ip;
