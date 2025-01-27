@@ -84,6 +84,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 = 1.4.3 - TBD =
 * Cloned staging site modifies the connected site url - FIXED
 * Option added to validate Turnstile api keys - ADDED
+* Staging sites can look connected when not authorised, now auto disconnected on authorisation fail - CHANGED
 
 = 1.4.2 - 2024-12-20 =
 * Turnstile protection switches not indicating off value - FIXED
