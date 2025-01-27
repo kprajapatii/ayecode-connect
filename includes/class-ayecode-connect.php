@@ -1694,21 +1694,23 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$result = false;
 
 			// Get current site URL
-			$connected_site_url = $connected_site_url ? trailingslashit( str_replace( array( "http://", "https://" ), "", $connected_site_url ) ): get_option( $this->prefix . "_url" );
+			$connected_site_url = $connected_site_url ? trailingslashit( str_replace( array( "http://", "https://" ), "", $connected_site_url ) ) : $this->get_site_url( true, true );
 
 			// Get the current site URL
-			$site_url = trailingslashit( str_replace( array( "http://","https://" ),"", site_url() ) );
+			$site_url = trailingslashit( str_replace( array( "http://", "https://" ), "", site_url() ) );
 
 			// If current site URL is empty then add it
 			if ( empty( $connected_site_url ) ) {
 				$connected_site_url = $site_url;
-				update_option( $this->prefix . "_url", $connected_site_url );
+
+				// Save site url.
+				$this->save_site_url( $connected_site_url );
 			}
 
 			// Check for site URL change, disconnect site and add warning
 			if ( $site_url && $site_url !== '/' && $connected_site_url && $connected_site_url != $site_url ) {
 				// Disconnect site but not from remote (that would invalidate the other site)
-				$this->disconnect_site(false);
+				$this->disconnect_site( false );
 
 				// Set a transient for 1 month so we can show a warning
 				set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
@@ -1971,6 +1973,53 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					exit;
 				}
 			}
+		}
+
+		public function save_site_url( $site_url ) {
+			$site_url = $this->_base64_encode( $site_url );
+
+			update_option( $this->prefix . '_url', $site_url );
+
+			return $site_url;
+		}
+
+		public function get_site_url( $clean = true, $check = false ) {
+			$site_url = get_option( $this->prefix . '_url', '' );
+
+			// Check and re-save as encoded.
+			if ( $check && ! $this->is_encoded( $site_url ) ) {
+				$site_url = $this->save_site_url( $site_url );
+			}
+
+			if ( ! $clean ) {
+				return $site_url;
+			}
+
+			return $this->_base64_decode( $site_url );
+		}
+
+		public function is_encoded( $string ) {
+			return $string && strpos( $string, 'ayecode:' ) === 0 ? true : false;
+		}
+
+		public function _base64_encode( $string ) {
+			if ( $this->is_encoded( $string ) ) {
+				$encoded = $string;
+			} else {
+				$encoded = ! is_null( $string ) ? 'ayecode:' . base64_encode( $string ) : ''; // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+			}
+
+			return $encoded;
+		}
+
+		public function _base64_decode( $string ) {
+			if ( $this->is_encoded( $string ) ) {
+				$decoded = base64_decode( str_replace( 'ayecode:', '', $string ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+			} else {
+				$decoded = ! is_null( $string ) ? $string : '';
+			}
+
+			return $decoded;
 		}
 	}
 endif;

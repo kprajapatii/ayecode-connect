@@ -19,6 +19,7 @@ class AyeCode_Connect_Turnstile {
 			'secret_key'    => '',
 			'theme'         => 'light',
 			'size'          => 'normal',
+			'check_verified'=> '',
 			'disable_roles' => [],
 			'protections'   => array(
 				'login'            => 1,
@@ -63,6 +64,10 @@ class AyeCode_Connect_Turnstile {
 	}
 
 	private function init_hooks() {
+		// Verify turnstile API keys.
+		add_action( 'ayecode_verify_turnstile_form_fields', array( $this, 'add_turnstile_widget' ) );
+		add_action( 'wp_ajax_ayecode_connect_verify_turnstile_keys', array( $this, 'verify_turnstile_keys' ) );
+
 		// Only initialize if we have valid keys
 		if ( $this->get_site_key() && $this->get_secret_key() && ! $this->check_role_disabled() ) {
 
@@ -175,8 +180,6 @@ class AyeCode_Connect_Turnstile {
 			} else {
 				add_action( 'wp_footer', array( $this, 'add_lazy_load_script' ) );
 			}
-
-
 		}
 	}
 
@@ -354,6 +357,16 @@ class AyeCode_Connect_Turnstile {
 	 * @return void This method does not return a value; it directly outputs the widget's HTML and JavaScript.
 	 */
 	public function add_turnstile_widget() {
+		global $aye_turnstile_setting;
+
+		if ( $this->check_verified() ) {
+			// Force true for backward compatibility.
+			if ( ! ( $aye_turnstile_setting && is_admin() ) && ! $this->is_verified() ) {
+				?><!-- Turnstile keys not verified --><?php
+				return;
+			}
+		}
+
 		$doing_ajax = wp_doing_ajax() ? 'ajax-' : '';
 		$id         = 'cf-turnstile-' . esc_attr( $doing_ajax ) . absint( $this->widget_count ++ );
 		?>
@@ -476,10 +489,18 @@ class AyeCode_Connect_Turnstile {
 	 * Verify the cloudflare turnstile response.
 	 *
 	 * @param $context
+	 * @param $is_admin True when call from setting page verification.
 	 *
 	 * @return true|WP_Error
 	 */
-	private function verify_turnstile( $context = '' ) {
+	private function verify_turnstile( $context = '', $is_admin = false ) {
+		if ( ! $is_admin && $this->check_verified() ) {
+			// Force true for backward compatibility.
+			if ( ! $this->is_verified() ) {
+				return true;
+			}
+		}
+
 		if ( ! isset( $_POST['cf-turnstile-response'] ) ) {
 			return new WP_Error(
 				'turnstile_missing',
@@ -492,7 +513,7 @@ class AyeCode_Connect_Turnstile {
 		if ( empty( $token ) ) {
 			return new WP_Error(
 				'turnstile_empty',
-				__( 'Security verification failed.', 'ayecode-connect' )
+				$is_admin ? __( 'Please try again. Turnstile response field is empty. Check the keys are setup properly.', 'ayecode-connect' ) : __( 'Security verification failed.', 'ayecode-connect' )
 			);
 		}
 
@@ -780,6 +801,116 @@ class AyeCode_Connect_Turnstile {
 			wp_send_json_error( $verify->get_error_message() );
 		}
 
+	}
+
+	/**
+	 * Check keys verification for backward compatibility.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return bool The site key if defined, or an empty string if not available.
+	 */
+	public function check_verified() {
+		if ( ! empty( $this->options['check_verified'] ) ) {
+			return true;
+		}
+
+		// Skip to allow backward compatibility.
+		return false;
+	}
+
+	/**
+	 * Check turnstile is verified.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @param bool $skip_check Force true for backward compatibility.
+	 * @return bool True if validated, else False.
+	 */
+	public function is_verified( $skip_check = false ) {
+		if ( $skip_check && ! $this->check_verified() ) {
+			return true;
+		}
+
+		$option_value = get_option( 'ayecode_turnstile_verified' );
+
+		if ( empty( $option_value ) || $option_value == 'no' ) {
+			return false;
+		}
+
+		$site_key = $this->get_site_key();
+		if ( empty( $site_key ) ) {
+			return false;
+		}
+
+		$secret_key = $this->get_secret_key();
+		if ( empty( $secret_key ) ) {
+			return false;
+		}
+
+		$is_verified = $option_value === md5( $site_key . '::' . $secret_key ) ? true : false;
+
+		return $is_verified;
+	}
+
+	/**
+	 * Verify turnstile keys.
+	 *
+	 * @since.1.4.3
+	 *
+	 * @return bool True if validated, else False.
+	 */
+	public function verify_turnstile_keys() {
+		$nonce = ! empty( $_REQUEST['security'] ) ? sanitize_text_field( $_REQUEST['security'] ) : '';
+
+		if ( ! ( $nonce && wp_verify_nonce( $nonce, 'ayecode-turnstile-verify-keys' ) ) ) {
+			$error = aui()->alert( array(
+					'type' => 'danger',
+					'content' => __( 'Security verification failed, please try again.', 'ayecode-connect' )
+				)
+			);
+
+			update_option( 'ayecode_turnstile_verified', 'no' );
+
+			wp_send_json_error( $error );
+		}
+
+		$response = $this->verify_turnstile( 'verify_keys', true );
+
+		if ( is_wp_error( $response ) ) {
+			$error = aui()->alert( array(
+					'type' => 'danger',
+					'content' => $response->get_error_message()
+				)
+			);
+
+			update_option( 'ayecode_turnstile_verified', 'no' );
+
+			wp_send_json_error( $error );
+		}
+
+		$success = aui()->alert( array(
+				'type' => 'success',
+				'content' => __( 'Turnstile API keys are verified successfully.', 'ayecode-connect' )
+			)
+		);
+
+		// Set check_verified when keys are verified with backward compatibility settings.
+		if ( empty( $this->options['check_verified'] ) ) {
+			$saved_options = get_option( 'ayecode_turnstile_options', array() );
+
+			if ( isset( $saved_options['site_key'] ) ) {
+				$saved_options['check_verified'] = 1;
+			}
+
+			update_option( 'ayecode_turnstile_options', $saved_options );
+		}
+
+		update_option( 'ayecode_turnstile_verified', md5( $this->get_site_key() . '::' . $this->get_secret_key() ) );
+
+		wp_send_json_success( $success );
+
+		wp_die();
 	}
 }
 
