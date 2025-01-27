@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 4.7
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -81,7 +81,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.3 - TBD =
+= 1.4.3 - 2025-01-27 =
 * Cloned staging site modifies the connected site url - FIXED
 * Option added to validate Turnstile api keys - ADDED
 * Staging sites can look connected when not authorised, now auto disconnected on authorisation fail - CHANGED
