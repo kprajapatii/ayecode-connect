@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.5 - TBD =
+* Captcha don't render on Turnstile setting page when disabled for admin role - FIXED
+
 = 1.4.4 - 2025-01-27 =
 * Cloned staging site modifies the connected site url - FIXED
 * Option added to validate Turnstile api keys - ADDED
