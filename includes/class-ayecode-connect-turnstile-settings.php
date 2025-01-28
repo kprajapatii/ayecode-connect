@@ -160,13 +160,29 @@ class AyeCode_Connect_Turnstile_Settings {
 								if ( ! $is_verified && $keys_found ) {
 								?>
 								<?php $this->enqueue_turnstile_script(); ?>
-								<form id="ayecode_turnstile_form" method="POST">
-									<input type="hidden" name="action" value="ayecode_connect_verify_turnstile_keys">
-									<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( "ayecode-turnstile-verify-keys" ) ); ?>">
-									<div class="mb-1" style="height:0;overflow:hidden;width:0">
-									<?php do_action( 'ayecode_verify_turnstile_form_fields' ); ?>
-									</div>
-								</form>
+                                        <div class="row alert alert-danger">
+                                            <div class="  col-sm-4 col-form-label text form-label">
+                                                <?php
+                                                _e('Keys MUST be verified before use.','ayecode-connect');
+                                                ?>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <form id="ayecode_turnstile_form" method="POST">
+                                                    <input type="hidden" name="action" value="ayecode_connect_verify_turnstile_keys">
+                                                    <input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( "ayecode-turnstile-verify-keys" ) ); ?>">
+                                                    <div class="mb-1" stylex="height:0;overflow:hidden;width:0">
+			                                            <?php
+                                                        do_action( 'ayecode_verify_turnstile_form_fields' );
+			                                            _e('Please complete the captcha and then click "verify keys" below. If captcha is not shown, your keys may be invalid or using "invisible" mode. ','ayecode-connect');
+
+			                                            ?>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                                        </div>
+
 								<?php } ?>
 
                                 <form method="post" action="options.php">
