@@ -64,121 +64,127 @@ class AyeCode_Connect_Turnstile {
 	}
 
 	private function init_hooks() {
+		global $pagenow;
+
 		// Verify turnstile API keys.
 		add_action( 'ayecode_verify_turnstile_form_fields', array( $this, 'add_turnstile_widget' ) );
 		add_action( 'wp_ajax_ayecode_connect_verify_turnstile_keys', array( $this, 'verify_turnstile_keys' ) );
 
 		// Only initialize if we have valid keys
-		if ( $this->get_site_key() && $this->get_secret_key() && ! $this->check_role_disabled() ) {
-
-			// WP Login protection
-			if ( ! empty( $this->options['protections']['login'] ) ) {
-				add_action( 'login_form', array( $this, 'add_turnstile_widget' ) );
-				add_filter( 'authenticate', array( $this, 'verify_login' ), 99, 3 );
-			}
-
-
-			// WP forgot password
-			if ( ! empty( $this->options['protections']['forgot_password'] ) ) {
-				add_action( 'lostpassword_form', array( $this, 'add_turnstile_widget' ) );
-				add_action( 'lostpassword_post', array( $this, 'verify_lost_password' ) );
-			}
-
-			// WP Registration protection
-			if ( ! empty( $this->options['protections']['register'] ) ) {
-				add_action( 'register_form', array( $this, 'add_turnstile_widget' ) );
-				add_filter( 'registration_errors', array( $this, 'verify_registration' ), 99, 3 );
-			}
-
-			// Comments protection @todo this should show just before the submit button, maybe via JS
-			if ( ! empty( $this->options['protections']['comments'] ) ) {
-				add_action( 'comment_form_submit_button', array( $this, 'add_turnstile_widget_comments' ), 10, 2 );
-				add_action( 'pre_comment_on_post', array( $this, 'verify_comment' ) );
-			}
-
-
-			// GD Add listing, we only check new listings not updates
-			if ( ! empty( $this->options['protections']['gd_add_listing'] ) ) {
-				$post_info = null;
-				if ( isset( $_REQUEST['pid'] ) && $_REQUEST['pid'] != '' ) {
-					$post_id   = $_REQUEST['pid'];
-					$post_info = get_post( $post_id );
+		if ( $this->get_site_key() && $this->get_secret_key() ) {
+			if ( $pagenow && $pagenow == 'admin.php' && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'ayecode-turnstile' ) {
+				// Load script on turnstile settings page.
+				add_action( 'admin_footer', array( $this, 'add_lazy_load_script' ) );
+			} else if ( ! $this->check_role_disabled() ) {
+				// WP Login protection
+				if ( ! empty( $this->options['protections']['login'] ) ) {
+					add_action( 'login_form', array( $this, 'add_turnstile_widget' ) );
+					add_filter( 'authenticate', array( $this, 'verify_login' ), 99, 3 );
 				}
 
-				if ( empty( $post_info ) ) {
-					add_action( 'geodir_after_main_form_fields', array(
+
+				// WP forgot password
+				if ( ! empty( $this->options['protections']['forgot_password'] ) ) {
+					add_action( 'lostpassword_form', array( $this, 'add_turnstile_widget' ) );
+					add_action( 'lostpassword_post', array( $this, 'verify_lost_password' ) );
+				}
+
+				// WP Registration protection
+				if ( ! empty( $this->options['protections']['register'] ) ) {
+					add_action( 'register_form', array( $this, 'add_turnstile_widget' ) );
+					add_filter( 'registration_errors', array( $this, 'verify_registration' ), 99, 3 );
+				}
+
+				// Comments protection @todo this should show just before the submit button, maybe via JS
+				if ( ! empty( $this->options['protections']['comments'] ) ) {
+					add_action( 'comment_form_submit_button', array( $this, 'add_turnstile_widget_comments' ), 10, 2 );
+					add_action( 'pre_comment_on_post', array( $this, 'verify_comment' ) );
+				}
+
+
+				// GD Add listing, we only check new listings not updates
+				if ( ! empty( $this->options['protections']['gd_add_listing'] ) ) {
+					$post_info = null;
+					if ( isset( $_REQUEST['pid'] ) && $_REQUEST['pid'] != '' ) {
+						$post_id   = $_REQUEST['pid'];
+						$post_info = get_post( $post_id );
+					}
+
+					if ( empty( $post_info ) ) {
+						add_action( 'geodir_after_main_form_fields', array(
+							$this,
+							'add_gd_add_listing_turnstile_widget_wrap'
+						), 0 );
+					}
+					add_filter( 'geodir_validate_ajax_save_post_data', array( $this, 'verify_add_listing' ), 5, 3 );
+				}
+
+				// GD Report Post geodir_report_post_form_after_fields
+				if ( ! empty( $this->options['protections']['gd_report_post'] ) ) {
+					add_action( 'geodir_report_post_form_after_fields', array( $this, 'add_turnstile_widget' ) );
+					add_action( 'geodir_report_post_validate_data', array( $this, 'verify_report_post' ), 10, 3 );
+				}
+
+				// GD Claim Listing standard form
+				if ( ! empty( $this->options['protections']['gd_claim_listing'] ) ) {
+					add_action( 'geodir_claim_post_form_after_fields', array( $this, 'add_turnstile_widget' ) );
+					add_filter( 'geodir_validate_ajax_claim_listing_data', array(
 						$this,
-						'add_gd_add_listing_turnstile_widget_wrap'
-					), 0 );
+						'claim_listing_form_check'
+					), 10, 2 );
 				}
-				add_filter( 'geodir_validate_ajax_save_post_data', array( $this, 'verify_add_listing' ), 5, 3 );
-			}
-
-			// GD Report Post geodir_report_post_form_after_fields
-			if ( ! empty( $this->options['protections']['gd_report_post'] ) ) {
-				add_action( 'geodir_report_post_form_after_fields', array( $this, 'add_turnstile_widget' ) );
-				add_action( 'geodir_report_post_validate_data', array( $this, 'verify_report_post' ), 10, 3 );
-			}
-
-			// GD Claim Listing standard form
-			if ( ! empty( $this->options['protections']['gd_claim_listing'] ) ) {
-				add_action( 'geodir_claim_post_form_after_fields', array( $this, 'add_turnstile_widget' ) );
-				add_filter( 'geodir_validate_ajax_claim_listing_data', array(
-					$this,
-					'claim_listing_form_check'
-				), 10, 2 );
-			}
 
 
-			// UWP Forms
-			add_action( 'uwp_template_fields', array( $this, 'add_turnstile_uwp_forms' ), 10, 1 );
-			add_filter( 'uwp_validate_result', array( $this, 'verify_uwp' ), 10, 3 );
+				// UWP Forms
+				add_action( 'uwp_template_fields', array( $this, 'add_turnstile_uwp_forms' ), 10, 1 );
+				add_filter( 'uwp_validate_result', array( $this, 'verify_uwp' ), 10, 3 );
 
-			// UWP Frontend Post Addon
-			if ( ! empty( $this->options['protections']['uwp_frontend'] ) ) {
-				add_action( 'uwp_frontend_post_after_form_fields', array(
-					$this,
-					'add_turnstile_widget'
-				), 10, 3 ); // frontend post addon
-				add_action( 'wp_ajax_uwp_fep_post_submit', array( $this, 'verify_uwp_frontend_post' ), 5 );
-				add_action( 'wp_ajax_nopriv_uwp_fep_post_submit', array( $this, 'verify_uwp_frontend_post' ), 5 );
-			}
-
-
-			// BlockStrap Contact Form
-			if ( ! empty( $this->options['protections']['bs_contact'] ) ) {
-				add_filter( 'getpaid_before_payment_form_pay_button', array( $this, 'add_turnstile_widget' ), 10, 2 );
-				add_action( 'getpaid_checkout_error_checks', array( $this, 'verify_getpaid_checkout_form' ), 10, 2 );
-
-				// Remove Google reCaptcha checks
-				remove_action( 'getpaid_before_payment_form_pay_button', 'getpaid_display_recaptcha_before_payment_button' );
-				remove_action( 'getpaid_checkout_error_checks', 'getpaid_validate_recaptcha_response' );
-			}
+				// UWP Frontend Post Addon
+				if ( ! empty( $this->options['protections']['uwp_frontend'] ) ) {
+					add_action( 'uwp_frontend_post_after_form_fields', array(
+						$this,
+						'add_turnstile_widget'
+					), 10, 3 ); // frontend post addon
+					add_action( 'wp_ajax_uwp_fep_post_submit', array( $this, 'verify_uwp_frontend_post' ), 5 );
+					add_action( 'wp_ajax_nopriv_uwp_fep_post_submit', array( $this, 'verify_uwp_frontend_post' ), 5 );
+				}
 
 
-			// GetPaid CCheckout Form
-			if ( ! empty( $this->options['protections']['gp_checkout'] ) ) {
-				add_filter( 'blockstrap_blocks_contact_form_captcha_input', array(
-					$this,
-					'blockstrap_blocks_contact_form_captcha_input'
-				), 10, 2 );
-				add_action( 'blockstrap_blocks_contact_form_captcha_valid', array(
-					$this,
-					'verify_blockstrap_contact_form'
-				), 10, 2 );
-			}
+				// BlockStrap Contact Form
+				if ( ! empty( $this->options['protections']['bs_contact'] ) ) {
+					add_filter( 'getpaid_before_payment_form_pay_button', array( $this, 'add_turnstile_widget' ), 10, 2 );
+					add_action( 'getpaid_checkout_error_checks', array( $this, 'verify_getpaid_checkout_form' ), 10, 2 );
 
-			// Add lazy loading script
-			if ( is_admin() ) {
-				add_action( 'admin_footer', array( $this, 'add_lazy_load_script' ) ); //@todo do we need this?
-			} elseif ( in_array( $GLOBALS['pagenow'], array(
-				'wp-login.php',
-				'wp-register.php'
-			) ) ) { // @todo test on sub domain install
-				add_action( 'login_footer', array( $this, 'add_lazy_load_script' ) );
-				add_action( 'login_footer', array( $this, 'adjust_login_form_size_css' ) );
-			} else {
-				add_action( 'wp_footer', array( $this, 'add_lazy_load_script' ) );
+					// Remove Google reCaptcha checks
+					remove_action( 'getpaid_before_payment_form_pay_button', 'getpaid_display_recaptcha_before_payment_button' );
+					remove_action( 'getpaid_checkout_error_checks', 'getpaid_validate_recaptcha_response' );
+				}
+
+
+				// GetPaid CCheckout Form
+				if ( ! empty( $this->options['protections']['gp_checkout'] ) ) {
+					add_filter( 'blockstrap_blocks_contact_form_captcha_input', array(
+						$this,
+						'blockstrap_blocks_contact_form_captcha_input'
+					), 10, 2 );
+					add_action( 'blockstrap_blocks_contact_form_captcha_valid', array(
+						$this,
+						'verify_blockstrap_contact_form'
+					), 10, 2 );
+				}
+
+				// Add lazy loading script
+				if ( is_admin() ) {
+					add_action( 'admin_footer', array( $this, 'add_lazy_load_script' ) ); //@todo do we need this?
+				} else if ( $pagenow && in_array( $pagenow, array(
+					'wp-login.php',
+					'wp-register.php'
+				) ) ) { // @todo test on sub domain install
+					add_action( 'login_footer', array( $this, 'add_lazy_load_script' ) );
+					add_action( 'login_footer', array( $this, 'adjust_login_form_size_css' ) );
+				} else {
+					add_action( 'wp_footer', array( $this, 'add_lazy_load_script' ) );
+				}
 			}
 		}
 	}
