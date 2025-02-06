@@ -755,9 +755,10 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					</div>
 					<div class="ac-footer border-top mt-5">
 						<p class="text-muted h6 mt-4"><?php _e( 'AyeCode Ltd are the creators of:', 'ayecode-connect' ); ?>
-							<a href="https://wpgeodirectory.com/">wpgeodirectory.com</a>,
-							<a href="https://wpgetpaid.com/">wpgetpaid.com</a> &
-							<a href="https://userswp.io/">userswp.io</a>
+							<a target="_blank" href="https://wpgeodirectory.com/">wpgeodirectory.com</a>,
+							<a target="_blank" href="https://wpgetpaid.com/">wpgetpaid.com</a>,
+							<a target="_blank" href="https://userswp.io/">userswp.io</a> &
+							<a target="_blank" href="https://wpblockstrap.com/">wpblockstrap.com</a>
 						</p>
 					</div>
 
