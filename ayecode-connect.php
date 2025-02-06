@@ -3,10 +3,10 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.4.4
+ * Version: 1.4.5
  * Author: AyeCode
  * Author URI: https://ayecode.io
- * Requires at least: 4.7
+ * Requires at least: 5.0
  * Tested up to: 6.7
  *
  * Text Domain: ayecode-connect
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-	define( 'AYECODE_CONNECT_VERSION', '1.4.4' );
+	define( 'AYECODE_CONNECT_VERSION', '1.4.5' );
 }
 
 if ( !defined( 'AYECODE_CONNECT_SSL_VERIFY' ) ) {
@@ -43,28 +43,22 @@ function ayecode_connect() {
 	 */
 	require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
-	//Include the client connection class
+	// Include the client connection class
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect.php';
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile-settings.php';
-    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile-settings.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile.php';
 
-	//Prepare client args
-	$args   = ayecode_connect_args();
+	// Prepare client args
+	$args = ayecode_connect_args();
 
 	$ayecode_connect = new AyeCode_Connect( $args );
 
-	//Call the init method to register routes. This should be called exactly once per client (Preferably before the init hook).
+	// Call the init method to register routes. This should be called exactly once per client (Preferably before the init hook).
 	$ayecode_connect->init();
 
 	// Determines the current locale.
-	if ( function_exists( 'determine_locale' ) ) {
-		$locale = determine_locale();
-	} else if ( function_exists( 'get_user_locale' ) ) {
-		$locale = get_user_locale();
-	} else {
-		$locale = get_locale();
-	}
+	$locale = determine_locale();
 
 	$locale = apply_filters( 'plugin_locale', $locale, 'ayecode-connect' );
 

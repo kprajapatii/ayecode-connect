@@ -4,10 +4,10 @@ Donate link: https://www.ko-fi.com/stiofan
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags:  ayecode, service, geodirectory, userswp, getpaid
-Requires at least: 4.7
+Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -16,7 +16,7 @@ Use this service plugin to easily activate any of our products, open a support t
 
 To take full advantage of this plugin you should have one of our plugins installed.
 
-[GeoDirectory](https://wordpress.org/plugins/geodirectory/) | [UsersWP](https://wordpress.org/plugins/userswp/) | [GetPaid](https://wordpress.org/plugins/invoicing/)
+[GeoDirectory](https://wordpress.org/plugins/geodirectory/) | [UsersWP](https://wordpress.org/plugins/userswp/) | [GetPaid](https://wordpress.org/plugins/invoicing/) | [BlockStrap](https://wordpress.org/plugins/blockstrap-page-builder-blocks/)
 
 AyeCode Connect is a service plugin, meaning that it will have no functionality until you connect your site to ours. This link allows us to provide extra services to your site such as live documentation search and submission of support tickets.
 After connecting your site you can install our update plugin which will give you the ability to automatically sync license keys of purchases and also be able to remotely install and update purchased products.
@@ -33,7 +33,7 @@ NOTE: Your site does NOT have to be using Cloudflare to be able to use Cloudflar
 
 = Minimum Requirements =
 
-* WordPress 4.7 or greater
+* WordPress 5.0 or greater
 * PHP version 5.6 or greater
 * MySQL version 5.0 or greater
 
@@ -81,7 +81,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.5 - TBD =
+= 1.4.5 - 2025-02-06 =
 * Captcha don't render on Turnstile setting page when disabled for admin role - FIXED
 
 = 1.4.4 - 2025-01-27 =

@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.4.3\n"
+"Project-Id-Version: AyeCode Connect 1.4.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-27 18:09+0530\n"
-"PO-Revision-Date: 2025-01-27 18:09+0530\n"
+"POT-Creation-Date: 2025-02-06 19:25+0530\n"
+"PO-Revision-Date: 2025-02-06 19:25+0530\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -26,7 +26,7 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-4: vendor/ayecode/wp-font-awesome-settings/"
 "assets\n"
 
-#: ayecode-connect.php:104 includes/class-ayecode-demo-content.php:290
+#: ayecode-connect.php:98 includes/class-ayecode-demo-content.php:290
 #: vendor/ayecode/wp-super-duper/wp-super-duper.php:3247
 msgid "Settings"
 msgstr ""
@@ -288,7 +288,7 @@ msgid "Iconbox filled"
 msgstr ""
 
 #: blocks/class-ayecode-wp-nav.php:271
-#: includes/class-ayecode-connect-turnstile-settings.php:257
+#: includes/class-ayecode-connect-turnstile-settings.php:273
 msgid "Size"
 msgstr ""
 
@@ -576,44 +576,44 @@ msgstr ""
 msgid "AyeCode Ltd are the creators of:"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:779
+#: includes/class-ayecode-connect-settings.php:780
 msgid "Debug Info"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:786
+#: includes/class-ayecode-connect-settings.php:787
 msgid "Connection Info"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:810
+#: includes/class-ayecode-connect-settings.php:811
 msgid "Activation Secret"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:827
+#: includes/class-ayecode-connect-settings.php:828
 msgid "Debug Tools"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:834
+#: includes/class-ayecode-connect-settings.php:835
 msgid "Clear all licenses"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:835
+#: includes/class-ayecode-connect-settings.php:836
 msgid "Test Connection ability"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:847
+#: includes/class-ayecode-connect-settings.php:848
 msgid "All User Licenses Found"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:856
-#: includes/class-ayecode-connect-settings.php:878
+#: includes/class-ayecode-connect-settings.php:857
+#: includes/class-ayecode-connect-settings.php:879
 msgid "No licenses found"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:869
+#: includes/class-ayecode-connect-settings.php:870
 msgid "All Installed Licenses"
 msgstr ""
 
-#: includes/class-ayecode-connect-settings.php:891
+#: includes/class-ayecode-connect-settings.php:892
 msgid ""
 "get_plugins() return <small>(if Update ID is missing from out,  install "
 "helper plugin below)</small>"
@@ -655,185 +655,195 @@ msgid ""
 "successfully verified."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:177
+#: includes/class-ayecode-connect-turnstile-settings.php:166
+msgid "Keys MUST be verified before use."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:176
+msgid ""
+"Please complete the captcha and then click \"verify keys\" below. If captcha "
+"is not shown, your keys may be invalid or using \"invisible\" mode. "
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:193
 msgid "API Keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:184
+#: includes/class-ayecode-connect-turnstile-settings.php:200
 msgid "Site Key"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:197
+#: includes/class-ayecode-connect-turnstile-settings.php:213
 msgid "Secret Key"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:211
-#: includes/class-ayecode-connect-turnstile-settings.php:214
+#: includes/class-ayecode-connect-turnstile-settings.php:227
+#: includes/class-ayecode-connect-turnstile-settings.php:230
 msgid "Status"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:212
-#: includes/class-ayecode-connect-turnstile-settings.php:215
+#: includes/class-ayecode-connect-turnstile-settings.php:228
+#: includes/class-ayecode-connect-turnstile-settings.php:231
 msgid "Verified"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:215
+#: includes/class-ayecode-connect-turnstile-settings.php:231
 msgid "Not Verified"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:215
+#: includes/class-ayecode-connect-turnstile-settings.php:231
 msgid "Verifying..."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:215
+#: includes/class-ayecode-connect-turnstile-settings.php:231
 msgid "Verify Keys"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:223
+#: includes/class-ayecode-connect-turnstile-settings.php:239
 #: vendor/ayecode/wp-super-duper/sd-functions.php:1497
 msgid "Appearance"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:235
+#: includes/class-ayecode-connect-turnstile-settings.php:251
 #: vendor/ayecode/wp-super-duper/sd-functions.php:1034
 msgid "Light"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:236
+#: includes/class-ayecode-connect-turnstile-settings.php:252
 #: vendor/ayecode/wp-super-duper/sd-functions.php:1035
 msgid "Dark"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:237
+#: includes/class-ayecode-connect-turnstile-settings.php:253
 #: vendor/ayecode/wp-super-duper/sd-functions.php:2029
 msgid "Auto"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:239
+#: includes/class-ayecode-connect-turnstile-settings.php:255
 #: includes/class-ayecode-demo-content.php:278 templates/import/site.php:51
 msgid "Theme"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:253
+#: includes/class-ayecode-connect-turnstile-settings.php:269
 msgid "Normal"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:254
+#: includes/class-ayecode-connect-turnstile-settings.php:270
 msgid "Compact"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:255
+#: includes/class-ayecode-connect-turnstile-settings.php:271
 msgid "Flexible"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:266
+#: includes/class-ayecode-connect-turnstile-settings.php:282
 msgid "Enable Protection On"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:272
+#: includes/class-ayecode-connect-turnstile-settings.php:288
 msgid "WordPress Login"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:276
+#: includes/class-ayecode-connect-turnstile-settings.php:292
 msgid "WordPress Registration"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:280
+#: includes/class-ayecode-connect-turnstile-settings.php:296
 msgid "WordPress Forgot Password"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:284
+#: includes/class-ayecode-connect-turnstile-settings.php:300
 msgid "Comments Form (includes GeoDirectory Reviews)"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:293
+#: includes/class-ayecode-connect-turnstile-settings.php:309
 msgid "GeoDirectory Add Listing Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:298
+#: includes/class-ayecode-connect-turnstile-settings.php:314
 msgid "GeoDirectory Report Post Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:306
+#: includes/class-ayecode-connect-turnstile-settings.php:322
 msgid "GeoDirectory Claim Listing Form (standard)"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:313
+#: includes/class-ayecode-connect-turnstile-settings.php:329
 msgid "UsersWP Login"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:317
+#: includes/class-ayecode-connect-turnstile-settings.php:333
 msgid "UsersWP Registration"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:321
+#: includes/class-ayecode-connect-turnstile-settings.php:337
 msgid "UsersWP Forgot Password"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:325
+#: includes/class-ayecode-connect-turnstile-settings.php:341
 msgid "UsersWP Account"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:335
+#: includes/class-ayecode-connect-turnstile-settings.php:351
 msgid "UsersWP Frontend Post"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:344
+#: includes/class-ayecode-connect-turnstile-settings.php:360
 msgid "BlockStrap Contact Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:352
+#: includes/class-ayecode-connect-turnstile-settings.php:368
 msgid "GetPaid Checkout Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:388
+#: includes/class-ayecode-connect-turnstile-settings.php:404
 msgid "Disable for"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:410
+#: includes/class-ayecode-connect-turnstile-settings.php:426
 msgid "Disable for user roles"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:418
+#: includes/class-ayecode-connect-turnstile-settings.php:434
 msgid "Save Changes"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:507
+#: includes/class-ayecode-connect-turnstile.php:513
 msgid "Security verification missing."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:516
+#: includes/class-ayecode-connect-turnstile.php:522
 msgid ""
 "Please try again. Turnstile response field is empty. Check the keys are "
 "setup properly."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:516
-#: includes/class-ayecode-connect-turnstile.php:549
+#: includes/class-ayecode-connect-turnstile.php:522
+#: includes/class-ayecode-connect-turnstile.php:555
 msgid "Security verification failed."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:524
+#: includes/class-ayecode-connect-turnstile.php:530
 msgid "Turnstile configuration error."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:539
+#: includes/class-ayecode-connect-turnstile.php:545
 msgid "Security verification service unavailable."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:603
+#: includes/class-ayecode-connect-turnstile.php:609
 msgid "Password Reset Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:620
+#: includes/class-ayecode-connect-turnstile.php:626
 msgid "Comment Submission Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:869
+#: includes/class-ayecode-connect-turnstile.php:875
 msgid "Security verification failed, please try again."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:894
+#: includes/class-ayecode-connect-turnstile.php:900
 msgid "Turnstile API keys are verified successfully."
 msgstr ""
 
