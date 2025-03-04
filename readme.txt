@@ -81,7 +81,8 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.6 - TBD =
+= 1.4.6 - 2025-TBD =
+* Backend user page "Send Reset Link" button not working due to turnstile check - FIXED
 * Enhance timeout error logging during demo site import - CHANGED
 
 = 1.4.5 - 2025-02-06 =
