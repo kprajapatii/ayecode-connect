@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.6 - TBD =
+* Enhance timeout error logging during demo site import - CHANGED
+
 = 1.4.5 - 2025-02-06 =
 * Captcha don't render on Turnstile setting page when disabled for admin role - FIXED
 

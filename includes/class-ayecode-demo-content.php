@@ -419,7 +419,12 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 							} catch(err) {}
 						},
 						error: function(xhr, textStatus, errorThrown) {
-							alert(textStatus + ': ' + errorThrown);
+							if (!errorThrown) {
+								if (xhr.status === 524) {
+									errorThrown = 'A timeout occurred!';
+								}
+							}
+							aci_error($aci_step, 'Error[' + xhr.status + ']: ' + errorThrown);
 						}
 					});
 				}
