@@ -715,8 +715,8 @@ class AyeCode_Connect_Turnstile {
 				case 'account':
 				case 'frontend':
 
-					// remove the WP check so we don't double-check
-					if ( 'login' === $type ) {
+					// Remove the WP login check so we don't double check.
+					if ( 'login' === $type || 'register' === $type ) {
 						remove_filter( 'authenticate', array( $this, 'verify_login' ), 99 );
 					}
 

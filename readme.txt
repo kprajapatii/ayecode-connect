@@ -84,6 +84,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 = 1.4.6 - 2025-TBD =
 * Backend user page "Send Reset Link" button not working due to turnstile check - FIXED
 * Enhance timeout error logging during demo site import - CHANGED
+* Auto login fails when Auto Approve + Auto Login enabled in UWP register - FIXED
 
 = 1.4.5 - 2025-02-06 =
 * Captcha don't render on Turnstile setting page when disabled for admin role - FIXED
