@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.7
-Stable tag: 1.4.5
+Stable tag: 1.4.6
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -81,7 +81,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.6 - 2025-TBD =
+= 1.4.6 - 2025-03-06 =
 * Backend user page "Send Reset Link" button not working due to turnstile check - FIXED
 * Enhance timeout error logging during demo site import - CHANGED
 * Auto login fails when Auto Approve + Auto Login enabled in UWP register - FIXED
