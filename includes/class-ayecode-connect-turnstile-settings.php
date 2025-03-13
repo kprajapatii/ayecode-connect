@@ -35,6 +35,7 @@ class AyeCode_Connect_Turnstile_Settings {
 			'uwp_frontend'     => 1,
 			'bs_contact'       => 1,
 			'gp_checkout'      => 1,
+			'gd_pay_per_lead'  => 1,
 		)
 	);
 
@@ -324,6 +325,14 @@ class AyeCode_Connect_Turnstile_Settings {
 											];
 										}
 
+										// GD PayPer Lead
+										if ( defined( 'GEODIR_PPL_VERSION' ) ) {
+											$turnstile_protections['gd_pay_per_lead'] = [
+												'title'   => __( 'GeoDirectory PayPer Lead', 'ayecode-connect' ),
+												'default' => true
+											];
+										}
+
 										if ( defined( 'USERSWP_VERSION' ) ) {
 											$turnstile_protections['uwp_login']    = [
 												'title'   => __( 'UsersWP Login', 'ayecode-connect' ),
@@ -369,6 +378,8 @@ class AyeCode_Connect_Turnstile_Settings {
 												'default' => true
 											];
 										}
+
+
 
 
 										$turnstile_protections = apply_filters( 'ayecode_turnstile_protections', $turnstile_protections );

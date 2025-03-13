@@ -29,6 +29,7 @@ class AyeCode_Connect_Turnstile {
 				'gd_add_listing'   => 1,
 				'gd_report_post'   => 1,
 				'gd_claim_listing' => 1,
+				'gd_pay_per_lead'  => 1,
 				'uwp_login'        => 1,
 				'uwp_register'     => 1,
 				'uwp_forgot'       => 1,
@@ -158,6 +159,18 @@ class AyeCode_Connect_Turnstile {
 					// Remove Google reCaptcha checks
 					remove_action( 'getpaid_before_payment_form_pay_button', 'getpaid_display_recaptcha_before_payment_button' );
 					remove_action( 'getpaid_checkout_error_checks', 'getpaid_validate_recaptcha_response' );
+				}
+
+				// GeoDirectory Pay Per Lead
+				if ( ! empty( $this->options['protections']['gd_pay_per_lead'] ) ) {
+					add_filter( 'geodir_ppl_contact_form_captcha_input', array(
+						$this,
+						'blockstrap_blocks_contact_form_captcha_input'
+					), 10, 2 );
+					add_action( 'geodir_ppl_contact_block_form_captcha_valid', array(
+						$this,
+						'verify_blockstrap_contact_form'
+					), 10, 2 );
 				}
 
 
