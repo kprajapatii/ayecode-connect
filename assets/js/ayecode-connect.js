@@ -152,7 +152,7 @@ function ayecode_connect_support($input,$state){
                 if($state){
                     ayecode_connect_init_widget();
                 }else{
-                    window.Beacon('destroy');
+                    AyeCodeConnectWidget.destroy();
                 }
             }else if(data.data){
                 // oh dear, toggle it back

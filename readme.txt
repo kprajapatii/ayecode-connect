@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 1.4.7
+Stable tag: 1.4.8
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -80,6 +80,10 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 1.4.8 - 2025-05-28 =
+* Allow links to documentation in error responses - CHANGED
+* New support widget, removing 3rd party scripts and adding link to view all your tickets - CHANGED
 
 = 1.4.7 - 2025-03-13 =
 * Added turnstile support for GeoDirectory Pay Per Lead addon - ADDED
@@ -291,5 +295,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
   Source: https://ayecode.io/
 
 * Image for Plugins screens ( ayeccode.svg ), Copyright AyeCode Ltd
+  License: CC0 Public Domain
+  Source: https://ayecode.io/
+
+* Images for Support Popup ( team*.jpg ), Copyright AyeCode Ltd
   License: CC0 Public Domain
   Source: https://ayecode.io/

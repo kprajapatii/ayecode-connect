@@ -51,28 +51,28 @@ class AyeCode_Connect_Support {
 	 *
 	 * @var string
 	 */
-	public $ac_beta_beacon_id = 'f115773a-6890-4880-8600-59affa616d05';
+	public $ac_beta_beacon_id = '597998048';
 
 	/**
 	 * GeoDirectory help scout beacon ID.
 	 *
 	 * @var string
 	 */
-	public $gd_beacon_id = 'cf9047de-e433-4975-ae7e-7bb09f276533';
+	public $gd_beacon_id = '3278983422';
 
 	/**
 	 * UsersWP help scout beacon ID.
 	 *
 	 * @var string
 	 */
-	public $uwp_beacon_id = 'e18552cc-bdee-401d-af01-9a01474b144b';
+	public $uwp_beacon_id = '1406029167';
 
 	/**
-	 * UsersWP help scout beacon ID.
+	 * GetPaid free scout beacon ID.
 	 *
 	 * @var string
 	 */
-	public $wpi_beacon_id = 'b5584c88-1f9b-4147-a339-33e79cb2fee5';
+	public $wpi_beacon_id = '617184761';
 
 
 	/**
@@ -248,19 +248,196 @@ class AyeCode_Connect_Support {
 	public function helpscout_base_js() {
 		ob_start();
 		?>
-		<script type="text/javascript">!function (e, t, n) {
-				function a() {
-					var e = t.getElementsByTagName("script")[0], n = t.createElement("script");
-					n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)
-				}
+		<script type="text/javascript">
+            // AyeCode Connect Widget
+            const AyeCodeConnectWidget = {
+                config: {
+                    freescoutBoxId: null,
+                    color: '#007bff',
+                    docsUrl: '#',
+                    prefillName: '',
+                    prefillEmail: '',
+                },
 
-				if (e.Beacon = n = function (t, n, a) {
-						e.Beacon.readyQueue.push({method: t, options: n, data: a})
-					}, n.readyQueue = [], "complete" === t.readyState)return a();
-				e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
-			}(window, document, window.Beacon || function () {
-				});
+                elements: {
+                    helpIcon: null,
+                    popup: null
+                },
+
+                init: function(options) {
+                    // Merge options with defaults
+                    Object.assign(this.config, options);
+
+                    // Create widget after DOM is ready
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', () => this.createWidget());
+                    } else {
+                        this.createWidget();
+                    }
+                },
+
+                createWidget: function() {
+                    // Create help icon
+                    const helpIcon = document.createElement('div');
+                    helpIcon.classList.add('bsui');
+                    helpIcon.innerHTML = `
+            <button type="button" class="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center hover-zoom"
+                    style="position: fixed; bottom: 20px; right: 20px; z-index: 1050; width: 50px; height: 50px; background-color: ${this.config.color}; border-color: ${this.config.color};">
+                <i class="fa-solid fa-life-ring fa-lg text-white fs-3" style="margin-bottom: -2px;"></i>
+            </button>
+        `;
+
+                    // Create popup window
+                    const popup = document.createElement('div');
+                    popup.classList.add('bsui');
+                    popup.innerHTML = `
+            <div class="card shadow p-0 m-0 position-fixed transition-all border-0" style="bottom: 90px; right: 20px; z-index: 1050; width: 320px; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;">
+                <div class="card-header text-center pb-5 pt-4" style="background-color: ${this.config.color}; color: white;">
+                    <h6 class="mb-3"><?php _e('How can we help?','ayecode-connect') ?></h6>
+
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <?php
+					$x = 0;
+					while($x < 5){
+						$x++;
+						$img = plugins_url( 'assets/img/team'.absint($x).'.jpg', dirname( __FILE__ ) );
+						echo '<img src="'.esc_url(  $img  ).'" class="rounded-circle border border-white border-3" style="width: 46px; height: 46px; margin-right: -5px;" />';
+					}
+					?>
+                    </div>
+
+                </div>
+                <div class="card-body p-3 rounded-bottom bg-light">
+                    <div class="d-grid gap-3 mt-n5">
+                        <a href="${this.config.docsUrl}" class="row bg-white text-muted py-4 shadow-sm hover-shadow mx-0 rounded-1 text-start text-decoration-none position-relative" target="_blank">
+                            <span class="col-3 text-center">
+                                <span class="border-0 iconbox fill rounded-circle iconsmall d-inline-block align-middle btn-translucent-primary transition-all stretched-link" >
+                                    <i class="fas fa-book "></i>
+                                </span>
+                            </span>
+                            <span class="col-9 text-start ps-0">
+                                <span class="text-dark fs-sm fw-bold"><?php esc_html_e('Documentation','ayecode-connect'); ?></span>
+                                <p class="text-muted p-0 m-0 fs-xs">
+                                    <?php esc_html_e('Browse the docs to find solutions','ayecode-connect'); ?>
+                                </p>
+                            </span>
+                        </a>
+
+                         <a href="https://support.ayecode.io/help/${this.config.freescoutBoxId}/?f[email]=${this.config.prefillEmail}&f[name]=${this.config.prefillName}" onclick="ayecode_connect_maybe_suggest_support_user_access()" class="row bg-white text-muted py-4 shadow-sm hover-shadow mx-0 rounded-1 text-start text-decoration-none position-relative" target="_blank">
+                            <span class="col-3 text-center">
+                                <span class="border-0 iconbox fill rounded-circle iconsmall d-inline-block align-middle btn-translucent-primary transition-all stretched-link" >
+                                    <i class="far fa-envelope"></i>
+                                </span>
+                            </span>
+                            <span class="col-9 text-start ps-0">
+                                <span class="text-dark fs-sm fw-bold"><?php esc_html_e('Open Support Ticket','ayecode-connect'); ?></span>
+                                <p class="text-muted p-0 m-0 fs-xs">
+                                    <?php esc_html_e('Need more help? We got you!','ayecode-connect'); ?>
+                                </p>
+                            </span>
+                        </a>
+
+                        <a href="https://support.ayecode.io/help/${this.config.freescoutBoxId}/tickets" class="row bg-white text-muted py-4 shadow-sm hover-shadow mx-0 rounded-1 text-start text-decoration-none position-relative" target="_blank">
+                            <span class="col-3 text-center">
+                                <span class="border-0 iconbox fill rounded-circle iconsmall d-inline-block align-middle btn-translucent-primary transition-all stretched-link" >
+                                    <i class="far fa-envelope-open"></i>
+                                </span>
+                            </span>
+                            <span class="col-9 text-start ps-0">
+                                <span class="text-dark fs-sm fw-bold"><?php esc_html_e('View Support Tickets','ayecode-connect'); ?></span>
+                                <p class="text-muted p-0 m-0 fs-xs">
+                                    <?php esc_html_e('View your previous support tickets','ayecode-connect'); ?>
+                                </p>
+                            </span>
+                        </a>
+
+
+                    </div>
+                </div>
+            </div>
+        `;
+
+                    // Add to DOM
+                    document.body.appendChild(helpIcon);
+                    document.body.appendChild(popup);
+
+                    // Store references for later removal
+                    this.elements.helpIcon = helpIcon;
+                    this.elements.popup = popup;
+
+                    // Get elements
+                    const button = helpIcon.querySelector('button');
+                    const buttonIcon = button.querySelector('i');
+                    const popupDiv = popup.querySelector('.card');
+
+                    let isOpen = false;
+
+                    // Toggle popup
+                    button.addEventListener('click', () => {
+                        if (isOpen) {
+                            this.closePopup(popupDiv, buttonIcon);
+                        } else {
+                            this.openPopup(popupDiv, buttonIcon);
+                        }
+                        isOpen = !isOpen;
+                    });
+
+                    // Close popup when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!helpIcon.contains(e.target) && !popup.contains(e.target) && isOpen) {
+                            this.closePopup(popupDiv, buttonIcon);
+                            isOpen = false;
+                        }
+                    });
+                },
+
+                openPopup: function(popupDiv, buttonIcon) {
+                    popupDiv.style.pointerEvents = 'auto';
+                    popupDiv.style.opacity = '1';
+                    popupDiv.style.transform = 'translateY(0)';
+                    buttonIcon.className = 'fas fa-times fa-lg text-white fs-3';
+                },
+
+                closePopup: function(popupDiv, buttonIcon) {
+                    popupDiv.style.opacity = '0';
+                    popupDiv.style.transform = 'translateY(10px)';
+                    buttonIcon.className = 'fa-solid fa-life-ring fa-lg text-white fs-3';
+
+                    // Disable pointer events after animation
+                    setTimeout(() => {
+                        popupDiv.style.pointerEvents = 'none';
+                    }, 300);
+                },
+
+                destroy: function() {
+                    // Remove elements from DOM
+                    if (this.elements.helpIcon) {
+                        this.elements.helpIcon.remove();
+                        this.elements.helpIcon = null;
+                    }
+                    if (this.elements.popup) {
+                        this.elements.popup.remove();
+                        this.elements.popup = null;
+                    }
+
+                    // Reset config
+                    this.config = {
+                        freescoutBoxId: null,
+                        color: '#007bff',
+                        docsUrl: '#',
+                    };
+                }
+            };
 		</script>
+        <style>
+            .bsui .d-grid .text-decoration-none{
+                top: 0;
+                transition: top ease 0.2s !important;
+            }
+            .bsui .d-grid .text-decoration-none:hover{
+                top: -2px !important;
+            }
+        </style>
 		<?php
 		return ob_get_clean();
 	}
@@ -277,7 +454,8 @@ class AyeCode_Connect_Support {
 		if ( ! $beacon_id ) {
 			return '';
 		}
-		$signature = $this->get_signature( $beacon_id );
+		$documentation_url = $this->get_documentation_url( $beacon_id );
+		$brand_color = $this->get_brand_color( $beacon_id );
 		ob_start();
 		?>
 		<script type="text/javascript">
@@ -296,13 +474,10 @@ class AyeCode_Connect_Support {
 			 * Fire the support access message if sent and then closed.
 			 */
 			function ayecode_connect_maybe_suggest_support_user_access() {
-				if (ayecodeSupportSent) {
-					<?php
-					$message_id = $this->get_message_id( $beacon_id, 'support-sent' );
-					if ( $message_id ) {
-						echo "window.Beacon('show-message', '" . esc_attr( $message_id ) . "',{ force: true });";
-					}
-					?>
+				if (!ayecodeSupportSent) {
+                    // aui_modal('Maybe Enable Support Access?','If you think your issue might require support access, please enable the support user from AyeCode Connect. This can speed up the resolution time.',$footer,$dismissible,$class,$dialog_class,$body_class);
+                    aui_modal('<?php esc_attr_e( 'Enable Support User Access?','ayecode-connect' );?>','<p class="fw-bold"><?php esc_attr_e( 'AyeCode Connect: If you think your issue might require support access, please enable the support user from AyeCode Connect. This can speed up the resolution time.','ayecode-connect' );?></p>','<a href="<?php echo esc_url( admin_url( "admin.php?page=ayecode-connect" ) ); ?>" class="btn btn-primary"><?php esc_attr_e( 'Go to Settings','ayecode-connect' );?></a>',true);
+                    ayecode_connect_set_support_sent()
 				}
 			}
 
@@ -310,75 +485,15 @@ class AyeCode_Connect_Support {
 			 * Fire up the support widget.
 			 */
 			function ayecode_connect_init_widget() {
-				// reset the beacon
-				window.Beacon('logout');
 
-				window.Beacon('init', '<?php echo esc_attr( $beacon_id );?>');
+                AyeCodeConnectWidget.init({
+                    freescoutBoxId: '<?php echo esc_attr( $beacon_id );?>',
+                    color: '<?php echo esc_attr( $brand_color );?>',
+                    docsUrl: '<?php echo esc_url( $documentation_url );?>',
+                    prefillName: '<?php echo esc_attr( $this->name );?>',
+                    prefillEmail: '<?php echo esc_attr( $this->email );?>',
+                });
 
-				<?php
-				// maybe identify connected user
-				if($this->name && $this->email){
-				?>
-				window.Beacon('identify', {
-					name: '<?php echo addslashes( $this->name ); ?>',
-					email: '<?php echo addslashes( $this->email ); ?>',
-					<?php
-					if ( $signature ) {
-						echo "signature: '$signature',";
-					}
-					?>
-
-				});
-
-				// maybe suggest support access on email send
-				window.Beacon('on', 'close', ayecode_connect_maybe_suggest_support_user_access);
-				window.Beacon('on', 'email-sent', ayecode_connect_set_support_sent);
-
-
-					<?php
-					if ( $this->ac_beta_beacon_id == $beacon_id ) {
-						?>
-						// beta feedback config
-						Beacon('config', {
-							display: {
-								style: 'text',
-								text: 'Feedback'
-							}
-						});
-						Beacon('prefill', {
-							subject: 'Demo Data Import Feedback'
-						});
-						<?php
-					}else{
-						?>
-						// standard config
-						Beacon('config', {
-							display: {
-								style: 'iconAndText',
-								text: 'help'
-							}
-						});
-						<?php
-					}
-
-
-				}
-
-				// Set session data
-				$data = $this->get_session_data();
-
-				if(! empty( $data )){
-				?>
-				window.Beacon('session-data', {
-					<?php
-					foreach ( $data as $label => $value ) {
-						echo "'" . addslashes( esc_attr( $label ) ) . "': " . "'" . addslashes( esc_attr( $value ) ) . "',";
-					}
-					?>
-				});
-				<?php
-				};
-				?>
 			}
 
 			// run if enabled
@@ -415,58 +530,50 @@ class AyeCode_Connect_Support {
 	}
 
 	/**
-	 * Get message id depending on beacon id.
-	 *
+     * Get the documentation url depending on the active beacon id.
+     *
 	 * @param $beacon_id
-	 * @param $type
 	 *
-	 * @return string|void
+	 * @return string
 	 */
-	public function get_message_id( $beacon_id, $type ) {
-		$messages   = array();
-		$message_id = '';
-		if ( $beacon_id == $this->gd_beacon_id ) {
-			$messages['support-sent'] = 'd7db9fd8-c81a-42ee-8e58-43db6a6d277c';
+	public function get_documentation_url( $beacon_id ) {
+		// page conditions
+		if ( $beacon_id == $this->gd_beacon_id  ) {
+			$url = 'https://wpgeodirectory.com/documentation/';
 		} elseif ( $beacon_id == $this->uwp_beacon_id ) {
-			$messages['support-sent'] = '5a8981bb-627e-43c2-85bd-8b3dfa1925ba';
-		} elseif ( $beacon_id == $this->wpi_beacon_id ) {
-			$messages['support-sent'] = 'd9d4a2b1-a744-4a7e-8319-bd52dc8131b3';
+			$url = 'https://userswp.io/documentation/';
+		} elseif ( $beacon_id == $this->wpi_beacon_id  ) {
+			$url = 'https://wpgetpaid.com/documentation/';
+		}else{
+			$url = 'https://wpgeodirectory.com/documentation/';
 		}
 
-		// check if exists
-		if ( ! empty( $messages[ $type ] ) ) {
-			$message_id = esc_attr( $messages[ $type ] );
-		}
-
-		return $message_id;
+		return $url;
 	}
 
 	/**
-	 * Gather some basic info to send with the support request.
+	 * Get the brand color.
 	 *
-	 * @return array
+	 * @param $beacon_id
+	 *
+	 * @return string
 	 */
-	public function get_session_data() {
-		$data = array();
-
-		if ( defined( 'AYECODE_CONNECT_VERSION' ) ) {
-			$data['AyeCode Connect Version'] = AYECODE_CONNECT_VERSION;
+	public function get_brand_color( $beacon_id ) {
+		// page conditions
+		if ( $beacon_id == $this->gd_beacon_id  ) {
+			$url = '#ff8333';
+		} elseif ( $beacon_id == $this->uwp_beacon_id ) {
+			$url = '#2981b3';
+		} elseif ( $beacon_id == $this->wpi_beacon_id  ) {
+			$url = '#009874';
+		}else{
+            // AyeCode color
+			$url = '#52a6dd';
 		}
 
-		if ( defined( 'GEODIRECTORY_VERSION' ) ) {
-			$data['GeoDirectory Version'] = GEODIRECTORY_VERSION;
-		}
-
-		if ( defined( 'USERSWP_VERSION' ) ) {
-			$data['UsersWP Version'] = USERSWP_VERSION;
-		}
-
-		if ( defined( 'WPINV_VERSION' ) ) {
-			$data['Wp Invoicing Version'] = WPINV_VERSION;
-		}
-
-		return $data;
+		return $url;
 	}
+
 
 
 }
