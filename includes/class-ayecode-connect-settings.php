@@ -512,9 +512,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			if ( is_wp_error( $result ) ) {
 				wp_send_json_success( "to ayecode:" . $result->get_error_message() );
 			} elseif ( empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
-				wp_send_json_error( esc_attr("from ayecode:" . $api_response['message'] ) );
+				wp_send_json_error(  wp_kses_post("from ayecode:" . $api_response['message'] ) );
 			} elseif ( ! empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
-				wp_send_json_success( esc_attr( $api_response['message'] ) );
+				wp_send_json_success(  wp_kses_post( $api_response['message'] ) );
 			}
 
 			wp_die();

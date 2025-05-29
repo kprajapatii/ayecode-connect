@@ -120,7 +120,7 @@ class AyeCode_Connect_Turnstile_Settings {
                         <div class="card shadow-sm mw-100">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h2 class="h5 mb-0"><i class="fab fa-cloudflare text-orange"></i> <?php _e( 'Cloudflare Turnstile Settings', 'ayecode-connect' ); ?></h2>
-                                <div class=""><i class="fas fa-book"></i> <a href="https://docs.wpgeodirectory.com/article/781-how-to-setup-cloudflare-turnstile-captcha" target="_blank"><?php _e( 'Documentation', 'ayecode-connect' ); ?></a> </div>
+                                <div class=""><i class="fas fa-book"></i> <a href="https://wpgeodirectory.com/documentation/article/how-tos/setting-up-cloudflare-turnstile-in-ayecode-connect/" target="_blank"><?php _e( 'Documentation', 'ayecode-connect' ); ?></a> </div>
                             </div>
                             <div class="card-body">
 								<?php
