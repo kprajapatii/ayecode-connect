@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.9 - 2025-07-TBD =
+* Site auto disconnected when url contains www. - FIXED
+
 = 1.4.8 - 2025-05-28 =
 * Allow links to documentation in error responses - CHANGED
 * New support widget, removing 3rd party scripts and adding link to view all your tickets - CHANGED
