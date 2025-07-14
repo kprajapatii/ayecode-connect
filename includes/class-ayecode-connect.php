@@ -1716,6 +1716,17 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$this->save_site_url( $connected_site_url );
 			}
 
+			// Remove www. to like www.xyz.com/ with xyz.com/.
+			if ( $site_url && strpos( $site_url, "www." ) === 0 ) {
+				$url_parts = explode( "www.", $site_url, 2 );
+				$site_url = $url_parts[1];
+			}
+
+			if ( $connected_site_url && strpos( $connected_site_url, "www." ) === 0 ) {
+				$url_parts = explode( "www.", $connected_site_url, 2 );
+				$connected_site_url = $url_parts[1];
+			}
+
 			// Check for site URL change, disconnect site and add warning
 			if ( $site_url && $site_url !== '/' && $connected_site_url && $connected_site_url != $site_url ) {
 				// Disconnect site but not from remote (that would invalidate the other site)
