@@ -83,6 +83,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.4.9 - 2025-07-TBD =
 * Site auto disconnected when url contains www. - FIXED
+* Turnstile captcha support for UWP Mailerlite addon forms - ADDED
 
 = 1.4.8 - 2025-05-28 =
 * Allow links to documentation in error responses - CHANGED
