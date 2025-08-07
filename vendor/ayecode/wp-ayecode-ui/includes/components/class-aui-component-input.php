@@ -137,17 +137,18 @@ class AUI_Component_Input {
 				// enqueue the script
 				$aui_settings = AyeCode_UI_Settings::instance();
 				$aui_settings->enqueue_flatpickr();
-			} elseif ( $type == 'iconpicker' ) {
+			} else if ( $type == 'iconpicker' ) {
 				$type = 'text';
-				//$args['class'] .= ' aui-flatpickr bg-initial ';
-//				$args['class'] .= ' bg-initial ';
+
+				// Validate FA icon.
+				$args['value'] = AUI_Component_Helper::sanitize_fa_icon( $args['value'], $args );
 
 				$args['extra_attributes']['data-aui-init'] = 'iconpicker';
 				$args['extra_attributes']['data-placement'] = 'bottomRight';
 
 				$args['input_group_right'] = '<span class="input-group-addon input-group-text c-pointer"></span>';
-//				$args['input_group_right_inside'] = true;
-				// enqueue the script
+
+				// Enqueue the script
 				$aui_settings = AyeCode_UI_Settings::instance();
 				$aui_settings->enqueue_iconpicker();
 			}
@@ -231,7 +232,7 @@ class AUI_Component_Input {
 			}
 
 			// close
-			$output .= ' >';
+			$output .= '>';
 
 			// help text
 			if ( ! empty( $args['help_text'] ) ) {
@@ -378,7 +379,7 @@ else{$eli.attr(\'type\',\'password\');}"
 
 	public static function label( $args = array(), $type = '' ) {
 		global $aui_bs5;
-		//<label for="exampleInputEmail1">Email address</label>
+
 		$defaults = array(
 			'title'      => 'div',
 			'for'        => '',
@@ -394,36 +395,36 @@ else{$eli.attr(\'type\',\'password\');}"
 		$output = '';
 
 		if ( $args['title'] ) {
-
 			// maybe hide labels //@todo set a global option for visibility class
 			if ( $type == 'file' || $type == 'checkbox' || $type == 'radio' || ! empty( $args['label_type'] ) ) {
 				$class = $args['class'];
 			} else {
-				$class = 'sr-only ' . $args['class'];
+				$class = 'sr-only ' . ( $aui_bs5 ? 'visually-hidden ' : '' ) . $args['class'];
 			}
 
 			// maybe horizontal
 			if ( $args['label_type'] == 'horizontal' && $type != 'checkbox' ) {
-				$class .= ' ' . AUI_Component_Helper::get_column_class( $args['label_col'], 'label' ) . ' col-form-label '.$type;
+				$class .= ' ' . AUI_Component_Helper::get_column_class( $args['label_col'], 'label' ) . ' col-form-label ' . $type;
 			}
 
-			if( $aui_bs5 ){ $class .= ' form-label'; }
+			if ( $aui_bs5 ) {
+				$class .= ' form-label';
+			}
 
 			// open
-			$output .= '<label ';
+			$output .= '<label';
 
 			// for
 			if ( ! empty( $args['for'] ) ) {
-				$output .= ' for="' . esc_attr( $args['for'] ) . '" ';
+				$output .= ' for="' . esc_attr( $args['for'] ) . '"';
 			}
 
 			// class
 			$class = $class ? AUI_Component_Helper::esc_classes( $class ) : '';
-			$output .= ' class="' . $class . '" ';
+			$output .= $class != "" ? ' class="' . $class . '"' : '';
 
 			// close
 			$output .= '>';
-
 
 			// title, don't escape fully as can contain html
 			if ( ! empty( $args['title'] ) ) {
@@ -432,10 +433,7 @@ else{$eli.attr(\'type\',\'password\');}"
 
 			// close wrap
 			$output .= '</label>';
-
-
 		}
-
 
 		return $output;
 	}
@@ -493,7 +491,7 @@ else{$eli.attr(\'type\',\'password\');}"
 			}
 
 			// close wrap
-			$output .= ' >';
+			$output .= '>';
 
 
 			// Input group left
@@ -690,7 +688,7 @@ else{$eli.attr(\'type\',\'password\');}"
 			}
 
 			// close tag
-			$output .= ' >';
+			$output .= '>';
 
 			// value
 			if ( ! empty( $args['value'] ) ) {
@@ -933,16 +931,16 @@ else{$eli.attr(\'type\',\'password\');}"
 
 		// required
 		if ( ! empty( $args['required'] ) ) {
-			$output .= ' required ';
+			$output .= ' required';
 		}
 
 		// multiple
 		if ( ! empty( $args['multiple'] ) ) {
-			$output .= ' multiple ';
+			$output .= ' multiple';
 		}
 
 		// close opening tag
-		$output .= ' >';
+		$output .= '>';
 
 		// placeholder
 		if ( isset( $args['placeholder'] ) && '' != $args['placeholder'] && ! $is_select2 ) {
@@ -1141,7 +1139,7 @@ else{$eli.attr(\'type\',\'password\');}"
 			$label_args['class'] .= 'd-block ';
 
 			if ( $args['label_type'] == 'hidden' ) {
-				$label_args['class'] .= 'sr-only ';
+				$label_args['class'] .= 'sr-only ' . ( $aui_bs5 ? 'visually-hidden ' : '' );
 			}
 		}
 
@@ -1268,11 +1266,11 @@ else{$eli.attr(\'type\',\'password\');}"
 
 		// required
 		if ( ! empty( $args['required'] ) ) {
-			$output .= ' required ';
+			$output .= ' required';
 		}
 
 		// close opening tag
-		$output .= ' >';
+		$output .= '>';
 
 		// label
 		if ( ! empty( $args['label'] ) && is_array( $args['label'] ) ) {
