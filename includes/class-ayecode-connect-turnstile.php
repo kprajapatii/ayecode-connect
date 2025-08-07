@@ -37,6 +37,8 @@ class AyeCode_Connect_Turnstile {
 				'uwp_frontend'     => 1,
 				'bs_contact'       => 1,
 				'gp_checkout'      => 1,
+				'uwp_mailerlite_subscribe'       => 1,
+				'uwp_mailerlite_unsubscribe'      => 1,
 			)
 		);
 
@@ -139,6 +141,11 @@ class AyeCode_Connect_Turnstile {
 				// UWP Forms
 				add_action( 'uwp_template_fields', array( $this, 'add_turnstile_uwp_forms' ), 10, 1 );
 				add_filter( 'uwp_validate_result', array( $this, 'verify_uwp' ), 10, 3 );
+
+				if ( ! empty( $this->options['protections']['uwp_mailerlite_subscribe'] ) || ! empty( $this->options['protections']['uwp_mailerlite_unsubscribe'] ) ) {
+					add_action( 'uwp_mailerlite_subscribe_fields', array( $this, 'add_turnstile_uwp_mailerlite_forms' ), 10, 1 );
+					add_action( 'uwp_mailerlite_form_validate', array( $this, 'verify_uwp_mailerlite_subscribe' ), 20,1 );
+				}
 
 				// UWP Frontend Post Addon
 				if ( ! empty( $this->options['protections']['uwp_frontend'] ) ) {
@@ -292,11 +299,38 @@ class AyeCode_Connect_Turnstile {
 			$this->add_turnstile_widget();
 		}
 
-		if ( 'frontend' === $type && ! empty( $this->options['protections']['uwp_frontend'] ) ) {
+
+	}
+
+	public function add_turnstile_uwp_mailerlite_forms( $args ) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if ( array_key_exists('subscribe_captcha',$args) && $args['subscribe_captcha'] == 'show' && $ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe'] == true ) {
+			$this->add_turnstile_widget();
+		}
+
+		if ( array_key_exists('unsubscribe_captcha',$args) && $args['unsubscribe_captcha'] == 'show' && $ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe'] == true ) {
 			$this->add_turnstile_widget();
 		}
 	}
 
+	public function verify_uwp_mailerlite_subscribe($data) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if(is_array($data)) {
+			if($data['action'] == 'uwp_mailerlite_subscribe' && $ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mailerlite_subscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+			if($data['action'] == 'uwp_mailerlite_unsubscribe' && $ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mailerlite_unsubscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+		}
+		return $data;
+	}
 
 	/**
 	 * Add some CSS for the login form sizing.
