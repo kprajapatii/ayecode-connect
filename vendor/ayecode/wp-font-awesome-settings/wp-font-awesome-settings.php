@@ -33,7 +33,7 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '1.1.7';
+		public $version = '1.1.10';
 
 		/**
 		 * Class textdomain.
@@ -122,7 +122,7 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 
 			}
 
-            // Set a constant if pro enbaled
+            // Set a constant if pro enabled
 			if ( ! defined( 'FAS_PRO' ) && $this->settings['pro'] ) {
 				define( 'FAS_PRO', true );
 			}
@@ -182,13 +182,21 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 						add_filter( 'block_editor_settings_all', array( $this, 'enqueue_editor_styles' ), 10, 2 );
 					}
 				} else {
+					$enqueue = false;
+
 					if ( $this->settings['enqueue'] == '' || $this->settings['enqueue'] == 'frontend' ) {
+						$enqueue = true;
 						add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 5000 );
 					}
 
 					if ( $this->settings['enqueue'] == '' || $this->settings['enqueue'] == 'backend' ) {
+						$enqueue = true;
 						add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 5000 );
 						add_filter( 'block_editor_settings_all', array( $this, 'enqueue_editor_scripts' ), 10, 2 );
+					}
+
+					if ( $enqueue ) {
+						add_filter( 'script_loader_tag', array( $this, 'script_loader_tag' ), 20, 3 );
 					}
 				}
 
@@ -226,10 +234,10 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 		 *
 		 * @return array
 		 */
-		public function enqueue_editor_scripts( $editor_settings, $block_editor_context ){
-
+		public function enqueue_editor_scripts( $editor_settings, $block_editor_context ) {
 			$url = $this->get_url();
-			$editor_settings['__unstableResolvedAssets']['scripts'] .= "<script src='$url' id='font-awesome-js'></script>";
+
+			$editor_settings['__unstableResolvedAssets']['scripts'] .= "<script src='$url' id='font-awesome-js' defer crossorigin='anonymous'></script>";
 
 			return $editor_settings;
 		}
@@ -292,7 +300,7 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 			$sub     = $this->settings['pro'] ? 'pro' : 'use';
 			$type    = $this->settings['type'];
 			$version = $this->settings['version'];
-			$kit_url = $this->settings['kit-url'] ? esc_url( $this->settings['kit-url'] ) : '';
+			$kit_url = $this->settings['kit-url'] ? sanitize_text_field( $this->settings['kit-url'] ) : '';
 			$url     = '';
 
 			if ( $type == 'KIT' && $kit_url ) {
@@ -482,18 +490,27 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
                                     <span><?php
 										echo wp_sprintf(
 											__( 'Requires a free account with Font Awesome. %sGet kit url%s', 'ayecode-connect' ),
-											'<a rel="noopener noreferrer" target="_blank" href="https://fontawesome.com/kits"><i class="fas fa-external-link-alt"></i>',
+											'<a rel="noopener noreferrer" target="_blank" href="https://fontawesome.com/kits"><i class="fas fa-external-link-alt"></i> ',
 											'</a>'
 										);
 										?></span>
                                 </td>
                             </tr>
-
                             <tr valign="top" class="wpfas-kit-hide">
                                 <th scope="row"><label for="wpfas-version"><?php _e( 'Version', 'ayecode-connect' ); ?></label></th>
                                 <td>
                                     <select name="wp-font-awesome-settings[version]" id="wpfas-version">
-                                        <option value="" <?php selected( $this->settings['version'], '' ); ?>><?php echo wp_sprintf( __( 'Latest - %s (default)', 'ayecode-connect' ), $this->get_latest_version() ); ?></option>
+                                        <?php /* @todo Remove after FA7 compatibility */ ?>
+                                        <option value="" <?php selected( $this->settings['version'], '' ); ?>><?php echo wp_sprintf( __( '%s (default)', 'ayecode-connect' ), '6.7.2' ); ?></option>
+                                        <?php $latest_version = $this->get_latest_version( false, true ); if ( $latest_version && version_compare( $latest_version, '7.0.0', '>' ) ) { ?>
+                                        <option value="<?php echo esc_attr( $latest_version ); ?>" <?php selected( $this->settings['version'], $latest_version ); ?>><?php echo esc_html( $latest_version ); ?></option>
+                                        <?php } ?>
+                                        <?php /* @todo Remove after after FA7 compatibility */ ?>
+
+                                        <?php /* @todo Un-comment after FA7 compatibility */ ?>
+                                        <?php /* ?><option value="" <?php selected( $this->settings['version'], '' ); ?>><?php echo wp_sprintf( __( 'Latest - %s (default)', 'ayecode-connect' ), $this->get_latest_version() ); ?></option><?php */ ?>
+                                        <option value="7.0.0" <?php selected( $this->settings['version'], '7.0.0' ); ?>>7.0.0</option>
+                                        <option value="6.4.2" <?php selected( $this->settings['version'], '6.4.2' ); ?>>6.4.2</option>
                                         <option value="6.1.0" <?php selected( $this->settings['version'], '6.1.0' ); ?>>6.1.0</option>
                                         <option value="6.0.0" <?php selected( $this->settings['version'], '6.0.0' ); ?>>6.0.0</option>
                                         <option value="5.15.4" <?php selected( $this->settings['version'], '5.15.4' ); ?>>5.15.4</option>
@@ -629,7 +646,7 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 		 * @since 1.0.7
 		 * @return mixed|string The latest version number found.
 		 */
-		public function get_latest_version( $force_api = false ) {
+		public function get_latest_version( $force_api = false, $force_latest = false ) {
 			$latest_version = $this->latest;
 
 			$cache = get_transient( 'wp-font-awesome-settings-version' );
@@ -644,6 +661,11 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 				if ( version_compare( $cache, $this->latest, '>=' ) >= 0 ) {
 					$latest_version = $cache;
 				}
+			}
+
+			// @todo remove after FA7 compatibility
+			if ( ! $force_latest && version_compare( $cache, '7.0.0', '>=' ) >= 0 ) {
+				$latest_version = '6.7.2';
 			}
 
 			// Check and auto download fonts locally.
@@ -1000,6 +1022,31 @@ if ( ! class_exists( 'WP_Font_Awesome_Settings' ) ) {
 			}
 
 			echo '<meta name="generator" content="WP Font Awesome Settings v' . esc_attr( $this->version ) . '"' . ( ! empty( $source[0] ) ? ' data-ac-source="' . esc_attr( $source[0] ) . '"' : '' ) . ' />';
+		}
+
+		/**
+		 * Add extra parameters to the script tag.
+		 *
+		 * Add crossorigin="anonymous" to prevent OpaqueResponseBlocking
+		 * (NS_BINDING_ABORTED) http error.
+		 *
+		 * @since 1.1.8
+		 *
+		 * @param string $tag The script tag.
+		 * @param string $handle The script handle.
+		 * @param string $src The script url.
+		 * @return string The script tag.
+		 */
+		public function script_loader_tag( $tag, $handle, $src ) {
+			if ( ( $handle == 'font-awesome' || $handle == 'font-awesome-shims' ) && ( strpos( $src, "kit.fontawesome.com" ) !== false || strpos( $src, ".fontawesome.com/releases/" ) !== false ) ) {
+				$tag = preg_replace(
+					'/<script[\s]+(.*?)>/',
+					'<script defer crossorigin="anonymous" \1>',
+					$tag
+				);
+			}
+
+			return $tag;
 		}
 	}
 
