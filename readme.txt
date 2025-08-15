@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.10 - 2025-08-TBD =
+* Turnstile captcha is not working on WPS Hide Login page - FIXED
+
 = 1.4.9 - 2025-08-07 =
 * Site auto disconnected when url contains www. - FIXED
 * Turnstile captcha support for UWP Mailerlite addon forms - ADDED
