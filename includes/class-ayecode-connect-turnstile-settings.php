@@ -353,6 +353,17 @@ class AyeCode_Connect_Turnstile_Settings {
 
 										}
 
+                                        if ( defined( 'UWP_MAILERLITE_VERSION' ) ) {
+                                            $turnstile_protections['uwp_mailerlite_subscribe'] = [
+                                                'title'   => __( 'UsersWP  - MailerLite Subscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                            $turnstile_protections['uwp_mailerlite_unsubscribe'] = [
+                                                'title'   => __( 'UsersWP  - MailerLite Unsubscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                        }
+
 
 										// UWP Frontend Post Addon
 										if ( defined( 'UWP_FRONTEND_POST_VERSION' ) ) {
