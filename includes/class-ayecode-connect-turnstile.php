@@ -304,11 +304,11 @@ class AyeCode_Connect_Turnstile {
 
 	public function add_turnstile_uwp_mailerlite_forms( $args ) {
 		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
-		if ( array_key_exists('subscribe_captcha',$args) && $args['subscribe_captcha'] == 'show' && $ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe'] == true ) {
+		if ( ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe']) && array_key_exists('subscribe_button_text',$args) ) {
 			$this->add_turnstile_widget();
 		}
 
-		if ( array_key_exists('unsubscribe_captcha',$args) && $args['unsubscribe_captcha'] == 'show' && $ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe'] == true ) {
+		if ( ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe']) && array_key_exists('unsubscribe_button_text',$args) ) {
 			$this->add_turnstile_widget();
 		}
 	}
