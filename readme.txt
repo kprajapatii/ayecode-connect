@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -81,8 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.10 - 2025-08-TBD =
+= 1.4.10 - 2025-08-28 =
 * Turnstile captcha is not working on WPS Hide Login page - FIXED
+* Shows warning for mailerlite Turnstile capthca - FIXED
 
 = 1.4.9 - 2025-08-07 =
 * Site auto disconnected when url contains www. - FIXED
