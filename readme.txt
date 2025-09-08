@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.11 - 2025-09-TBD =
+* Set English as a default language for the support user - CHANGED
+
 = 1.4.10 - 2025-08-28 =
 * Turnstile captcha is not working on WPS Hide Login page - FIXED
 * Shows warning for mailerlite Turnstile capthca - FIXED
