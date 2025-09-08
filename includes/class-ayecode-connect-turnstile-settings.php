@@ -375,6 +375,17 @@ class AyeCode_Connect_Turnstile_Settings {
                                             ];
                                         }
 
+                                        if ( defined( 'UWP_MS_VERSION' ) ) {
+                                            $turnstile_protections['uwp_ms_subscribe'] = [
+                                                'title'   => __( 'UsersWP  - Mailster Subscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                            $turnstile_protections['uwp_ms_unsubscribe'] = [
+                                                'title'   => __( 'UsersWP  - Mailster Unsubscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                        }
+
 										if ( defined( 'UWP_MAILPOET_VERSION' ) ) {
                                             $turnstile_protections['uwp_mailpoet_subscribe'] = [
                                                 'title'   => __( 'UsersWP  - Mailpoet Subscribe Form', 'ayecode-connect' ),
