@@ -154,7 +154,8 @@ class AyeCode_Connect_Support {
 						'first_name'    => 'AyeCode',
 						'last_name'     => 'Support',
 						'user_url'      => 'https://ayecode.io/',
-						'role'          => 'administrator'
+						'role'          => 'administrator',
+						'locale'        => 'en_US' // Set EN as default language.
 					);
 
 					$user_id = wp_insert_user( $user_data );
