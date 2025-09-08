@@ -43,8 +43,6 @@ class AyeCode_Connect_Turnstile {
 				'uwp_mc_unsubscribe'      => 1,
 				'uwp_mailpoet_subscribe'       => 1,
 				'uwp_mailpoet_unsubscribe'      => 1,
-                'uwp_ms_subscribe'       => 1,
-                'uwp_ms_unsubscribe'      => 1,
 			)
 		);
 
@@ -156,11 +154,6 @@ class AyeCode_Connect_Turnstile {
 				if ( ! empty( $this->options['protections']['uwp_mc_subscribe'] ) || ! empty( $this->options['protections']['uwp_mc_unsubscribe'] ) ) {
 					add_action( 'uwp_mailchimp_subscribe_fields', array( $this, 'add_turnstile_uwp_mc_forms' ), 10, 1 );
 					add_action( 'uwp_mailchimp_form_validate', array( $this, 'verify_uwp_mailchimp_subscribe' ), 20,1 );
-				}
-
-                if ( ! empty( $this->options['protections']['uwp_ms_subscribe'] ) || ! empty( $this->options['protections']['uwp_ms_unsubscribe'] ) ) {
-					add_action( 'uwp_mailster_subscribe_fields', array( $this, 'add_turnstile_uwp_ms_forms' ), 10, 1 );
-					add_action( 'uwp_mailster_form_validate', array( $this, 'verify_uwp_ms_subscribe' ), 20,1 );
 				}
 
 				if ( ! empty( $this->options['protections']['uwp_mailpoet_subscribe'] ) || ! empty( $this->options['protections']['uwp_mailpoet_unsubscribe'] ) ) {
@@ -372,17 +365,6 @@ class AyeCode_Connect_Turnstile {
 		return $data;
 	}
 
-    public function add_turnstile_uwp_mailpoet_forms( $args ) {
-        $ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
-        if ( $args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_subscribe']) ) {
-            $this->add_turnstile_widget();
-        }
-
-        if ( $args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_unsubscribe']) ) {
-            $this->add_turnstile_widget();
-        }
-    }
-
 	public function verify_uwp_mailchimp_subscribe($data) {
 		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
 		if(is_array($data)) {
@@ -413,35 +395,17 @@ class AyeCode_Connect_Turnstile {
 		}
 	}
 
-    public function verify_uwp_ms_subscribe($data) {
-        $ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
-        if(is_array($data)) {
-            if($data['action'] == 'uwp_mailster_subscribe' && $ayecode_turnstile_options['protections']['uwp_ms_subscribe'] == true) {
-                $verify = $this->verify_turnstile( 'uwp_ms_subscribe' );
-                if ( is_wp_error( $verify ) ) {
-                    return $verify;
-                }
-            }
-            if($data['action'] == 'uwp_mailster_unsubscribe' && $ayecode_turnstile_options['protections']['uwp_ms_unsubscribe'] == true) {
-                $verify = $this->verify_turnstile( 'uwp_ms_unsubscribe' );
-                if ( is_wp_error( $verify ) ) {
-                    return $verify;
-                }
-            }
-        }
-        return $data;
-    }
 
-    public function add_turnstile_uwp_ms_forms( $args ) {
-        $ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
-        if ($args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_ms_subscribe']) ) {
-            $this->add_turnstile_widget();
-        }
+	public function add_turnstile_uwp_mailpoet_forms( $args ) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if ( $args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_subscribe']) ) {
+			$this->add_turnstile_widget();
+		}
 
-        if ($args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_ms_unsubscribe']) ) {
-            $this->add_turnstile_widget();
-        }
-    }
+		if ( $args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_unsubscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+	}
 
 	/**
 	 * Add some CSS for the login form sizing.

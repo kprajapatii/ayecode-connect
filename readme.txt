@@ -85,7 +85,6 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Set English as a default language for the support user - CHANGED
 * Turnstile captcha support for UWP MailPoet addon forms - ADDED
 * Turnstile captcha support for UWP MailChimp addon forms - ADDED
-* Turnstile captcha support for UWP Mailster addon forms - ADDED
 
 = 1.4.10 - 2025-08-28 =
 * Turnstile captcha is not working on WPS Hide Login page - FIXED
