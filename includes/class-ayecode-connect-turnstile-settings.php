@@ -364,6 +364,28 @@ class AyeCode_Connect_Turnstile_Settings {
                                             ];
                                         }
 
+										if ( defined( 'UWP_MC_VERSION' ) ) {
+                                            $turnstile_protections['uwp_mc_subscribe'] = [
+                                                'title'   => __( 'UsersWP  - MailChimp Subscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                            $turnstile_protections['uwp_mc_unsubscribe'] = [
+                                                'title'   => __( 'UsersWP  - MailChimp Unsubscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                        }
+
+										if ( defined( 'UWP_MAILPOET_VERSION' ) ) {
+                                            $turnstile_protections['uwp_mailpoet_subscribe'] = [
+                                                'title'   => __( 'UsersWP  - Mailpoet Subscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                            $turnstile_protections['uwp_mailpoet_unsubscribe'] = [
+                                                'title'   => __( 'UsersWP  - Mailpoet Unsubscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                        }
+
 
 										// UWP Frontend Post Addon
 										if ( defined( 'UWP_FRONTEND_POST_VERSION' ) ) {
