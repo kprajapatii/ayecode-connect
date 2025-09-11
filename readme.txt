@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 1.4.10
+Stable tag: 1.4.11
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -81,7 +81,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.11 - 2025-09-TBD =
+= 1.4.11 - 2025-09-11 =
 * Set English as a default language for the support user - CHANGED
 * Turnstile captcha support for UWP MailPoet addon forms - ADDED
 * Turnstile captcha support for UWP MailChimp addon forms - ADDED

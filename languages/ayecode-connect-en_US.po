@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.4.10\n"
+"Project-Id-Version: AyeCode Connect 1.4.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-28 19:45+0530\n"
-"PO-Revision-Date: 2025-08-28 19:45+0530\n"
+"POT-Creation-Date: 2025-09-11 20:25+0530\n"
+"PO-Revision-Date: 2025-09-11 20:25+0530\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -619,48 +619,48 @@ msgid ""
 "helper plugin below)</small>"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:296
+#: includes/class-ayecode-connect-support.php:297
 msgid "How can we help?"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:319
+#: includes/class-ayecode-connect-support.php:320
 #: includes/class-ayecode-connect-turnstile-settings.php:123
 #: vendor/ayecode/wp-deactivation-survey/wp-deactivation-survey.php:69
 msgid "Documentation"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:321
+#: includes/class-ayecode-connect-support.php:322
 msgid "Browse the docs to find solutions"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:333
+#: includes/class-ayecode-connect-support.php:334
 msgid "Open Support Ticket"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:335
+#: includes/class-ayecode-connect-support.php:336
 msgid "Need more help? We got you!"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:347
+#: includes/class-ayecode-connect-support.php:348
 msgid "View Support Tickets"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:349
+#: includes/class-ayecode-connect-support.php:350
 msgid "View your previous support tickets"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:479
+#: includes/class-ayecode-connect-support.php:480
 msgid "Enable Support User Access?"
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:479
+#: includes/class-ayecode-connect-support.php:480
 msgid ""
 "AyeCode Connect: If you think your issue might require support access, "
 "please enable the support user from AyeCode Connect. This can speed up the "
 "resolution time."
 msgstr ""
 
-#: includes/class-ayecode-connect-support.php:479
+#: includes/class-ayecode-connect-support.php:480
 msgid "Go to Settings"
 msgstr ""
 
@@ -836,66 +836,82 @@ msgstr ""
 msgid "UsersWP  - MailerLite Unsubscribe Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:371
-msgid "UsersWP Frontend Post"
+#: includes/class-ayecode-connect-turnstile-settings.php:369
+msgid "UsersWP  - MailChimp Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:373
+msgid "UsersWP  - MailChimp Unsubscribe Form"
 msgstr ""
 
 #: includes/class-ayecode-connect-turnstile-settings.php:380
+msgid "UsersWP  - Mailpoet Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:384
+msgid "UsersWP  - Mailpoet Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:393
+msgid "UsersWP Frontend Post"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:402
 msgid "BlockStrap Contact Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:388
+#: includes/class-ayecode-connect-turnstile-settings.php:410
 msgid "GetPaid Checkout Form"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:426
+#: includes/class-ayecode-connect-turnstile-settings.php:448
 msgid "Disable for"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:448
+#: includes/class-ayecode-connect-turnstile-settings.php:470
 msgid "Disable for user roles"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile-settings.php:456
+#: includes/class-ayecode-connect-turnstile-settings.php:478
 msgid "Save Changes"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:560
+#: includes/class-ayecode-connect-turnstile.php:635
 msgid "Security verification missing."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:569
+#: includes/class-ayecode-connect-turnstile.php:644
 msgid ""
 "Please try again. Turnstile response field is empty. Check the keys are "
 "setup properly."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:569
-#: includes/class-ayecode-connect-turnstile.php:602
+#: includes/class-ayecode-connect-turnstile.php:644
+#: includes/class-ayecode-connect-turnstile.php:677
 msgid "Security verification failed."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:577
+#: includes/class-ayecode-connect-turnstile.php:652
 msgid "Turnstile configuration error."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:592
+#: includes/class-ayecode-connect-turnstile.php:667
 msgid "Security verification service unavailable."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:667
+#: includes/class-ayecode-connect-turnstile.php:742
 msgid "Password Reset Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:684
+#: includes/class-ayecode-connect-turnstile.php:759
 msgid "Comment Submission Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:933
+#: includes/class-ayecode-connect-turnstile.php:1008
 msgid "Security verification failed, please try again."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:958
+#: includes/class-ayecode-connect-turnstile.php:1033
 msgid "Turnstile API keys are verified successfully."
 msgstr ""
 
