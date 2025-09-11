@@ -39,6 +39,10 @@ class AyeCode_Connect_Turnstile {
 				'gp_checkout'      => 1,
 				'uwp_mailerlite_subscribe'       => 1,
 				'uwp_mailerlite_unsubscribe'      => 1,
+				'uwp_mc_subscribe'       => 1,
+				'uwp_mc_unsubscribe'      => 1,
+				'uwp_mailpoet_subscribe'       => 1,
+				'uwp_mailpoet_unsubscribe'      => 1,
 			)
 		);
 
@@ -145,6 +149,16 @@ class AyeCode_Connect_Turnstile {
 				if ( ! empty( $this->options['protections']['uwp_mailerlite_subscribe'] ) || ! empty( $this->options['protections']['uwp_mailerlite_unsubscribe'] ) ) {
 					add_action( 'uwp_mailerlite_subscribe_fields', array( $this, 'add_turnstile_uwp_mailerlite_forms' ), 10, 1 );
 					add_action( 'uwp_mailerlite_form_validate', array( $this, 'verify_uwp_mailerlite_subscribe' ), 20,1 );
+				}
+
+				if ( ! empty( $this->options['protections']['uwp_mc_subscribe'] ) || ! empty( $this->options['protections']['uwp_mc_unsubscribe'] ) ) {
+					add_action( 'uwp_mailchimp_subscribe_fields', array( $this, 'add_turnstile_uwp_mc_forms' ), 10, 1 );
+					add_action( 'uwp_mailchimp_form_validate', array( $this, 'verify_uwp_mailchimp_subscribe' ), 20,1 );
+				}
+
+				if ( ! empty( $this->options['protections']['uwp_mailpoet_subscribe'] ) || ! empty( $this->options['protections']['uwp_mailpoet_unsubscribe'] ) ) {
+					add_action( 'uwp_mailpoet_subscribe_fields', array( $this, 'add_turnstile_uwp_mailpoet_forms' ), 10, 1 );
+					add_action( 'uwp_mailpoet_form_validate', array( $this, 'verify_uwp_mailpoet_subscribe' ), 20,1 );
 				}
 
 				// UWP Frontend Post Addon
@@ -304,11 +318,11 @@ class AyeCode_Connect_Turnstile {
 
 	public function add_turnstile_uwp_mailerlite_forms( $args ) {
 		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
-		if ( ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe']) && array_key_exists('subscribe_button_text',$args) ) {
+		if ( $args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_subscribe'])) {
 			$this->add_turnstile_widget();
 		}
 
-		if ( ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe']) && array_key_exists('unsubscribe_button_text',$args) ) {
+		if ($args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailerlite_unsubscribe']) ) {
 			$this->add_turnstile_widget();
 		}
 	}
@@ -330,6 +344,67 @@ class AyeCode_Connect_Turnstile {
 			}
 		}
 		return $data;
+	}
+
+	public function verify_uwp_mailpoet_subscribe($data) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if(is_array($data)) {
+			if($data['action'] == 'uwp_mailpoet_subscribe' && $ayecode_turnstile_options['protections']['uwp_mailpoet_subscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mailpoet_subscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+			if($data['action'] == 'uwp_mailpoet_unsubscribe' && $ayecode_turnstile_options['protections']['uwp_mailpoet_unsubscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mailpoet_unsubscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+		}
+		return $data;
+	}
+
+	public function verify_uwp_mailchimp_subscribe($data) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if(is_array($data)) {
+			if($data['action'] == 'uwp_mailchimp_subscribe' && $ayecode_turnstile_options['protections']['uwp_mc_subscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mc_subscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+			if($data['action'] == 'uwp_mailchimp_unsubscribe' && $ayecode_turnstile_options['protections']['uwp_mc_unsubscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_mc_unsubscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+		}
+		return $data;
+	}
+
+	public function add_turnstile_uwp_mc_forms( $args ) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if ($args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mc_subscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+		
+		if ($args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mc_unsubscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+	}
+
+
+	public function add_turnstile_uwp_mailpoet_forms( $args ) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if ( $args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_subscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+
+		if ( $args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_unsubscribe']) ) {
+			$this->add_turnstile_widget();
+		}
 	}
 
 	/**
