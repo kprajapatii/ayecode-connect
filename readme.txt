@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.12 - 2025-09-TBD =
+* Disable turnstile captcha on GetPaid Checkout Form is not working - FIXED
+
 = 1.4.11 - 2025-09-11 =
 * Set English as a default language for the support user - CHANGED
 * Turnstile captcha support for UWP MailPoet addon forms - ADDED
@@ -88,7 +91,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 = 1.4.10 - 2025-08-28 =
 * Turnstile captcha is not working on WPS Hide Login page - FIXED
-* Shows warning for mailerlite Turnstile capthca - FIXED
+* Shows warning for mailerlite Turnstile captcha - FIXED
 
 = 1.4.9 - 2025-08-07 =
 * Site auto disconnected when url contains www. - FIXED

@@ -171,9 +171,8 @@ class AyeCode_Connect_Turnstile {
 					add_action( 'wp_ajax_nopriv_uwp_fep_post_submit', array( $this, 'verify_uwp_frontend_post' ), 5 );
 				}
 
-
-				// BlockStrap Contact Form
-				if ( ! empty( $this->options['protections']['bs_contact'] ) ) {
+				// GetPaid Checkout Form
+				if ( ! empty( $this->options['protections']['gp_checkout'] ) ) {
 					add_filter( 'getpaid_before_payment_form_pay_button', array( $this, 'add_turnstile_widget' ), 10, 2 );
 					add_action( 'getpaid_checkout_error_checks', array( $this, 'verify_getpaid_checkout_form' ), 10, 2 );
 
@@ -194,9 +193,8 @@ class AyeCode_Connect_Turnstile {
 					), 10, 2 );
 				}
 
-
-				// GetPaid CCheckout Form
-				if ( ! empty( $this->options['protections']['gp_checkout'] ) ) {
+				// BlockStrap Contact Form
+				if ( ! empty( $this->options['protections']['bs_contact'] ) ) {
 					add_filter( 'blockstrap_blocks_contact_form_captcha_input', array(
 						$this,
 						'blockstrap_blocks_contact_form_captcha_input'
