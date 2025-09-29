@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AyeCode Connect 1.4.11\n"
+"Project-Id-Version: AyeCode Connect 1.4.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-11 20:25+0530\n"
-"PO-Revision-Date: 2025-09-11 20:25+0530\n"
+"POT-Creation-Date: 2025-09-29 14:24+0530\n"
+"PO-Revision-Date: 2025-09-29 14:24+0530\n"
 "Last-Translator: \n"
 "Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
 "Language: en_US\n"
@@ -876,42 +876,42 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:635
+#: includes/class-ayecode-connect-turnstile.php:633
 msgid "Security verification missing."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:644
+#: includes/class-ayecode-connect-turnstile.php:642
 msgid ""
 "Please try again. Turnstile response field is empty. Check the keys are "
 "setup properly."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:644
-#: includes/class-ayecode-connect-turnstile.php:677
+#: includes/class-ayecode-connect-turnstile.php:642
+#: includes/class-ayecode-connect-turnstile.php:675
 msgid "Security verification failed."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:652
+#: includes/class-ayecode-connect-turnstile.php:650
 msgid "Turnstile configuration error."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:667
+#: includes/class-ayecode-connect-turnstile.php:665
 msgid "Security verification service unavailable."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:742
+#: includes/class-ayecode-connect-turnstile.php:740
 msgid "Password Reset Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:759
+#: includes/class-ayecode-connect-turnstile.php:757
 msgid "Comment Submission Failed"
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:1008
+#: includes/class-ayecode-connect-turnstile.php:1006
 msgid "Security verification failed, please try again."
 msgstr ""
 
-#: includes/class-ayecode-connect-turnstile.php:1033
+#: includes/class-ayecode-connect-turnstile.php:1031
 msgid "Turnstile API keys are verified successfully."
 msgstr ""
 

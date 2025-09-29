@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 5.0
 Requires PHP: 5.6
 Tested up to: 6.8
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -81,7 +81,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 1.4.12 - 2025-09-TBD =
+= 1.4.12 - 2025-09-29 =
 * Disable turnstile captcha on GetPaid Checkout Form is not working - FIXED
 
 = 1.4.11 - 2025-09-11 =
