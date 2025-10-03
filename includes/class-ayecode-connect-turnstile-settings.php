@@ -386,6 +386,17 @@ class AyeCode_Connect_Turnstile_Settings {
                                             ];
                                         }
 
+										if ( defined( 'UWP_ACTIVECAMPAIGN_VERSION' ) ) {
+                                            $turnstile_protections['uwp_active_campaign_subscribe'] = [
+                                                'title'   => __( 'UsersWP  - ActiveCampaign Subscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                            $turnstile_protections['uwp_active_campaign_unsubscribe'] = [
+                                                'title'   => __( 'UsersWP  - ActiveCampaign Unsubscribe Form', 'ayecode-connect' ),
+                                                'default' => true
+                                            ];
+                                        }
+
 
 										// UWP Frontend Post Addon
 										if ( defined( 'UWP_FRONTEND_POST_VERSION' ) ) {
