@@ -43,6 +43,8 @@ class AyeCode_Connect_Turnstile {
 				'uwp_mc_unsubscribe'      => 1,
 				'uwp_mailpoet_subscribe'       => 1,
 				'uwp_mailpoet_unsubscribe'      => 1,
+				'uwp_active_campaign_subscribe'      => 1,
+				'uwp_active_campaign_unsubscribe'      => 1,
 			)
 		);
 
@@ -159,6 +161,11 @@ class AyeCode_Connect_Turnstile {
 				if ( ! empty( $this->options['protections']['uwp_mailpoet_subscribe'] ) || ! empty( $this->options['protections']['uwp_mailpoet_unsubscribe'] ) ) {
 					add_action( 'uwp_mailpoet_subscribe_fields', array( $this, 'add_turnstile_uwp_mailpoet_forms' ), 10, 1 );
 					add_action( 'uwp_mailpoet_form_validate', array( $this, 'verify_uwp_mailpoet_subscribe' ), 20,1 );
+				}
+
+				if ( ! empty( $this->options['protections']['uwp_active_campaign_subscribe'] ) || ! empty( $this->options['protections']['uwp_active_campaign_unsubscribe'] ) ) {
+					add_action( 'uwp_activecampaign_subscribe_fields', array( $this, 'add_turnstile_uwp_active_campaign_forms' ), 10, 1 );
+					add_action( 'uwp_activecampaign_form_validate', array( $this, 'verify_uwp_active_campaign_subscribe' ), 20,1 );
 				}
 
 				// UWP Frontend Post Addon
@@ -382,6 +389,25 @@ class AyeCode_Connect_Turnstile {
 		return $data;
 	}
 
+	public function verify_uwp_active_campaign_subscribe($data) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if(is_array($data)) {
+			if($data['action'] == 'uwp_active_campaign_subscribe' && $ayecode_turnstile_options['protections']['uwp_active_campaign_subscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_active_campaign_subscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+			if($data['action'] == 'uwp_active_campaign_unsubscribe' && $ayecode_turnstile_options['protections']['uwp_active_campaign_unsubscribe'] == true) {
+				$verify = $this->verify_turnstile( 'uwp_active_campaign_unsubscribe' );
+				if ( is_wp_error( $verify ) ) {
+					return $verify;
+				}
+			}
+		}
+		return $data;
+	}
+
 	public function add_turnstile_uwp_mc_forms( $args ) {
 		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
 		if ($args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mc_subscribe']) ) {
@@ -401,6 +427,17 @@ class AyeCode_Connect_Turnstile {
 		}
 
 		if ( $args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_mailpoet_unsubscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+	}
+
+	public function add_turnstile_uwp_active_campaign_forms( $args ) {
+		$ayecode_turnstile_options = get_option( 'ayecode_turnstile_options');
+		if ( $args['type'] == 'subscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_active_campaign_subscribe']) ) {
+			$this->add_turnstile_widget();
+		}
+
+		if ( $args['type'] == 'unsubscribe' && ! empty($ayecode_turnstile_options['protections']['uwp_active_campaign_unsubscribe']) ) {
 			$this->add_turnstile_widget();
 		}
 	}
