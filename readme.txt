@@ -81,6 +81,10 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.13 - 2025-TBD =
+* Turnstile captcha support for UWP Active Campaign addon forms - ADDED
+* Turnstile captcha support for UWP Brevo addon forms - ADDED
+
 = 1.4.12 - 2025-09-29 =
 * Disable turnstile captcha on GetPaid Checkout Form is not working - FIXED
 
