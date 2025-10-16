@@ -1,0 +1,1128 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: AyeCode Connect 1.4.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-16 14:38+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: AyeCode Ltd <contact@ayecode.io>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;__ngettext:1,2;__ngettext_noop:1,2;_c;_e;_ex:1,2c;"
+"_n:1,2;_n_noop:1,2;_nc:4c,1,2;_nx:4c,1,2;_nx_noop:4c,1,2;_x:1,2c;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;gettext;"
+"gettext_noop\n"
+"X-Poedit-Basepath: ..\n"
+"X-Generator: Poedit 3.5\n"
+"X-Loco-Version: 2.3.1; wp-5.3.2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: vendor\n"
+
+#: ayecode-connect.php:98 includes/class-ayecode-demo-content.php:290
+msgid "Settings"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:35
+msgid "AyeNav"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:39
+msgid ""
+"A Block to add GeoDirectory and UsersWP dynamic menu items to the WP "
+"Navigation Block."
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:43 blocks/class-ayecode-wp-nav.php:172
+#: blocks/class-ayecode-wp-nav.php:182 blocks/class-ayecode-wp-nav.php:192
+#: blocks/class-ayecode-wp-nav.php:203 blocks/class-ayecode-wp-nav.php:211
+#: blocks/class-ayecode-wp-nav.php:222 blocks/class-ayecode-wp-nav.php:232
+#: blocks/class-ayecode-wp-nav.php:242
+msgid "Link"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:45
+msgid "Content"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:54 blocks/class-ayecode-wp-nav.php:266
+#: blocks/class-ayecode-wp-nav.php:281 blocks/class-ayecode-wp-nav.php:295
+#: blocks/class-ayecode-wp-nav.php:305 blocks/class-ayecode-wp-nav.php:315
+#: blocks/class-ayecode-wp-nav.php:325 blocks/class-ayecode-wp-nav.php:335
+#: blocks/class-ayecode-wp-nav.php:347 blocks/class-ayecode-wp-nav.php:357
+#: blocks/class-ayecode-wp-nav.php:367 blocks/class-ayecode-wp-nav.php:377
+#: blocks/class-ayecode-wp-nav.php:389 blocks/class-ayecode-wp-nav.php:399
+#: blocks/class-ayecode-wp-nav.php:409 blocks/class-ayecode-wp-nav.php:419
+#: blocks/class-ayecode-wp-nav.php:435
+msgid "Link styles"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:55
+msgid "Typography"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:58
+msgid "Styles"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:67
+msgid "Wrapper Styles"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:68 blocks/class-ayecode-wp-nav.php:71
+msgid "Advanced"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:89 blocks/class-ayecode-wp-nav.php:219
+#: blocks/class-ayecode-wp-nav.php:560
+msgid "Home"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:90 blocks/class-ayecode-wp-nav.php:177
+msgid "Page"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:91 blocks/class-ayecode-wp-nav.php:188
+msgid "Post ID"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:92
+msgid "WP Login (logged out)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:93
+msgid "WP Logout (logged in)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:94 blocks/class-ayecode-wp-nav.php:198
+msgid "Custom URL"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:95 blocks/class-ayecode-wp-nav.php:583
+msgid "Open Lightbox"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:100
+msgid "GD Search"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:101
+msgid "GD Location"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:104
+#, php-format
+msgid "%s (archive)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:106
+#, php-format
+msgid "%s (add listing)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:111
+msgid "GD Location Switcher"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:116
+msgid "UWP Login (logged out)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:117
+msgid "UWP Register (logged out)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:118
+msgid "UWP Forgot Password? (logged out)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:121
+msgid "Account (logged in)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:122
+msgid "Change Password (logged in)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:123
+msgid "Profile (logged in)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:124
+msgid "Log out (logged in)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:140 blocks/class-ayecode-wp-nav.php:179
+msgid "Select Page"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:168
+msgid "Link Type"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:199
+msgid "Add custom link URL"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:200
+msgid "https://example.com"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:209
+msgid "Enter the BS > Contact form ID prefixed by a `#` eg: #contact-form"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:217
+msgid "Link Text"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:218
+msgid "Add custom link text or leave blank for dynamic"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:227
+msgid "Icon class"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:228
+msgid "Enter a font awesome icon class."
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:229
+msgid "fas fa-ship"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:237
+msgid "Aria label"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:238
+msgid "Describe the link for assistive technologies."
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:239
+msgid "Visit our facebook page"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:255
+msgid "Link style"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:257 blocks/class-ayecode-wp-nav.php:429
+msgid "None"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:258
+msgid "Button"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:259
+msgid "Button rounded"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:260
+msgid "Button Icon Circle"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:261
+msgid "Iconbox bordered"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:262
+msgid "Iconbox filled"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:271
+#: includes/class-ayecode-connect-turnstile-settings.php:274
+msgid "Size"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:273
+msgid "Default"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:274
+msgid "Extra Small (BS5)"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:275
+msgid "Small"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:276
+msgid "Medium"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:277
+msgid "Large"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:286
+msgid "Color"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:287
+msgid "Select the color."
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:290
+msgid "Custom colors"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:427
+msgid "Link Divider"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:430
+msgid "Left"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:431
+msgid "Right"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:575
+msgid "Sign in"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:580
+msgid "Sign out"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:587
+msgid "Custom"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:590
+msgid "Search"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:593
+msgid "Location"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:596
+msgid "Set Locationx"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:614
+msgid "Clear Location"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:638
+#, php-format
+msgid "Add %s"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:644
+msgid "Login"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:648
+msgid "Register"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:652
+msgid "Forgot Password"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:656
+msgid "Account"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:659
+msgid "Change password"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:662
+msgid "Profile"
+msgstr ""
+
+#: blocks/class-ayecode-wp-nav.php:665
+msgid "Log out"
+msgstr ""
+
+#: includes/class-ayecode-connect-remote-actions.php:1664
+msgid "Download source not valid."
+msgstr ""
+
+#: includes/class-ayecode-connect-remote-actions.php:1878
+msgid "Unable to connect to the filesystem. Please confirm your credentials."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:158
+msgid ""
+"Could not access filesystem. Please ensure your credentials are correct."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:164
+msgid "Filesystem initialization failed. Please try again."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:174
+msgid "Source file does not exist."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:181
+msgid "Could not create mu-plugins directory."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:188
+msgid ""
+"Plugin installed successfully. This should resolve any update issues. If "
+"you still have issues, please contact support."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:190
+msgid "Something went wrong during the installation. Please contact support."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:334
+msgid "Plugin and theme update notifications must be enabled first"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:423
+#: includes/class-ayecode-connect-settings.php:657
+#, php-format
+msgid "Auto expires in %s"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:471
+#: includes/class-ayecode-demo-content.php:181
+msgid "Something went wrong, try refreshing the page and trying again."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:472
+#: includes/class-ayecode-demo-content.php:182
+msgid "Are you sure you with to disconnect your site?"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:535
+msgid "Licenses cleared, refresh page to confirm."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:577
+msgid ""
+"One click addon installs, live documentation search, support right from "
+"your WordPress Dashboard"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:585
+#, php-format
+msgid "You are connected to AyeCode Connect as user: %s"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:592
+msgid "Plugin and theme update notifications"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:595
+#: includes/class-ayecode-connect-settings.php:613
+#: includes/class-ayecode-connect-settings.php:631
+#: includes/class-ayecode-connect-settings.php:661
+#: includes/class-ayecode-connect-settings.php:679
+#: includes/class-ayecode-connect-settings.php:697
+msgid "Loading..."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:610
+msgid "One click addon installs, no more license keys"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:628
+msgid "Documentation and Support Widget"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:652
+msgid "Temporary Support User Access"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:684
+msgid "Disconnect site"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:694
+msgid ""
+"Another plugin is calling the get_plugins() function too early which may "
+"block updates. We can try to fix this by calling our filter first with a "
+"must use plugin."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:695
+msgid "Install now"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:707
+msgid "You must connect your site before you can import demo content."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:723
+msgid ""
+"It looks like you might have a coming soon or maintenance plugin active? "
+"This may block our connection server."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:729
+msgid ""
+"By clicking the <b>Connect Site</b> button, you agree to our <a "
+"href='https://ayecode.io/terms-and-conditions/' target='_blank' class='text-"
+"muted' ><u>Terms of Service</u></a> and to share details with AyeCode Ltd"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:732
+msgid "Connect Site"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:739
+msgid "Your website URL has changed, please re-connect with your new URL."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:748
+msgid ""
+"It looks like you might be running on localhost, AyeCode Connect will only "
+"work on a live website."
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:757
+msgid "AyeCode Ltd are the creators of:"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:780
+msgid "Debug Info"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:787
+msgid "Connection Info"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:811
+msgid "Activation Secret"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:828
+msgid "Debug Tools"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:835
+msgid "Clear all licenses"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:836
+msgid "Test Connection ability"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:848
+msgid "All User Licenses Found"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:857
+#: includes/class-ayecode-connect-settings.php:879
+msgid "No licenses found"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:870
+msgid "All Installed Licenses"
+msgstr ""
+
+#: includes/class-ayecode-connect-settings.php:892
+msgid ""
+"get_plugins() return <small>(if Update ID is missing from out,  install "
+"helper plugin below)</small>"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:297
+msgid "How can we help?"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:320
+#: includes/class-ayecode-connect-turnstile-settings.php:123
+msgid "Documentation"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:322
+msgid "Browse the docs to find solutions"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:334
+msgid "Open Support Ticket"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:336
+msgid "Need more help? We got you!"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:348
+msgid "View Support Tickets"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:350
+msgid "View your previous support tickets"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:480
+msgid "Enable Support User Access?"
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:480
+msgid ""
+"AyeCode Connect: If you think your issue might require support access, "
+"please enable the support user from AyeCode Connect. This can speed up the "
+"resolution time."
+msgstr ""
+
+#: includes/class-ayecode-connect-support.php:480
+msgid "Go to Settings"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:67
+msgid "Turnstile Settings"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:68
+msgid "Turnstile Captcha"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:122
+msgid "Cloudflare Turnstile Settings"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:132
+msgid "Settings Saved"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:140
+msgid ""
+"Some settings are defined in wp-config.php and cannot be modified here."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:148
+msgid ""
+"Please disable UsersWP reCaptch plugin. This plugin replaces the need for "
+"it."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:156
+msgid ""
+"Turnstile will be added to any frontend forms only after the api keys are "
+"successfully verified."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:167
+msgid "Keys MUST be verified before use."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:177
+msgid ""
+"Please complete the captcha and then click \"verify keys\" below. If "
+"captcha is not shown, your keys may be invalid or using \"invisible\" mode. "
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:194
+msgid "API Keys"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:201
+msgid "Site Key"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:214
+msgid "Secret Key"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:228
+#: includes/class-ayecode-connect-turnstile-settings.php:231
+msgid "Status"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:229
+#: includes/class-ayecode-connect-turnstile-settings.php:232
+msgid "Verified"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:232
+msgid "Not Verified"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:232
+msgid "Verifying..."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:232
+msgid "Verify Keys"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:240
+msgid "Appearance"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:252
+msgid "Light"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:253
+msgid "Dark"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:254
+msgid "Auto"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:256
+#: includes/class-ayecode-demo-content.php:278 templates/import/site.php:51
+msgid "Theme"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:270
+msgid "Normal"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:271
+msgid "Compact"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:272
+msgid "Flexible"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:283
+msgid "Enable Protection On"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:289
+msgid "WordPress Login"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:293
+msgid "WordPress Registration"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:297
+msgid "WordPress Forgot Password"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:301
+msgid "Comments Form (includes GeoDirectory Reviews)"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:310
+msgid "GeoDirectory Add Listing Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:315
+msgid "GeoDirectory Report Post Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:323
+msgid "GeoDirectory Claim Listing Form (standard)"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:331
+msgid "GeoDirectory PayPer Lead"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:338
+msgid "UsersWP Login"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:342
+msgid "UsersWP Registration"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:346
+msgid "UsersWP Forgot Password"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:350
+msgid "UsersWP Account"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:358
+msgid "UsersWP  - MailerLite Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:362
+msgid "UsersWP  - MailerLite Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:369
+msgid "UsersWP  - MailChimp Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:373
+msgid "UsersWP  - MailChimp Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:380
+msgid "UsersWP  - Mailpoet Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:384
+msgid "UsersWP  - Mailpoet Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:391
+msgid "UsersWP  - ActiveCampaign Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:395
+msgid "UsersWP  - ActiveCampaign Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:402
+msgid "UsersWP  - Brevo Subscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:406
+msgid "UsersWP  - Brevo Unsubscribe Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:415
+msgid "UsersWP Frontend Post"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:424
+msgid "BlockStrap Contact Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:432
+msgid "GetPaid Checkout Form"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:470
+msgid "Disable for"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:492
+msgid "Disable for user roles"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile-settings.php:500
+msgid "Save Changes"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:707
+msgid "Security verification missing."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:716
+msgid ""
+"Please try again. Turnstile response field is empty. Check the keys are "
+"setup properly."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:716
+#: includes/class-ayecode-connect-turnstile.php:749
+msgid "Security verification failed."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:724
+msgid "Turnstile configuration error."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:739
+msgid "Security verification service unavailable."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:814
+msgid "Password Reset Failed"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:831
+msgid "Comment Submission Failed"
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:1080
+msgid "Security verification failed, please try again."
+msgstr ""
+
+#: includes/class-ayecode-connect-turnstile.php:1105
+msgid "Turnstile API keys are verified successfully."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:250
+msgid ""
+"<b>AyeCode Connected!</b> You can now install any addons you have a license "
+"for and your license keys will automatically be synced."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:463
+msgid "Invalid Registration Data"
+msgstr ""
+
+#: includes/class-ayecode-connect.php:467
+msgid "Invalid Secret"
+msgstr ""
+
+#: includes/class-ayecode-connect.php:803
+#, php-format
+msgid "Domain `%1$s` just failed is_usable_domain check as it is empty."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:834
+#, php-format
+msgid ""
+"Domain `%1$s` just failed is_usable_domain check as it is in the forbidden "
+"array."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:849
+#, php-format
+msgid ""
+"Domain `%1$s` just failed is_usable_domain check as it uses an invalid top "
+"level domain."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1188
+#: includes/class-ayecode-connect.php:1203
+#: includes/class-ayecode-connect.php:1421
+msgid "Missing Authorization Header."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1209
+#: includes/class-ayecode-connect.php:1427
+#: includes/class-ayecode-connect.php:1433
+msgid "Invalid Authorization Header."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1216
+msgid "Missing blog token."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1221
+#: includes/class-ayecode-connect.php:1441
+msgid "You are not authorized to do that."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1356
+msgid "Missing token"
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1491
+msgid "Specify an action"
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1753
+#, php-format
+msgid ""
+"<b>AyeCode Connect:</b> Your website URL has changed, please %sre-connect%s "
+"this site."
+msgstr ""
+
+#: includes/class-ayecode-connect.php:1812
+msgid "Missing site id."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:241
+msgid ""
+"This importer should only be used on NEW sites, it will change the whole "
+"look and appearance of your site."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:264
+msgid "Importing Demo"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:272
+msgid "Downloading Data"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:284 templates/import/site.php:66
+msgid "Plugins"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:296
+msgid "Categories"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:302
+msgid "Page Templates"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:308
+msgid "Dummy Posts"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:317
+msgid "Widgets"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:323
+msgid "Menus"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:337
+msgid "Import"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:358
+msgid ""
+"This import may remove all current GeoDirectory data, please only proceed "
+"if you are ok with this."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:368
+msgid "Importing..."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:446
+msgid "ERROR"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:482
+msgid "View Site"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:606
+msgid ""
+"These are legacy themes which are no longer supported and will be removed "
+"soon."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:715
+msgid "Fail to request download package."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:723
+msgid "Fail to generate download package."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:769
+msgid "Could not unpack demo data file."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:864
+#: includes/class-ayecode-demo-content.php:873
+#, php-format
+msgid "Could not install plugins: %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:869
+#, php-format
+msgid "Plugins installed: %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:877
+#, php-format
+msgid "Errors: %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:886
+msgid "Could not install plugins:"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:907
+msgid "Categories:"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:940
+msgid "Page Templates:"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:988
+msgid "Widgets:"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1060
+msgid "The theme installation failed."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1118
+msgid "Could not access to the filesystem."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1128
+msgid "Could not access to the data file."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1135
+msgid "No demo data found."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1142
+msgid "Invalid demo data."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1149
+#, php-format
+msgid "No demo data found for %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1171
+#: includes/class-ayecode-demo-content.php:1175
+#, php-format
+msgid "Theme Install Error: %s"
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1175
+msgid "Invalid demo data found for theme."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1225
+#, php-format
+msgid "Could not install theme %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1246
+#, php-format
+msgid "Could not set theme %s."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1266
+msgid "Could not set plugins due to invalid data."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1367
+msgid "Could not set settings due to invalid data."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1403
+msgid "Could not import categories due to invalid data."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1442
+msgid "Could not import templates due to invalid data."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1747
+msgid "Unable to protect demo data download folder from browsing."
+msgstr ""
+
+#: includes/class-ayecode-demo-content.php:1756
+msgid "Unable to create demo data download folder."
+msgstr ""
+
+#: templates/import/site.php:38 templates/import/site.php:82
+msgid "Paid"
+msgstr ""
+
+#: templates/import/site.php:43
+#, php-format
+msgid ""
+"This is a 3rd party paid theme, please install and activate this theme "
+"FIRST. %sGet Product%s"
+msgstr ""
+
+#: templates/import/site.php:48 templates/import/site.php:84
+msgid "Free"
+msgstr ""
+
+#: templates/import/site.php:95
+#, php-format
+msgid ""
+"This is a 3rd party paid product, please install and activate this plugin "
+"FIRST. %sGet Product%s"
+msgstr ""
+
+#: templates/import/site.php:97
+msgid "Paid 3rd Party"
+msgstr ""
+
+#: templates/import/site.php:128
+msgid "Requires Elementor Pro"
+msgstr ""
+
+#: templates/import/site.php:135
+msgid "View"
+msgstr ""
