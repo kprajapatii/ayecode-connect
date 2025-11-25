@@ -699,22 +699,25 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-			$plugins = get_plugins();
-
+			$plugins_full = get_plugins();
+            $plugins = array();
 			// Remove any non AyeCode plugins.
-			foreach ( $plugins as $slug => $plugin ) {
-				if ( empty( $plugin['Update URL'] ) ) {
-					// Check if a main plugin
-					if ( isset( $plugin['TextDomain'] ) && in_array( $plugin['TextDomain'], array(
-							"geodirectory",
-							"userswp",
-							"invoicing"
-						) )
-					) {
-						// Don't remove
-					} else {
-						unset( $plugins[ $slug ] ); // remove
-					}
+			foreach ( $plugins_full as $slug => $plugin ) {
+
+                // only keep pluigns with an update URL or our CORE plugins
+				if ( !empty( $plugin['Update URL'] ) || (  isset( $plugin['TextDomain'] ) && in_array( $plugin['TextDomain'], array(
+                                        "geodirectory",
+                                        "userswp",
+                                        "invoicing"
+                                ) ) ) ) {
+                    // strip the items back to only the required info
+                    $plugins[ $slug ] = array(
+                            'Update URL' => !empty($plugin['Update URL']) ? $plugin['Update URL'] : '',
+                            'Update ID' => !empty($plugin['Update ID']) ? $plugin['Update ID'] : '',
+                            'Name' => !empty($plugin['Name']) ? $plugin['Name'] : '',
+                            'Version' => !empty($plugin['Version']) ? $plugin['Version'] : '',
+                            'TextDomain' => !empty($plugin['TextDomain']) ? $plugin['TextDomain'] : '',
+                    );
 				}
 			}
 
