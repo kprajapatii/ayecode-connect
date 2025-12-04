@@ -81,6 +81,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.14 - 2025-TBD =
+* Remove unused plugin array elements from API calls to prevent issues with servers with low max_input_vars - FIXED
+
 = 1.4.13 - 2025-10-16 =
 * Turnstile captcha support for UWP Active Campaign addon forms - ADDED
 * Turnstile captcha support for UWP Brevo addon forms - ADDED
