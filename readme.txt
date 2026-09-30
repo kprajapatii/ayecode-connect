@@ -85,6 +85,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.23 - 2026-09-TBD =
+* Update AUI 0.2.56 and SD 1.2.37 - CHANGED
+
 = 1.4.22 - 2026-09-08 =
 * WP Login blocked by Turnstile captcha when Wordfence 2FA is active - FIXED
 
