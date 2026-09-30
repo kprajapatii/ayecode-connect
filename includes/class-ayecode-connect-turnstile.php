@@ -1282,6 +1282,19 @@ class AyeCode_Connect_Turnstile {
 	}
 
 	/**
+	 * Check if both turnstile keys are supplied by wp-config.php constants.
+	 *
+	 * Keys defined by the host are trusted, so the verification gate does not apply to them.
+	 *
+	 * @since 1.4.23
+	 *
+	 * @return bool True if both AYECODE_TURNSTILE_SITE_KEY and AYECODE_TURNSTILE_SECRET_KEY are defined and non-empty.
+	 */
+	public function keys_from_constants() {
+		return defined( 'AYECODE_TURNSTILE_SITE_KEY' ) && AYECODE_TURNSTILE_SITE_KEY && defined( 'AYECODE_TURNSTILE_SECRET_KEY' ) && AYECODE_TURNSTILE_SECRET_KEY ? true : false;
+	}
+
+	/**
 	 * Check keys verification for backward compatibility.
 	 *
 	 * @since.1.4.3
@@ -1289,6 +1302,11 @@ class AyeCode_Connect_Turnstile {
 	 * @return bool The site key if defined, or an empty string if not available.
 	 */
 	public function check_verified() {
+		// Keys defined in wp-config.php are trusted, never gate on verification.
+		if ( $this->keys_from_constants() ) {
+			return false;
+		}
+
 		if ( ! empty( $this->options['check_verified'] ) ) {
 			return true;
 		}

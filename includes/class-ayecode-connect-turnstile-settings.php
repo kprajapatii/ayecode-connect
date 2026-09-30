@@ -76,7 +76,50 @@ class AyeCode_Connect_Turnstile_Settings {
 	 * Register settings.
 	 */
 	public function register_settings() {
-		register_setting( 'ayecode_turnstile_settings', 'ayecode_turnstile_options' );
+		register_setting(
+			'ayecode_turnstile_settings',
+			'ayecode_turnstile_options',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_options' )
+			)
+		);
+	}
+
+	/**
+	 * Sanitize the options before they are saved.
+	 *
+	 * Preserves the stored keys when they are not submitted (the inputs are disabled when the keys
+	 * are defined in wp-config.php) and prevents the verification gate from being latched on when
+	 * the keys are supplied by constants.
+	 *
+	 * @since 1.4.23
+	 *
+	 * @param mixed $options The submitted options.
+	 * @return array The sanitized options.
+	 */
+	public function sanitize_options( $options ) {
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
+
+		$saved_options = get_option( 'ayecode_turnstile_options', array() );
+		if ( ! is_array( $saved_options ) ) {
+			$saved_options = array();
+		}
+
+		// Disabled inputs are not submitted, keep the stored keys so they survive the save.
+		foreach ( array( 'site_key', 'secret_key' ) as $key ) {
+			if ( ! isset( $options[ $key ] ) && isset( $saved_options[ $key ] ) ) {
+				$options[ $key ] = $saved_options[ $key ];
+			}
+		}
+
+		// Keys defined in wp-config.php are trusted, never latch the verification gate.
+		if ( $this->keys_from_constants() ) {
+			unset( $options['check_verified'] );
+		}
+
+		return $options;
 	}
 
 	/**
@@ -89,8 +132,9 @@ class AyeCode_Connect_Turnstile_Settings {
 		$site_key_constant   = defined( 'AYECODE_TURNSTILE_SITE_KEY' );
 		$secret_key_constant = defined( 'AYECODE_TURNSTILE_SECRET_KEY' );
 		$keys_found          = $this->get_site_key() && $this->get_secret_key() ? true : false;
+		$keys_managed        = $this->keys_from_constants();
 		$option_verified     = get_option( 'ayecode_turnstile_verified' );
-		$is_verified         = $keys_found && $this->is_verified( false ) ? true : false;
+		$is_verified         = $keys_found && ( $keys_managed || $this->is_verified( false ) ) ? true : false;
 		$aye_turnstile_setting = true;
 
 		// Set default to know if not set yet.
@@ -221,10 +265,15 @@ class AyeCode_Connect_Turnstile_Settings {
 										?>
                                     </div>
 
+									<?php if ( ! $keys_managed ) { ?>
 									<input type="hidden" name="ayecode_turnstile_options[check_verified]" id="check_verified" value="1">
+									<?php } ?>
 									<?php if ( $keys_found ) { ?>
 									<div class="mb-3 row">
-										<?php if ( $is_verified ) { ?>
+										<?php if ( $keys_managed ) { ?>
+										<div class="col-sm-4"><h3 class="h6"><?php esc_html_e( 'Status', 'ayecode-connect' ); ?></h3></div>
+										<div class="col-sm-8"><button class="btn btn-success btn-sm disabled"><i class="fas fa-check-circle mr-2 me-2"></i><?php esc_html_e( 'Managed by your host', 'ayecode-connect' ); ?></button></div>
+										<?php } elseif ( $is_verified ) { ?>
 										<div class="col-sm-4"><h3 class="h6"><?php esc_html_e( 'Status', 'ayecode-connect' ); ?></h3></div>
 										<div class="col-sm-8"><button class="btn btn-success btn-sm disabled"><i class="fas fa-check-circle mr-2 me-2"></i><?php esc_html_e( 'Verified', 'ayecode-connect' ); ?></button></div>
 										<?php } else { ?>
@@ -577,6 +626,19 @@ class AyeCode_Connect_Turnstile_Settings {
 	}
 
 	/**
+	 * Check if both turnstile keys are supplied by wp-config.php constants.
+	 *
+	 * Keys defined by the host are trusted, so the verification gate does not apply to them.
+	 *
+	 * @since 1.4.23
+	 *
+	 * @return bool True if both AYECODE_TURNSTILE_SITE_KEY and AYECODE_TURNSTILE_SECRET_KEY are defined and non-empty.
+	 */
+	public function keys_from_constants() {
+		return defined( 'AYECODE_TURNSTILE_SITE_KEY' ) && AYECODE_TURNSTILE_SITE_KEY && defined( 'AYECODE_TURNSTILE_SECRET_KEY' ) && AYECODE_TURNSTILE_SECRET_KEY ? true : false;
+	}
+
+	/**
 	 * Check keys verification for backward compatibility.
 	 *
 	 * @since.1.4.3
@@ -584,6 +646,11 @@ class AyeCode_Connect_Turnstile_Settings {
 	 * @return bool The site key if defined, or an empty string if not available.
 	 */
 	public function check_verified() {
+		// Keys defined in wp-config.php are trusted, never gate on verification.
+		if ( $this->keys_from_constants() ) {
+			return false;
+		}
+
 		$options = $this->get_turnstile_options();
 
 		if ( ! empty( $options['check_verified'] ) ) {
@@ -640,6 +707,8 @@ class AyeCode_Connect_Turnstile_Settings {
 	 * @since.1.4.3
 	 */
 	public function enqueue_turnstile_script() {
+		// Load the Cloudflare api.js loader wherever the settings page is mounted.
+		add_action( 'admin_footer', array( AyeCode_Connect_Turnstile::instance(), 'add_lazy_load_script' ) );
 		add_action( 'admin_footer', array( $this, 'add_turnstile_script' ) );
 	}
 
