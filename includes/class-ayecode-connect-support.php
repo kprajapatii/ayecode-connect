@@ -161,9 +161,9 @@ class AyeCode_Connect_Support {
 					$user_id = wp_insert_user( $user_data );
 
 					if ( is_wp_error( $user_id ) ) {
-						echo $user_id->get_error_message();
-					}elseif($user_id){
-						if(is_multisite()){
+						echo esc_html( $user_id->get_error_message() );
+					} elseif ( $user_id ) {
+						if ( is_multisite() ) {
 							$blog_id = get_current_blog_id();
 							add_user_to_blog( $blog_id, $user_id, $user_data['role'] );
 							grant_super_admin( $user_id );
@@ -180,7 +180,6 @@ class AyeCode_Connect_Support {
 					wp_redirect( admin_url( "admin.php?page=ayecode-connect" ) );
 					exit;
 				}
-
 			}
 		}
 	}

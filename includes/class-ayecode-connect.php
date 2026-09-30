@@ -463,15 +463,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return new WP_Error( 'registration_state_invalid', __( 'Invalid Registration Data', 'ayecode-connect' ), 400 );
 			}
 
-			if ( $this->get_activation_secret() != $activation_secret ) {
+			if ( ! is_scalar( $activation_secret ) || ! hash_equals( (string) $this->get_activation_secret(), (string) $activation_secret ) ) {
 				return new WP_Error( 'invalid_secret', __( 'Invalid Secret', 'ayecode-connect' ), 401 );
 			}
 
-			update_option( $this->prefix . '_connected_username', $username );
-			update_option( $this->prefix . '_connected_email', $user_email );
-			update_option( $this->prefix . '_connected_name', $user_display_name);
-			update_option( $this->prefix . '_connected_user_id', $user_id );
-			update_option( $this->prefix . '_blog_id', $blog_id );
+			update_option( $this->prefix . '_connected_username', sanitize_text_field( $username ) );
+			update_option( $this->prefix . '_connected_email', sanitize_email( $user_email ) );
+			update_option( $this->prefix . '_connected_name', sanitize_text_field( $user_display_name ) );
+			update_option( $this->prefix . '_connected_user_id', absint( $user_id ) );
+			update_option( $this->prefix . '_blog_id', absint( $blog_id ) );
 			update_option( $this->prefix . '_blog_token', $access_token );
 			update_option( $this->prefix . '_licence_sync', true );
 
@@ -1266,7 +1266,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			// Check the signature
 			$hash = hash_hmac( 'sha256', $header_64 . "." . $body_64, $key, true ); //(HS256)
-			if ( ! hash_equals( $signature, $hash ) ) {
+			if ( ! hash_equals( $hash, $signature ) ) {
 				return false;
 			}
 
@@ -1567,17 +1567,17 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return array( "success" => false );
 			}
 
-			$hash = esc_attr( $request['hash'] );
+			$hash        = is_scalar( $request['hash'] ) ? esc_attr( $request['hash'] ) : '';
 			$stored_hash = esc_attr( get_transient('ac_test_connection') );
-			$success = false;
+			$success     = false;
 
 			if ( ! $stored_hash || ! $hash ) {
 				$success = false;
 				$code = "no_hash";
-			} elseif ( $hash && $stored_hash && $stored_hash != $hash ) {
+			} elseif ( ! hash_equals( (string) $stored_hash, (string) $hash ) ) {
 				$success = false;
 				$code = "hash_not_equal";
-			} elseif ( $hash && $stored_hash && $stored_hash == $hash ) {
+			} else {
 				$success = true;
 				$code = "success";
 			}
@@ -1637,13 +1637,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return bool
 		 */
-		public function verify_registration_permission_callback(){
+		public function verify_registration_permission_callback( $request = null ){
 			$result = false;
 
-			$activation_secret = isset( $_REQUEST['activation_secret'] ) ? sanitize_text_field($_REQUEST['activation_secret']) : '';
-			$current_activation_secret =  $this->get_activation_secret();
+			$activation_secret         = $request instanceof WP_REST_Request ? $request->get_param( 'activation_secret' ) : ( isset( $_REQUEST['activation_secret'] ) ? wp_unslash( $_REQUEST['activation_secret'] ) : '' );
+			$activation_secret         = is_scalar( $activation_secret ) ? sanitize_text_field( $activation_secret ) : '';
+			$current_activation_secret = $this->get_activation_secret();
 
-			if ($current_activation_secret && $activation_secret && $current_activation_secret == $activation_secret ) {
+			if ( $current_activation_secret && $activation_secret && hash_equals( (string) $current_activation_secret, (string) $activation_secret ) ) {
 				$result = true;
 			}
 
@@ -1747,13 +1748,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		/**
 		 * Show admin notice if site URL changes.
 		 */
-		public function website_url_change_error(){
-			$url_change_disconnection_notice = get_transient( $this->prefix . '_site_moved');
-			if($url_change_disconnection_notice){
-				$ayecode_connect = admin_url( "admin.php?page=ayecode-connect" );
+		public function website_url_change_error() {
+			$url_change_disconnection_notice = get_transient( $this->prefix . '_site_moved' );
+
+			if ( $url_change_disconnection_notice ) {
+				$ayecode_connect = esc_url( admin_url( "admin.php?page=ayecode-connect" ) );
 				?>
 				<div class="notice notice-error is-dismissible">
-					<p><?php echo sprintf( __( '<b>AyeCode Connect:</b> Your website URL has changed, please %sre-connect%s this site.', 'ayecode-connect' ),"<a href='$ayecode_connect'>", "</a>" ); ?></p>
+					<p><?php echo sprintf( __( '<b>AyeCode Connect:</b> Your website URL has changed, please %sre-connect%s this site.', 'ayecode-connect' ), "<a href='$ayecode_connect'>", "</a>" ); ?></p>
 				</div>
 				<?php
 			}
@@ -1783,8 +1785,6 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			);
 
 			$response = self::remote_request( $args,$body );
-
-			print_r( $response );
 
 			// in case the request failed...
 			if ( is_wp_error( $response ) ) {

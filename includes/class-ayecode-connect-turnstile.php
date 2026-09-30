@@ -128,7 +128,7 @@ class AyeCode_Connect_Turnstile {
 				if ( ! empty( $this->options['protections']['gd_add_listing'] ) ) {
 					$post_info = null;
 					if ( isset( $_REQUEST['pid'] ) && $_REQUEST['pid'] != '' ) {
-						$post_id   = $_REQUEST['pid'];
+						$post_id   = absint( $_REQUEST['pid'] );
 						$post_info = get_post( $post_id );
 					}
 
