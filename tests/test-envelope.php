@@ -32,7 +32,7 @@ $e['jti'] = 'J4'; $e['exp'] = $now - 1; check( 'expired rejected', is_wp_error( 
 $e = $base; $e['jti'] = 'J5'; $e['iat'] = $now + 600; check( 'future iat rejected', is_wp_error( $r = $v->verify( $e, $sign( $e ), 4839, 'https://example.com' ) ) && $r->get_error_code() === 'envelope_not_yet_valid' );
 $e = $base; $e['jti'] = 'J6'; $sig = $sign( $e ); $e['payload']['slug'] = 'evil'; check( 'tampered payload rejected', is_wp_error( $r = $v->verify( $e, $sig, 4839, 'https://example.com' ) ) && $r->get_error_code() === 'envelope_bad_signature' );
 $e = $base; $e['jti'] = 'J7'; $e['kid'] = 'nope'; check( 'unknown kid rejected', is_wp_error( $r = $v->verify( $e, $sign( $e ), 4839, 'https://example.com' ) ) && $r->get_error_code() === 'envelope_unknown_kid' );
-$e = $base; $e['jti'] = 'J8'; check( 'json string envelope accepted', true === $v->verify( json_encode( $e ), $sign( $e ), 4839, 'https://example.com' ) );
+$e = $base; $e['jti'] = 'J8'; check( 'canonical string envelope accepted', true === $v->verify( AyeCode_Connect_Envelope::canonical_json( $e ), $sign( $e ), 4839, 'https://example.com' ) );
 check( 'spki to raw', strlen( AyeCode_Connect_Envelope::spki_to_raw( 'MCowBQYDK2VwAyEAQQRiDPwvQ17LA8m3GZp2ZaDMBDw0FitywpgdkjRA7Po=' ) ) === 32 );
 $_SERVER['REMOTE_ADDR'] = '203.0.113.9'; $_SERVER['HTTP_X_FORWARDED_FOR'] = '173.208.153.114';
 check( 'remote_addr ignores X-Forwarded-For', AyeCode_Connect_Envelope::remote_addr() === '203.0.113.9' );

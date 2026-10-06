@@ -1458,79 +1458,51 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 		 *
 		 * @return bool
 		 */
+		/**
+		 * Request validation. Since 2.0 the REST permission callback (signed envelope, or legacy JWT from an
+		 * allowed IP) is the gate; the old spoofable client-IP check is gone.
+		 */
 		private function validate_request() {
-			$result = false;
-
-			if ( $this->get_server_ip() === "173.208.153.114" ) {
-				$result = true;
-			}
-
-			$result = true; // @TODO validate for remote request instead from server.
-
-			return $result;
+			return true;
 		}
 
 		/**
-		 * Get the request has come from our server.
-		 *
-		 * @return string
+		 * Hosts we will download install packages from. HTTPS only.
+		 * The old IP-resolution check broke whenever a host moved behind Cloudflare or R2.
 		 */
-		private function get_server_ip() {
-			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-				// Check ip from share internet
-				$ip = $_SERVER['HTTP_CLIENT_IP'];
-			} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-				// To check ip is pass from proxy
-				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-			} else {
-				$ip = $_SERVER['REMOTE_ADDR'];
-			}
-
-			// Cloudflare can provide a comma separated ip list
-			if ( strpos( $ip, ',' ) !== false ) {
-				$parts = explode( ',', $ip );
-				$ip    = trim( $parts[0] );
-			}
-
-			return $ip;
+		public static function allowed_download_hosts() {
+			return apply_filters( 'ayecode_connect_allowed_download_hosts', array(
+				'api.ayecode.io',
+				'downloads.wordpress.org',
+				'wordpress.org',
+				// legacy hosts while 1.x downloads still come from them (removed in 2.1)
+				'ayecode.io',
+				'wpgeodirectory.com',
+				'userswp.io',
+				'wpinvoicing.com',
+				'wpgetpaid.com',
+				'wpeasyupdates.com',
+			) );
 		}
 
-		/**
-		 * Validate a download url is from our own server: 173.208.153.114
-		 *
-		 * @param $url
-		 *
-		 * @return bool
-		 */
-		private function validate_download_url( $url ) {
-			$result = false;
-
-			if ( $url ) {
-				$parse = parse_url( $url );
-
-				if ( ! empty( $parse['host'] ) ) {
-					$ip = gethostbyname( $parse['host'] );
-
-					if ( $ip === "173.208.153.114" ) { // AyeCode.io Server
-						$result = true;
-					} else if ( $ip === "198.143.164.252" ) { // wordpress.org server
-						$result = true;
-					} else if ( $ip === "127.0.0.1" ) {
-						//$result = true; // @todo localhost
-					}
+		public static function validate_download_url( $url ) {
+			$parse = wp_parse_url( (string) $url );
+			if ( empty( $parse['host'] ) || empty( $parse['scheme'] ) ) {
+				return false;
+			}
+			if ( 'https' !== strtolower( $parse['scheme'] ) ) {
+				return false;
+			}
+			$host = strtolower( $parse['host'] );
+			foreach ( self::allowed_download_hosts() as $allowed ) {
+				$allowed = strtolower( $allowed );
+				if ( $host === $allowed || '.' . $allowed === substr( $host, - strlen( '.' . $allowed ) ) ) {
+					return true;
 				}
 			}
-
-			return $result;
+			return false;
 		}
 
-		/**
-		 * Install plugin.
-		 *
-		 * @param $result
-		 *
-		 * @return mixed
-		 */
 		public function install_plugin( $result, $request = array() ) {
 			$this->debug_log( 'start', __METHOD__, __FILE__, __LINE__ );
 

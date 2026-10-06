@@ -744,8 +744,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$host      = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
 								$localhost = $this->client->is_usable_domain( $host );
 								if ( is_wp_error( $localhost ) ) {
-									echo '<div class="alert alert-danger w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-danger text-light me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
-									_e( "It looks like you might be running on localhost, AyeCode Connect will only work on a live website.", "ayecode-connect" );
+									echo '<div class="alert alert-warning w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-warning text-dark me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
+									_e( "This looks like a local or private site. Connecting works, but remote actions arrive when you open the admin or every few minutes, not instantly.", "ayecode-connect" );
 									echo "</div>";
 								}
 							}

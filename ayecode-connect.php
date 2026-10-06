@@ -3,7 +3,7 @@
  * Plugin Name: AyeCode Connect
  * Plugin URI: https://ayecode.io/
  * Description: A service plugin letting users connect AyeCode Services to their site.
- * Version: 1.4.23
+ * Version: 2.0.0
  * Author: AyeCode
  * Author URI: https://ayecode.io
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( !defined( 'AYECODE_CONNECT_VERSION' ) ) {
-	define( 'AYECODE_CONNECT_VERSION', '1.4.23' );
+	define( 'AYECODE_CONNECT_VERSION', '2.0.0' );
 }
 
 if ( !defined( 'AYECODE_CONNECT_SSL_VERIFY' ) ) {
@@ -44,6 +44,8 @@ function ayecode_connect() {
 	require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
 	// Include the client connection class
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-envelope.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-api.php';
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect.php';
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile-settings.php';
@@ -78,8 +80,9 @@ function ayecode_connect_args() {
 	return array(
 		'remote_url'            => $base_url, //URL to the WP site containing the WP_Service_Provider class
 		'connection_url'        => $base_url . '/connect', //This should be a custom page the authinticates a user the calls the WP_Service_Provider::connect_site() method
-		'api_url'               => $base_url . '/wp-json/', //Might be different for you
+		'api_url'               => $base_url . '/wp-json/', // legacy API, used only while api.ayecode.io is unreachable
 		'api_namespace'         => 'ayecode/v1',
+		'api_base'              => apply_filters( 'ayecode_connect_api_base', 'https://api.ayecode.io' ), // 2.0 API (contract: api.ayecode.io/v1)
 		'local_api_namespace'   => 'ayecode-connect/v1', //Should be unique for each client implementation
 		'prefix'                => 'ayecode_connect', //A unique prefix for things (accepts alphanumerics and underscores). Each client on a given site should have it's own unique prefix
 		'textdomain'            => 'ayecode-connect',

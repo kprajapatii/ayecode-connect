@@ -84,6 +84,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * Class constructor
 		 *
 		 */
+		/** @var string 2.0 API base, e.g. https://api.ayecode.io */
+		public $api_base = 'https://api.ayecode.io';
+
+		/** @var AyeCode_Connect_API */
+		public $api;
+
 		public function __construct( array $args = array() ) {
 			foreach ( $args as $key => $value ) {
 				$this->{$key} = $value;
@@ -91,6 +97,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			$this->api_url       = trailingslashit( $this->api_url );
 			$this->api_namespace = ltrim( $this->api_namespace, '/' );
+			$this->api_base      = untrailingslashit( $this->api_base );
+			$this->api           = new AyeCode_Connect_API( $this, $this->api_base );
 		}
 
 		/**
@@ -296,7 +304,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return Boolean is the site connected?
 		 */
 		public function is_active() {
-			return (bool) $this->get_access_token();
+			return (bool) $this->get_access_token() || (bool) $this->api->get_site_token();
 		}
 
 		/**
@@ -321,12 +329,53 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @return String API URL.
 		 */
 		public function get_api_url( $relative_url ) {
-			$api_url = $this->api_url;
-
-			$api_base     = trailingslashit( $api_url . $this->api_namespace );
 			$relative_url = ltrim( $relative_url, '/' );
 
-			return $api_base . $relative_url;
+			if ( $this->use_legacy_api() ) {
+				return trailingslashit( $this->api_url . $this->api_namespace ) . $relative_url;
+			}
+
+			// 2.0 routes drop the /{site id} suffix: the site token identifies the site.
+			$map = array(
+				'#^me/\d+$#'             => 'me',
+				'#^support/\d+$#'        => 'support',
+				'#^enable-updates/\d+$#' => 'enable-updates',
+				'#^sites/\d+$#'          => 'site',
+			);
+			$relative_url = preg_replace( array_keys( $map ), array_values( $map ), $relative_url );
+
+			return $this->api_base . '/v1/connect/' . $relative_url;
+		}
+
+		/**
+		 * The legacy ayecode.io API is used only when this site has no 2.0 site token (connected before 2.0,
+		 * the old server still completes handshakes) or the 2.0 API was unreachable within the last hour.
+		 *
+		 * @since 2.0.0
+		 */
+		public function use_legacy_api() {
+			if ( apply_filters( $this->prefix . '_force_legacy_api', false ) ) {
+				return true;
+			}
+			if ( ! $this->api->get_site_token() && $this->get_access_token() ) {
+				return true;
+			}
+
+			return $this->api->use_legacy();
+		}
+
+		/**
+		 * A domain the API could never reach inbound (localhost, private IP, .test/.local). Not a blocker in 2.0:
+		 * such sites register through the API and pull their commands.
+		 *
+		 * @since 2.0.0
+		 */
+		public function is_local_domain( $domain = '' ) {
+			if ( ! $domain ) {
+				$domain = wp_parse_url( home_url(), PHP_URL_HOST );
+			}
+
+			return is_wp_error( $this->is_usable_domain( $domain ) );
 		}
 
 		/**
@@ -495,7 +544,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 *
 		 * @return mixed|string
 		 */
-		public function get_activation_secret() {
+		public function get_activation_secret( $create = true ) {
 			//Prepare transient name
 			$transient = $this->prefix . '_activation_secret';
 
@@ -511,6 +560,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			//If set, return
 			if ( ! empty( $secret ) ) {
 				return $secret;
+			}
+
+			if ( ! $create ) {
+				return '';
 			}
 
 			//Else, create a new activation secret...
@@ -582,6 +635,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				)
 			);
 
+			$this->api->schedule_registration_polling();
+			$this->api->schedule_registration_polling();
+
 			return add_query_arg( $args, $this->connection_url );
 		}
 
@@ -610,6 +666,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 
 			//Then delete local secrets
 			$this->delete_secrets();
+			delete_option( $this->prefix . AyeCode_Connect_API::OPTION_SITE_TOKEN );
+			delete_option( $this->prefix . AyeCode_Connect_API::OPTION_LOCAL );
+			delete_option( 'exup_site_token' );
+			wp_clear_scheduled_hook( $this->prefix . AyeCode_Connect_API::CRON_PULL );
+			wp_clear_scheduled_hook( $this->prefix . AyeCode_Connect_API::CRON_REGISTER );
 
 			// remove all licences
 			delete_option( 'exup_keys' );
@@ -745,6 +806,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+			// 2.0 API: the licences come back in the response instead of being pushed to us; apply them here.
+			if ( is_object( $body ) && ( isset( $body->installed ) || isset( $body->all ) ) ) {
+				$this->api->apply_licences(
+					isset( $body->installed ) ? (array) $body->installed : array(),
+					isset( $body->all ) ? (array) $body->all : array()
+				);
+			}
 
 			// check if unauthorised, in this case something is wrong and we should disconnect.
 			if ( 401 == wp_remote_retrieve_response_code( $response ) && !empty($body->code) && 'rest_forbidden' === $body->code ) {
@@ -1349,48 +1418,65 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				'sslverify'   => AYECODE_CONNECT_SSL_VERIFY,
 			);
 
-			$args = wp_parse_args( $args, $defaults );
-
+			$args            = wp_parse_args( $args, $defaults );
 			$args['blog_id'] = (int) $args['blog_id'];
+			$token           = $this->get_access_token();
+			$site_token      = $this->api->get_site_token();
 
-			$token = $this->get_access_token();
-
-			if ( ! $token ) {
+			if ( ! $token && ! $site_token ) {
 				$error = new WP_Error( 'missing_token', __( 'Missing token', 'ayecode-connect' ) );
-
 				$this->debug_log( $error->get_error_message(), __METHOD__ . ':get_access_token error', __FILE__, __LINE__ );
-
 				return $error;
 			}
 
-			$method = strtoupper( $args['method'] );
-
-			$timeout = intval( $args['timeout'] );
-
+			$method      = strtoupper( $args['method'] );
+			$timeout     = intval( $args['timeout'] );
 			$redirection = $args['redirection'];
 			$stream      = $args['stream'];
 			$filename    = $args['filename'];
 			$sslverify   = $args['sslverify'];
-
-			$request = compact( 'method', 'body', 'timeout', 'redirection', 'stream', 'filename', 'sslverify' );
-
-			$url = esc_url( $args['url'] );
-
+			$request     = compact( 'method', 'body', 'timeout', 'redirection', 'stream', 'filename', 'sslverify' );
+			$url         = esc_url( $args['url'] );
 			$this->debug_log( $url, __METHOD__ . ':url', __FILE__, __LINE__ );
 
-			$signature = self::encode( array( 'blog_id' => $args['blog_id'] ), $token );
-
-			$request['headers'] = array_merge(
-				$args['headers'],
-				array(
+			$is_new_api = $site_token && 0 === strpos( $url, $this->api_base );
+			if ( $is_new_api ) {
+				// 2.0 API: site token, JSON body.
+				$request['headers'] = array_merge( $args['headers'], array(
+					'Authorization'          => 'Bearer ' . $site_token,
+					'Content-Type'           => 'application/json',
+					'Accept'                 => 'application/json',
+					'X-HTTP-Method-Override' => $method,
+				) );
+				if ( is_array( $body ) ) {
+					$request['body'] = wp_json_encode( $body );
+				}
+			} else {
+				$signature          = self::encode( array( 'blog_id' => $args['blog_id'] ), $token );
+				$request['headers'] = array_merge( $args['headers'], array(
 					'Authorization'          => 'X_AUTH ' . $signature,
-					'X-HTTP-Method-Override' => $method
-				)
-			);
+					'X-HTTP-Method-Override' => $method,
+				) );
+			}
+
+			$response = wp_remote_request( $url, $request );
+
+			// If the 2.0 API is down, mark it and fall back to the legacy path for an hour where a legacy token exists.
+			if ( $is_new_api && ( is_wp_error( $response ) || (int) wp_remote_retrieve_response_code( $response ) >= 500 ) ) {
+				$this->api->mark_api_down();
+				if ( $token && $this->api_url ) {
+					$this->debug_log( 'api down, retrying legacy', __METHOD__, __FILE__, __LINE__ );
+					$legacy_url         = str_replace( $this->api_base . '/v1/connect/', trailingslashit( $this->api_url . $this->api_namespace ), $url );
+					$signature          = self::encode( array( 'blog_id' => $args['blog_id'] ), $token );
+					$request['headers'] = array_merge( $args['headers'], array( 'Authorization' => 'X_AUTH ' . $signature, 'X-HTTP-Method-Override' => $method ) );
+					$request['body']    = $body;
+					$response           = wp_remote_request( $legacy_url, $request );
+				}
+			}
 
 			$this->debug_log( 'end', __METHOD__, __FILE__, __LINE__ );
 
-			return wp_remote_request( $url, $request );
+			return $response;
 		}
 
 		/**
@@ -1416,33 +1502,42 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @since    1.0.0
 		 */
 		public function has_permission( $request ) {
-			// Retrieve the jwt for the request
-			$jwt = $this->get_jwt( $request );
+			// 2.0: a signed envelope is sufficient on its own, whoever delivered it.
+			$envelope  = $request->get_param( 'envelope' );
+			$signature = $request->get_param( 'signature' );
+			if ( $envelope && $signature ) {
+				$verified = $this->api->envelope()->verify( $envelope, $signature, $this->get_blog_id(), home_url() );
+				if ( true === $verified ) {
+					$this->api->log_auth( 'envelope' );
+					return true;
+				}
+				$this->api->log_auth( 'envelope_rejected' );
+				return new WP_Error( 'rest_forbidden', $verified->get_error_message(), array( 'status' => 401 ) );
+			}
 
-			// Ensure the jwt auth is set...
+			// Legacy (removed in 2.1): HS256 JWT with the blog token, only from an allowed sender IP.
+			// REMOTE_ADDR only; forwarded-for headers are attacker controlled.
+			$jwt = $this->get_jwt( $request );
 			if ( empty( $jwt ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Missing Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
-
-			// And is valid
+			if ( ! in_array( AyeCode_Connect_Envelope::remote_addr(), $this->api->envelope()->get_allowed_legacy_ips(), true ) ) {
+				$this->api->log_auth( 'legacy_rejected_ip' );
+				return new WP_Error( 'rest_forbidden', esc_html__( 'Unsigned commands are only accepted from the AyeCode server.', 'ayecode-connect' ), array( 'status' => 401 ) );
+			}
 			$tokens = explode( '.', $jwt );
 			if ( count( $tokens ) != 3 ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Invalid Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
-
-			// Ensure the body is not empty
 			$body = json_decode( self::url_safe_base64_decode( $tokens[1] ) );
 			if ( empty( $body ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'Invalid Authorization Header.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
-
-			// Retrieve the secret key associated with the blog id
 			$key = $this->get_access_token();
-
-			//... then use it to decrypt the jwt
 			if ( empty( $key ) || empty( self::decode( $jwt, $key ) ) ) {
 				return new WP_Error( 'rest_forbidden', esc_html__( 'You are not authorized to do that.', 'ayecode-connect' ), array( 'status' => 401 ) );
 			}
+			$this->api->log_auth( 'legacy_jwt' );
 
 			return true;
 		}

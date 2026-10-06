@@ -48,8 +48,13 @@ class AyeCode_Connect_Envelope {
 	 */
 	public function verify( $envelope, $signature, $site_id, $home_url, $now = null ) {
 		$now = $now ? (int) $now : time();
+		// The API delivers the envelope as the exact canonical string it signed; verify those bytes. An array
+		// (e.g. from a JSON REST body) is canonicalised here instead.
 		if ( is_string( $envelope ) ) {
-			$envelope = json_decode( $envelope, true );
+			$signed_bytes = $envelope;
+			$envelope     = json_decode( $envelope, true );
+		} else {
+			$signed_bytes = is_array( $envelope ) ? self::canonical_json( $envelope ) : '';
 		}
 		if ( ! is_array( $envelope ) ) {
 			return new WP_Error( 'envelope_invalid', 'Envelope is not valid JSON.' );
@@ -68,7 +73,7 @@ class AyeCode_Connect_Envelope {
 		if ( strlen( $public_key ) !== 32 || strlen( $sig ) !== 64 ) {
 			return new WP_Error( 'envelope_bad_signature', 'Signature has the wrong length.' );
 		}
-		if ( ! sodium_crypto_sign_verify_detached( $sig, self::canonical_json( $envelope ), $public_key ) ) {
+		if ( ! sodium_crypto_sign_verify_detached( $sig, $signed_bytes, $public_key ) ) {
 			return new WP_Error( 'envelope_bad_signature', 'Signature does not verify.' );
 		}
 		if ( (int) $envelope['site_id'] !== (int) $site_id ) {
