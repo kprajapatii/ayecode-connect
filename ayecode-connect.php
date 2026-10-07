@@ -50,11 +50,18 @@ function ayecode_connect() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-settings.php';
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile-settings.php';
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-turnstile.php';
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		require_once plugin_dir_path( __FILE__ ) . 'includes/class-ayecode-connect-cli.php';
+	}
 
 	// Prepare client args
 	$args = ayecode_connect_args();
 
 	$ayecode_connect = new AyeCode_Connect( $args );
+
+	if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'AyeCode_Connect_CLI' ) ) {
+		WP_CLI::add_command( 'ayecode-connect', new AyeCode_Connect_CLI( $ayecode_connect ) );
+	}
 
 	// Call the init method to register routes. This should be called exactly once per client (Preferably before the init hook).
 	$ayecode_connect->init();

@@ -1589,6 +1589,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				return new WP_Error( 'missing_action', __( 'Specify an action', 'ayecode-connect' ) );
 			}
 
+			update_option( $prefix . '_last_command', array( 'action' => $action, 'path' => 'push', 'time' => time() ), false );
+
 			if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				/**
 				 * Run the remote actions class.

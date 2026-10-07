@@ -317,6 +317,7 @@ class AyeCode_Connect_API {
 	 */
 	public function execute( array $envelope ) {
 		$action  = sanitize_title_with_dashes( $envelope['action'] );
+		update_option( $this->prefix . '_last_command', array( 'action' => $action, 'path' => 'pull', 'time' => time() ), false );
 		$payload = is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
 		if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';

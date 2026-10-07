@@ -122,6 +122,18 @@ delete_option( $prefix . '_blog_token' );
 if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) { require_once WP_PLUGIN_DIR . '/ayecode-connect/includes/class-ayecode-connect-remote-actions.php'; }
 chk( 'install allow-list accepts the API host', AyeCode_Connect_Remote_Actions::validate_download_url( str_replace( 'http://127.0.0.1:8787', 'https://api.ayecode.io', $asf->package ) ) );
 
+// ---- 7b. WP-CLI status (support tool): runs, shows the connection, never prints the token ----
+{
+	if ( ! class_exists( 'AyeCode_Connect_CLI' ) ) { require_once WP_PLUGIN_DIR . '/ayecode-connect/includes/class-ayecode-connect-cli.php'; }
+	$cli = new AyeCode_Connect_CLI( $c ); $rows = $cli->status_rows();
+	chk( 'cli status reports the connected site', $rows['connected'] === 'yes' && $rows['site_id'] === $c->get_blog_id() && $rows['site_token'] === 'present' && $rows['api'] === 'api.ayecode.io', wp_json_encode( array( $rows['connected'], $rows['site_id'], $rows['api'] ) ) );
+	chk( 'cli status counts signed commands and records the last one', $rows['commands_signed'] >= 1 && strpos( $rows['last_command'], 'update_licences via pull' ) === 0, $rows['last_command'] );
+	chk( 'cli status never contains the site token', strpos( wp_json_encode( $rows ), $c->api->get_site_token() ) === false );
+	$out = WP_CLI::runcommand( 'ayecode-connect status --format=json', array( 'return' => true, 'launch' => false, 'exit_error' => false ) );
+	$j = json_decode( $out, true );
+	chk( 'wp ayecode-connect status runs as a command', is_array( $j ) && isset( $j['site_id'] ), is_array( $j ) ? '' : substr( (string) $out, 0, 120 ) );
+}
+
 // ---- 8. disconnect ----
 $c->disconnect_site( true );
 chk( 'disconnect clears token and keys', ! $c->api->get_site_token() && ! get_option( 'exup_keys' ) && ! $c->is_registered() );
