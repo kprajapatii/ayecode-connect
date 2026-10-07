@@ -74,6 +74,17 @@ chk( 'activate via API', isset( $a['success'] ), wp_json_encode( $a ) );
 $a2 = $admin->activate_licence( 'geodir_advance_search_filters/geodir_advance_search_filters.php', 'deadbeefdeadbeefdeadbeefdeadbeef', 'plugin' );
 chk( 'invalid key gives the invalid message', isset( $a2['error'] ) && strpos( $a2['error'], 'invalid' ) !== false, wp_json_encode( $a2 ) );
 
+// ---- 4b. extensions-screen install: core's plugins_api() asks WPEU for a package it has not got installed ----
+$GLOBALS['seen_hosts'] = array();
+$_REQUEST['update_url'] = 'https://wpgeodirectory.com'; $_REQUEST['item_id'] = 65056; $_REQUEST['license'] = $KEY; $_REQUEST['wpeu_activate'] = '1';
+if ( ! function_exists( 'plugins_api' ) ) { require_once ABSPATH . 'wp-admin/includes/plugin-install.php'; }
+$api_info = plugins_api( 'plugin_information', (object) array( 'slug' => 'gd-install-test' ) );
+unset( $_REQUEST['update_url'], $_REQUEST['item_id'], $_REQUEST['license'], $_REQUEST['wpeu_activate'] );
+$legacy_hit = array_intersect( $GLOBALS['seen_hosts'], array( 'wpgeodirectory.com', 'wpinvoicing.com', 'wpgetpaid.com', 'userswp.io', 'api.wordpress.org' ) );
+chk( 'install lookup went to the API only', in_array( '127.0.0.1', $GLOBALS['seen_hosts'], true ) && empty( $legacy_hit ), implode( ',', array_unique( $GLOBALS['seen_hosts'] ) ) );
+chk( 'install lookup returns a signed API package with name and version', is_object( $api_info ) && strpos( (string) $api_info->download_link, '/dl/65056/' ) !== false && ! empty( $api_info->name ) && ! empty( $api_info->version ), is_object( $api_info ) ? 'v' . $api_info->version : ( is_wp_error( $api_info ) ? $api_info->get_error_message() : 'none' ) );
+$keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); update_option( 'exup_keys', $keys );
+
 // ---- 5. command pull: FreeScout queues update_licences, the site pulls, verifies and applies it ----
 delete_option( 'exup_keys' );
 $installed = array( 'geodir_advance_search_filters/geodir_advance_search_filters.php' => array( 'license_key' => $KEY, 'status' => 'active', 'download_id' => 65056, 'expiration' => 0, 'parent' => 0, 'user_id' => 3036 ) );
