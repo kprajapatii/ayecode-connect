@@ -25,8 +25,8 @@ chk( 'uses 2.0 api (not legacy)', ! $c->use_legacy_api() && strpos( $c->get_api_
 
 // ---- 1b. a site connected through the old server exchanges its legacy token for an API token ----
 {
-	$lid = 999998; $bt = 'legacy-' . wp_generate_password( 24, false );
-	list( $s, $r ) = api( 'POST', '/v1/sync', array( 'source' => 'edd', 'ops' => array( array( 'entity' => 'site', 'op' => 'upsert', 'data' => array( 'id' => $lid, 'url' => home_url(), 'user_id' => 3036, 'home_url' => home_url(), 'blog_token' => $bt ) ) ) ), array( 'authorization' => 'Bearer ' . $SYNC ) );
+	$lid = 999998; $bt = 'legacy-' . wp_generate_password( 24, false ); $lurl = 'https://legacy-' . wp_parse_url( home_url(), PHP_URL_HOST ); // its own URL: a mirrored site supersedes other rows for the same URL
+	list( $s, $r ) = api( 'POST', '/v1/sync', array( 'source' => 'edd', 'ops' => array( array( 'entity' => 'site', 'op' => 'upsert', 'data' => array( 'id' => $lid, 'url' => $lurl, 'user_id' => 3036, 'home_url' => $lurl, 'blog_token' => $bt ) ) ) ), array( 'authorization' => 'Bearer ' . $SYNC ) );
 	chk( 'old server mirrored the legacy site', $s === 200 && ! empty( $r['ok'] ) );
 	$saved = array( get_option( $prefix . '_blog_id' ), get_option( $prefix . '_blog_token' ), $c->api->get_site_token() );
 	update_option( $prefix . '_blog_id', $lid ); update_option( $prefix . '_blog_token', $bt ); delete_option( $prefix . '_site_token' ); delete_transient( $prefix . '_token_exchange_tried' );
@@ -53,6 +53,16 @@ $info = External_Updates_API::check_updates( $ours );
 $asf = isset( $info->{'geodir_advance_search_filters/geodir_advance_search_filters.php'} ) ? $info->{'geodir_advance_search_filters/geodir_advance_search_filters.php'} : null;
 chk( 'API update check returns the add-on', $asf && ! empty( $asf->new_version ), $asf ? 'v' . $asf->new_version . ' license=' . $asf->license : 'none' );
 chk( 'package link is a signed Worker download', $asf && strpos( $asf->package, '/dl/65056/' ) !== false );
+// the real WP update-check path (check_for_updates) must use the API and never the legacy domains
+$GLOBALS['seen_hosts'] = array();
+add_filter( 'pre_http_request', function ( $pre, $args, $url ) { $GLOBALS['seen_hosts'][] = wp_parse_url( $url, PHP_URL_HOST ); return $pre; }, 10, 3 );
+$admin2 = new External_Updates_Admin( 'external-updates', WP_EASY_UPDATES_VERSION );
+$admin2->check_for_plugin_updates( new stdClass() ); // first call is skipped by the core double-run guard
+$td = $admin2->check_for_plugin_updates( (object) array( 'checked' => array(), 'response' => array(), 'no_update' => array() ) );
+$legacy_hit = array_intersect( $GLOBALS['seen_hosts'], array( 'wpgeodirectory.com', 'wpinvoicing.com', 'wpgetpaid.com', 'userswp.io' ) );
+chk( 'check_for_updates went to the API only', in_array( '127.0.0.1', $GLOBALS['seen_hosts'], true ) && empty( $legacy_hit ), implode( ',', array_unique( $GLOBALS['seen_hosts'] ) ) );
+$found = isset( $td->response['geodir_advance_search_filters/geodir_advance_search_filters.php'] ) || isset( $td->no_update['geodir_advance_search_filters/geodir_advance_search_filters.php'] );
+chk( 'check_for_updates filled the update transient from the API', $found );
 $t = $admin->check_for_plugin_updates( (object) array( 'checked' => array(), 'response' => array() ) ); $t = $admin->check_for_plugin_updates( $t );
 chk( 'check_for_updates populates the transient from the API', isset( $t->response['geodir_advance_search_filters/geodir_advance_search_filters.php'] ) || isset( $t->no_update['geodir_advance_search_filters/geodir_advance_search_filters.php'] ) );
 
