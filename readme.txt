@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 6.0
 Requires PHP: 7.2
 Tested up to: 7.1
-Stable tag: 1.4.23
+Stable tag: 2.0.0
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -84,6 +84,18 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 2.0.0 - 2026-10-07 =
+* New API: the plugin now talks to api.ayecode.io, with the old ayecode.io endpoints kept as a fallback during the move - CHANGED
+* Remote commands from AyeCode are verified by Ed25519 signature; the IP address check is no longer the security gate - SECURITY
+* Each command is bound to this site, expires, and cannot be replayed - SECURITY
+* Legacy commands from the old server are accepted only from the real connecting IP (REMOTE_ADDR), never from forwarded headers - SECURITY
+* Plugin and theme installs only download from api.ayecode.io or wordpress.org over HTTPS - SECURITY
+* Local and unreachable sites (localhost, .test, .local, private networks) can now connect; the site polls for its commands instead of waiting to be called - ADDED
+* Connection no longer depends on the server reaching this site; registration completes from the site side - CHANGED
+* A per-site token is used for update and licence calls once connected - ADDED
+* Public signing keys and the legacy IP list are refreshed daily from api.ayecode.io - ADDED
+* Settings page warns when the site is on a local domain - ADDED
 
 = 1.4.23 - 2026-09-30 =
 * Turnstile stopped working after saving the settings page when keys are set in wp-config.php - FIXED
