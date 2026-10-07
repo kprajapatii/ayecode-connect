@@ -23,6 +23,21 @@ chk( 'is_registered / is_active', $c->is_registered() && $c->is_active() );
 chk( 'connected user stored', get_option( $prefix . '_connected_username' ) === 'atest2' );
 chk( 'uses 2.0 api (not legacy)', ! $c->use_legacy_api() && strpos( $c->get_api_url( '/me/' . $c->get_blog_id() ), '/v1/connect/me' ) !== false );
 
+// ---- 1b. a site connected through the old server exchanges its legacy token for an API token ----
+{
+	$lid = 999998; $bt = 'legacy-' . wp_generate_password( 24, false );
+	list( $s, $r ) = api( 'POST', '/v1/sync', array( 'source' => 'edd', 'ops' => array( array( 'entity' => 'site', 'op' => 'upsert', 'data' => array( 'id' => $lid, 'url' => home_url(), 'user_id' => 3036, 'home_url' => home_url(), 'blog_token' => $bt ) ) ) ), array( 'authorization' => 'Bearer ' . $SYNC ) );
+	chk( 'old server mirrored the legacy site', $s === 200 && ! empty( $r['ok'] ) );
+	$saved = array( get_option( $prefix . '_blog_id' ), get_option( $prefix . '_blog_token' ), $c->api->get_site_token() );
+	update_option( $prefix . '_blog_id', $lid ); update_option( $prefix . '_blog_token', $bt ); delete_option( $prefix . '_site_token' ); delete_transient( $prefix . '_token_exchange_tried' );
+	chk( 'legacy-only site uses the legacy api', $c->use_legacy_api() );
+	chk( 'exchange_legacy_token succeeds', $c->api->maybe_exchange_legacy_token() === true );
+	chk( 'site token stored, 2.0 api now used', strlen( $c->api->get_site_token() ) >= 32 && ! $c->use_legacy_api() );
+	chk( 'exchange is a no-op once a token exists', $c->api->maybe_exchange_legacy_token() === false );
+	api( 'DELETE', '/v1/connect/site', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
+	update_option( $prefix . '_blog_id', $saved[0] ); update_option( $prefix . '_blog_token', $saved[1] ); update_option( $prefix . '_site_token', $saved[2] );
+}
+
 // ---- 2. licence sync through the 2.0 route ----
 $r = $c->sync_licences();
 $keys = get_option( 'exup_keys', array() );

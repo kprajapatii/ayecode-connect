@@ -93,7 +93,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Plugin and theme installs only download from api.ayecode.io or wordpress.org over HTTPS - SECURITY
 * Local and unreachable sites (localhost, .test, .local, private networks) can now connect; the site polls for its commands instead of waiting to be called - ADDED
 * Connection no longer depends on the server reaching this site; registration completes from the site side - CHANGED
-* A per-site token is used for update and licence calls once connected - ADDED
+* A per-site token is used for update and licence calls once connected; sites already connected get one automatically on upgrade - ADDED
 * Public signing keys and the legacy IP list are refreshed daily from api.ayecode.io - ADDED
 * Settings page warns when the site is on a local domain - ADDED
 

@@ -21,6 +21,7 @@ class AyeCode_Connect_API {
 	const TRANSIENT_PULL      = '_commands_pulled';
 	const CRON_PULL           = '_pull_commands';
 	const CRON_REGISTER       = '_pending_registration';
+	const TRANSIENT_EXCHANGE  = '_token_exchange_tried';
 
 	/** @var AyeCode_Connect */
 	protected $client;
@@ -184,6 +185,60 @@ class AyeCode_Connect_API {
 		return true;
 	}
 
+	/** Exchange at most once an hour while it keeps failing (API down, token unknown yet). */
+	public function maybe_exchange_legacy_token() {
+		if ( $this->get_site_token() || ! $this->client->get_blog_id() || ! $this->client->get_access_token() ) {
+			return false;
+		}
+		if ( false !== get_transient( $this->prefix . self::TRANSIENT_EXCHANGE ) ) {
+			return false;
+		}
+		set_transient( $this->prefix . self::TRANSIENT_EXCHANGE, 1, HOUR_IN_SECONDS );
+
+		return $this->exchange_legacy_token();
+	}
+
+	/**
+	 * A site with a legacy HS256 blog token and no site token proves the legacy token to the API and gets a
+	 * site token. From then on the 2.0 routes are used and the old server never needs to push to this site,
+	 * which also fixes sites behind a proxy where the legacy IP check cannot see the real caller.
+	 *
+	 * @return bool
+	 */
+	public function exchange_legacy_token() {
+		$blog_id = (int) $this->client->get_blog_id();
+		$token   = $this->client->get_access_token();
+		if ( $this->get_site_token() || ! $blog_id || ! $token ) {
+			return false;
+		}
+		$jwt      = AyeCode_Connect::encode( array( 'blog_id' => $blog_id ), $token );
+		$response = wp_remote_post( $this->api_base . '/v1/connect/token', array(
+			'timeout' => 20,
+			'headers' => array(
+				'Authorization' => 'X_AUTH ' . $jwt,
+				'Content-Type'  => 'application/json',
+				'Accept'        => 'application/json',
+				'User-Agent'    => 'AyeCode Connect/' . AYECODE_CONNECT_VERSION . '; ' . home_url(),
+			),
+			'body'    => wp_json_encode( array( 'url' => home_url(), 'local' => $this->client->is_local_domain() ) ),
+		) );
+		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+			return false;
+		}
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( empty( $data['site_token'] ) || (int) $data['site_id'] !== $blog_id ) {
+			return false;
+		}
+		update_option( $this->prefix . self::OPTION_SITE_TOKEN, sanitize_text_field( $data['site_token'] ) );
+		update_option( $this->prefix . self::OPTION_LOCAL, ! empty( $data['local'] ) ? 1 : 0 );
+		update_option( $this->prefix . '_licence_sync', true );
+		delete_transient( $this->prefix . self::TRANSIENT_EXCHANGE );
+		$this->schedule_pull();
+		do_action( $this->prefix . '_registered_via_api', $data );
+
+		return true;
+	}
+
 	/** Start polling for registration after the user has been sent to the connect page. */
 	public function schedule_registration_polling() {
 		if ( ! wp_next_scheduled( $this->prefix . self::CRON_REGISTER ) ) {
@@ -210,6 +265,9 @@ class AyeCode_Connect_API {
 		if ( ! $this->client->is_registered() && isset( $_GET['page'] ) && 'ayecode-connect' === $_GET['page'] ) {
 			$this->try_register();
 		}
+		// Connected through the old server (1.4.x upgrade, or the ayecode.io/connect page still finishing the
+		// handshake): swap the legacy token for an API token so licences and commands come from the API.
+		$this->maybe_exchange_legacy_token();
 		// Local sites cannot be reached inbound: pull commands on admin page loads, at most once a minute.
 		if ( $this->is_local() && $this->get_site_token() && false === get_transient( $this->prefix . self::TRANSIENT_PULL ) ) {
 			set_transient( $this->prefix . self::TRANSIENT_PULL, 1, MINUTE_IN_SECONDS );
@@ -299,6 +357,9 @@ class AyeCode_Connect_API {
 	/* ---------- daily ping ---------- */
 
 	public function daily() {
+		if ( ! $this->get_site_token() ) {
+			$this->exchange_legacy_token();
+		}
 		if ( ! $this->get_site_token() ) {
 			return;
 		}
