@@ -85,6 +85,23 @@ chk( 'install lookup went to the API only', in_array( '127.0.0.1', $GLOBALS['see
 chk( 'install lookup returns a signed API package with name and version', is_object( $api_info ) && strpos( (string) $api_info->download_link, '/dl/65056/' ) !== false && ! empty( $api_info->name ) && ! empty( $api_info->version ), is_object( $api_info ) ? 'v' . $api_info->version : ( is_wp_error( $api_info ) ? $api_info->get_error_message() : 'none' ) );
 $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); update_option( 'exup_keys', $keys );
 
+// ---- 4c. enabling updates queues a WPEU install from the API (not the legacy zip host) ----
+{
+	// the local dev database may not carry the WPEU product row the live one has; make it so (idempotent)
+	api( 'POST', '/v1/sync', array( 'ops' => array( array( 'entity' => 'product', 'op' => 'upsert', 'data' => array( 'id' => 9000001, 'slug' => 'wp-easy-updates', 'brand' => 'geodirectory', 'name' => 'WP Easy Updates', 'status' => 'publish', 'current_version' => '2.0.0', 'r2_key' => 'packages/wp-easy-updates/wp-easy-updates-2.0.0.zip', 'free' => 1 ) ) ) ), array( 'authorization' => 'Bearer ' . $SYNC ) );
+	$r = $c->request_updates();
+	chk( 'enable-updates accepted by the API', is_object( $r ) && ! empty( $r->success ), wp_json_encode( $r ) );
+	list( $s, $q ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
+	$env = is_array( $q ) && ! empty( $q['commands'] ) ? json_decode( $q['commands'][0]['envelope'], true ) : array();
+	$link = isset( $env['payload']['download_link'] ) ? $env['payload']['download_link'] : '';
+	chk( 'queued command installs wp-easy-updates from a signed API download', isset( $env['action'] ) && $env['action'] === 'install_plugin' && strpos( $link, '/dl/9000001/' ) !== false, $link ? $link : wp_json_encode( $q ) );
+	if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) { require_once WP_PLUGIN_DIR . '/ayecode-connect/includes/class-ayecode-connect-remote-actions.php'; }
+	chk( 'that download passes the client allow-list', $link && AyeCode_Connect_Remote_Actions::validate_download_url( str_replace( 'http://127.0.0.1:8787', 'https://api.ayecode.io', $link ) ) );
+	if ( ! empty( $env['jti'] ) ) { api( 'POST', '/v1/connect/commands/' . rawurlencode( $env['jti'] ) . '/result', array( 'success' => true, 'note' => 'test: not installed' ), array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) ); }
+	list( $s, $q2 ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
+	chk( 'queue empty after reporting the result', is_array( $q2 ) && empty( $q2['commands'] ) );
+}
+
 // ---- 5. command pull: FreeScout queues update_licences, the site pulls, verifies and applies it ----
 delete_option( 'exup_keys' );
 $installed = array( 'geodir_advance_search_filters/geodir_advance_search_filters.php' => array( 'license_key' => $KEY, 'status' => 'active', 'download_id' => 65056, 'expiration' => 0, 'parent' => 0, 'user_id' => 3036 ) );
