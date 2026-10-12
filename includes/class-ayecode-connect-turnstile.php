@@ -1163,6 +1163,12 @@ class AyeCode_Connect_Turnstile {
 			return $result;
 		}
 
+		// Remove the WP login check for UWP forms. UWP forms have their own setting, so the WP login check must not
+		// run even when the UWP protection is disabled, otherwise the login fails due to the missing turnstile response.
+		if ( 'login' === $type || 'register' === $type ) {
+			remove_filter( 'authenticate', array( $this, 'verify_login' ), 99 );
+		}
+
 		if ( empty( $this->options['protections'][ 'uwp_' . $type ] ) || is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -1175,11 +1181,6 @@ class AyeCode_Connect_Turnstile {
 				case 'forgot':
 				case 'account':
 				case 'frontend':
-
-					// Remove the WP login check so we don't double check.
-					if ( 'login' === $type || 'register' === $type ) {
-						remove_filter( 'authenticate', array( $this, 'verify_login' ), 99 );
-					}
 
 					$verify = $this->verify_turnstile( 'uwp_' . $type );
 					if ( is_wp_error( $verify ) ) {

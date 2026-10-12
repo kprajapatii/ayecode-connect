@@ -85,6 +85,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
+= 1.4.24 - TBD =
+* UWP login always fails when Turnstile is enabled for WP login and disabled for UWP login - FIXED
+
 = 1.4.23 - 2026-09-30 =
 * Turnstile stopped working after saving the settings page when keys are set in wp-config.php - FIXED
 * Turnstile settings page showed keys set in wp-config.php as "Not Verified" and asked to verify them - FIXED
