@@ -1051,6 +1051,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 				if ( ! empty( $options ) ) {
 					foreach ( $options as $key => $option ) {
+						$key = sanitize_title_with_dashes( $key );
 
 						if($key=='custom_css'){
 							$option = wp_strip_all_tags( $option );
@@ -1076,7 +1077,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						}
 
 						if( $this->can_modify_option( $key ) ) {
-							update_option( sanitize_title_with_dashes( $key ), $option );
+							update_option( $key, $option );
 						}
 					}
 
@@ -1828,8 +1829,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				require_once( ABSPATH . 'wp-admin/includes/theme.php' );
 			}
 
-			$slug          = isset( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
-			$download_link = ! empty( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '';
+			$slug          = isset( $_REQUEST['slug'] ) && is_scalar( $_REQUEST['slug'] ) ? sanitize_title_for_query( $_REQUEST['slug'] ) : '';
+			$download_link = ! empty( $_REQUEST['download_link'] ) && is_scalar( $_REQUEST['download_link'] ) ? esc_url_raw( $_REQUEST['download_link'] ) : '';
 
 			$this->debug_log( $slug, __METHOD__ . ':slug', __FILE__, __LINE__ );
 			$this->debug_log( $download_link, __METHOD__ . ':download_link', __FILE__, __LINE__ );
@@ -1942,6 +1943,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			// Update WP options.
 			if ( ! empty( $update_options ) ) {
 				foreach ( $update_options as $option_key => $option_value ) {
+					$option_key = sanitize_title_with_dashes( $option_key );
+
 					if ( $option_key == 'custom_css' ) {
 						$option_value = wp_strip_all_tags( $option_value );
 
@@ -1972,7 +1975,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 					}
 
 					if ( $this->can_modify_option( $option_key ) ) {
-						update_option( sanitize_title_with_dashes( $option_key ), $option_value );
+						update_option( $option_key, $option_value );
 					}
 				}
 			}

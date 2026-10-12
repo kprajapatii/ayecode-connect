@@ -510,7 +510,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 
 			if ( is_wp_error( $result ) ) {
-				wp_send_json_success( "to ayecode:" . $result->get_error_message() );
+				wp_send_json_success( esc_html( "to ayecode:" . $result->get_error_message() ) );
 			} elseif ( empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
 				wp_send_json_error(  wp_kses_post("from ayecode:" . $api_response['message'] ) );
 			} elseif ( ! empty( $api_response['success'] ) && ! empty( $api_response['message'] ) ) {
@@ -582,7 +582,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$connected_username = $this->client->get_connected_username();
 								?>
 								<div class="alert alert-success  w-50 mx-auto text-left" role="alert">
-									<?php echo sprintf( __( "You are connected to AyeCode Connect as user: %s", "ayecode-connect" ), "<b>$connected_username</b>" ); ?>
+									<?php echo sprintf( __( "You are connected to AyeCode Connect as user: %s", "ayecode-connect" ), '<b>' . esc_html( $connected_username ) . '</b>' ); ?>
 								</div>
 
 								<ul class="list-group w-50 mx-auto">
@@ -815,7 +815,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
                                          data-parent="#accordionExample">
                                         <div class="<?php echo $aui_bs5 ? 'accordion-body' : 'card-body'; ?>">
 											<?php
-											echo $this->client->get_activation_secret();
+											echo esc_html( $this->client->get_activation_secret() );
 							                ?>
                                         </div>
                                     </div>
