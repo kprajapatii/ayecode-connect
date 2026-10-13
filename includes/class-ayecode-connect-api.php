@@ -268,8 +268,10 @@ class AyeCode_Connect_API {
 		// Connected through the old server (1.4.x upgrade, or the ayecode.io/connect page still finishing the
 		// handshake): swap the legacy token for an API token so licences and commands come from the API.
 		$this->maybe_exchange_legacy_token();
-		// Local sites cannot be reached inbound: pull commands on admin page loads, at most once a minute.
-		if ( $this->is_local() && $this->get_site_token() && false === get_transient( $this->prefix . self::TRANSIENT_PULL ) ) {
+		// Local sites cannot be reached inbound: pull commands on admin page loads, at most once a minute. Every site
+		// pulls when its Connect page is opened, so anything queued while pushes are off arrives without the daily wait.
+		$on_connect_page = isset( $_GET['page'] ) && 'ayecode-connect' === $_GET['page'];
+		if ( ( $this->is_local() || $on_connect_page ) && $this->get_site_token() && false === get_transient( $this->prefix . self::TRANSIENT_PULL ) ) {
 			set_transient( $this->prefix . self::TRANSIENT_PULL, 1, MINUTE_IN_SECONDS );
 			$this->pull_commands();
 		}

@@ -291,6 +291,16 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					$result = $this->client->request_updates();
 					if ( is_wp_error( $result ) ) {
 						$success = false;
+					} elseif ( ! $this->client->use_legacy_api() ) {
+						// 2.0 API: the install command is queued for this site; collect it now rather than at the next daily pull.
+						$this->client->api->pull_commands();
+						wp_clean_plugins_cache();
+						$installed_plugins = array_map( array( $this, 'format_plugin_slug' ), array_keys( get_plugins() ) );
+						if ( ! in_array( 'external-updates', $installed_plugins ) ) {
+							$success = false;
+						} elseif ( ! is_plugin_active( $plugin ) && is_wp_error( activate_plugin( $plugin ) ) ) {
+							$success = false;
+						}
 					}
 				}
 

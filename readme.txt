@@ -91,7 +91,8 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Each command is bound to this site, expires, and cannot be replayed - SECURITY
 * Legacy commands from the old server are accepted only from the real connecting IP (REMOTE_ADDR), never from forwarded headers - SECURITY
 * Plugin and theme installs only download from api.ayecode.io or wordpress.org over HTTPS - SECURITY
-* Local and unreachable sites (localhost, .test, .local, private networks) can now connect; the site polls for its commands instead of waiting to be called - ADDED
+* The site can now collect its commands instead of waiting to be called (groundwork for connecting local sites) - ADDED
+* Turning on update notifications installs and activates WP Easy Updates straight away - CHANGED
 * Connection no longer depends on the server reaching this site; registration completes from the site side - CHANGED
 * A per-site token is used for update and licence calls once connected; sites already connected get one automatically on upgrade - ADDED
 * Public signing keys and the legacy IP list are refreshed daily from api.ayecode.io - ADDED
