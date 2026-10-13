@@ -98,6 +98,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Settings page warns when the site is on a local domain - ADDED
 * The licence toggle stays off until the updates plugin is active, since licences are managed by it - CHANGED
 * WP-CLI: `wp ayecode-connect status`, `pull` and `sync-licences` for support - ADDED
+* UWP login always fails when Turnstile is enabled for WP login and disabled for UWP login - FIXED
 
 = 1.4.23 - 2026-09-30 =
 * Turnstile stopped working after saving the settings page when keys are set in wp-config.php - FIXED

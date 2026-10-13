@@ -128,7 +128,7 @@ class AyeCode_Connect_Turnstile {
 				if ( ! empty( $this->options['protections']['gd_add_listing'] ) ) {
 					$post_info = null;
 					if ( isset( $_REQUEST['pid'] ) && $_REQUEST['pid'] != '' ) {
-						$post_id   = $_REQUEST['pid'];
+						$post_id   = absint( $_REQUEST['pid'] );
 						$post_info = get_post( $post_id );
 					}
 
@@ -1158,15 +1158,18 @@ class AyeCode_Connect_Turnstile {
 	 * @return mixed Returns the modified result after verification or the initial result if conditions are not met.
 	 */
 	public function verify_uwp( $result, $type, $data ) {
-
 		if ( empty( $type ) && ! isset( $data[ 'uwp_' . $type . '_nonce' ] ) ) {
 			return $result;
+		}
+
+		// Remove the WP login check so we don't double check.
+		if ( 'login' === $type || 'register' === $type ) {
+			remove_filter( 'authenticate', array( $this, 'verify_login' ), 99 );
 		}
 
 		if ( empty( $this->options['protections'][ 'uwp_' . $type ] ) || is_wp_error( $result ) ) {
 			return $result;
 		}
-
 
 		if ( $type ) {
 			switch ( $type ) {
@@ -1175,13 +1178,8 @@ class AyeCode_Connect_Turnstile {
 				case 'forgot':
 				case 'account':
 				case 'frontend':
-
-					// Remove the WP login check so we don't double check.
-					if ( 'login' === $type || 'register' === $type ) {
-						remove_filter( 'authenticate', array( $this, 'verify_login' ), 99 );
-					}
-
 					$verify = $this->verify_turnstile( 'uwp_' . $type );
+
 					if ( is_wp_error( $verify ) ) {
 						$result = $verify;
 					}

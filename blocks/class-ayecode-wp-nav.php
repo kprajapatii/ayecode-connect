@@ -6,6 +6,10 @@
  * @since 2.3.56
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * GeoDir_Widget_Page_Title class.
  *
@@ -772,13 +776,9 @@ class AyeCode_WP_Nav extends WP_Super_Duper {
 
 		if ($this->is_block_content_call()) {
 			return $link_text || $icon ? '<a href="#'.esc_url_raw($link).'" class="'.esc_attr($link_class).'" '.$icon_aria_label.$link_attr.'>'.$link_divider_left.$icon.esc_attr($link_text).$link_divider_right.'</a>' : '';
-			// shortcode
 		} else {
 			$link_class .= ' wp-block-navigation-item__content';
 			return $link_text || $icon ? '<li class="wp-block-navigation-item wp-block-navigation-link '.$wrap_class.'"><a href="'.esc_url_raw($link).'" class="'.esc_attr($link_class).'" '.$icon_aria_label.$link_attr.'>'.$link_divider_left.$icon.esc_attr($link_text).$link_divider_right.'</a></li>' : '';
-			// shortcode
 		}
-
-	}//end output()
-
+	}
 }

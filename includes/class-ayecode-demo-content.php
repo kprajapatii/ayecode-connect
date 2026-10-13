@@ -1323,9 +1323,9 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 					}
 				}
 
-				$plugin_title = $args['slug'];
-				if ( isset( $args['name'] ) ) {
-					$plugin_title .= '(' . $args['name'] . ')';
+				$plugin_title = esc_html( $args['slug'] );
+				if ( isset( $args['name'] ) && is_scalar( $args['name'] ) ) {
+					$plugin_title .= '(' . esc_html( $args['name'] ) . ')';
 				}
 
 				if ( $status ) {
@@ -1335,7 +1335,7 @@ if ( ! class_exists( 'AyeCode_Demo_Content' ) ) {
 				}
 
 				if ( $_errors ) {
-					$errors[ $args['slug'] ] = $plugin_title . ' ' . $_errors;
+					$errors[ $args['slug'] ] = $plugin_title . ' ' . esc_html( is_scalar( $_errors ) ? $_errors : implode( ' ', (array) $_errors ) );
 				}
 			}
 
