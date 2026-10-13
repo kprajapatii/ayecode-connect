@@ -85,7 +85,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 2.0.0 - 2026-10-07 =
+= 2.0.0 - 2026-10-13 =
 * New API: the plugin now talks to api.ayecode.io, with the old ayecode.io endpoints kept as a fallback during the move - CHANGED
 * Remote commands from AyeCode are verified by Ed25519 signature; the IP address check is no longer the security gate - SECURITY
 * Each command is bound to this site, expires, and cannot be replayed - SECURITY
@@ -373,3 +373,8 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Images for Support Popup ( team*.jpg ), Copyright AyeCode Ltd
   License: CC0 Public Domain
   Source: https://ayecode.io/
+
+== Upgrade Notice ==
+
+= 2.0.0 =
+Major update. AyeCode Connect now uses the new api.ayecode.io service and signed commands. Connected sites stay connected and switch over automatically. Please also update WP Easy Updates to 2.0.0.
