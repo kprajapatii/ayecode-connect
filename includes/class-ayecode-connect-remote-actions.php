@@ -1829,6 +1829,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 
 			$this->debug_log( $download_link, __METHOD__ .  ':' . $slug . ':download_link', __FILE__, __LINE__ );
 
+			// same allow-list as plugin installs
+			if ( ! empty( $download_link ) && ! self::validate_download_url( $download_link ) ) {
+				$download_link = '';
+				$error         = __( "Download source not valid.", "ayecode-connect" );
+			}
+
 			if ( ! empty( $download_link ) ) {
 				WP_Filesystem();
 

@@ -288,20 +288,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 						$success = false;
 					}
 				} else {// request
-					$result = $this->client->request_updates();
-					if ( is_wp_error( $result ) ) {
-						$success = false;
-					} elseif ( ! $this->client->use_legacy_api() ) {
-						// 2.0 API: the install command is queued for this site; collect it now rather than at the next daily pull.
-						$this->client->api->pull_commands();
-						wp_clean_plugins_cache();
-						$installed_plugins = array_map( array( $this, 'format_plugin_slug' ), array_keys( get_plugins() ) );
-						if ( ! in_array( 'external-updates', $installed_plugins ) ) {
-							$success = false;
-						} elseif ( ! is_plugin_active( $plugin ) && is_wp_error( activate_plugin( $plugin ) ) ) {
-							$success = false;
-						}
-					}
+					$success = $this->client->install_updates_plugin();
 				}
 
 			} else { // disable
@@ -617,9 +604,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 									<?php $wpeu_active = defined( 'WP_EASY_UPDATES_ACTIVE' ); ?>
 									<li class="list-group-item d-flex justify-content-between align-items-center">
-										<span class="mr-auto me-auto"><?php _e( "One click addon installs, no more license keys", "ayecode-connect" ); ?>
+										<span class="mr-auto me-auto text-left text-start"><?php _e( "One click addon installs, no more license keys", "ayecode-connect" ); ?>
 											<?php if ( ! $wpeu_active ) { ?>
-												<small class="d-block text-muted"><?php _e( "Turn on update notifications first; licences are managed by the updates plugin.", "ayecode-connect" ); ?></small>
+												<small class="d-block text-muted text-left text-start"><?php _e( "Turn on update notifications first; licences are managed by the updates plugin.", "ayecode-connect" ); ?></small>
 											<?php } ?>
 										</span>
 										<div class="spinner-border spinner-border-sm mr-2 me-2 d-none text-muted"

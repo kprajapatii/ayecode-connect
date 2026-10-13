@@ -90,9 +90,9 @@ If your host runs "mod security" on your hosting and has some specific additiona
 * Remote commands from AyeCode are verified by Ed25519 signature; the IP address check is no longer the security gate - SECURITY
 * Each command is bound to this site, expires, and cannot be replayed - SECURITY
 * Legacy commands from the old server are accepted only from the real connecting IP (REMOTE_ADDR), never from forwarded headers - SECURITY
-* Plugin and theme installs only download from api.ayecode.io or wordpress.org over HTTPS - SECURITY
+* Plugin and theme installs only download over HTTPS from api.ayecode.io, wordpress.org or AyeCode's own sites - SECURITY
 * The site can now collect its commands instead of waiting to be called (groundwork for connecting local sites) - ADDED
-* Turning on update notifications installs and activates WP Easy Updates straight away - CHANGED
+* Connecting a site sets up update notifications and one click installs straight away, including sites behind a proxy or CDN - FIXED
 * Connection no longer depends on the server reaching this site; registration completes from the site side - CHANGED
 * A per-site token is used for update and licence calls once connected; sites already connected get one automatically on upgrade - ADDED
 * Public signing keys and the legacy IP list are refreshed daily from api.ayecode.io - ADDED

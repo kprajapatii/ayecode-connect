@@ -31,6 +31,8 @@ class AyeCode_Connect_API {
 	protected $api_base;
 	/** @var AyeCode_Connect_Envelope */
 	protected $envelope;
+	/** @var array prefixes whose hooks are registered: the plugin builds several clients per request, hooks run once */
+	protected static $hooked = array();
 
 	public function __construct( $client, $api_base ) {
 		$this->client   = $client;
@@ -38,9 +40,15 @@ class AyeCode_Connect_API {
 		$this->api_base = untrailingslashit( $api_base );
 		$this->envelope = new AyeCode_Connect_Envelope( $this->api_base );
 
+		if ( ! empty( self::$hooked[ $this->prefix ] ) ) {
+			return;
+		}
+		self::$hooked[ $this->prefix ] = true;
 		add_filter( 'cron_schedules', array( $this, 'cron_schedules' ) );
 		add_action( $this->prefix . self::CRON_PULL, array( $this, 'pull_commands' ) );
 		add_action( $this->prefix . self::CRON_REGISTER, array( $this, 'try_register' ) );
+		// before cron_callback (10) syncs licences, so an upgraded 1.4 site uses the API from its first daily run
+		add_action( $this->prefix . '_callback', array( $this, 'maybe_exchange_legacy_token' ), 5 );
 		add_action( $this->prefix . '_callback', array( $this, 'daily' ), 20 );
 		add_action( 'admin_init', array( $this, 'admin_init' ), 5 );
 	}
@@ -114,12 +122,32 @@ class AyeCode_Connect_API {
 		}
 		$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( 401 === $code ) {
+			$this->handle_unauthorized();
 			return new WP_Error( 'api_unauthorized', 'The site token was rejected.' );
 		}
 		if ( $code >= 400 ) {
 			return new WP_Error( 'api_error', isset( $decoded['message'] ) ? $decoded['message'] : 'API error ' . $code, $decoded );
 		}
 		return is_array( $decoded ) ? $decoded : array();
+	}
+
+	/**
+	 * The API refused our site token: it was replaced or the site was removed from the account. Drop it. A site that
+	 * still has its legacy token gets a new one on the next admin load; one without is disconnected and told to
+	 * reconnect, as 1.4 did when the old server refused it.
+	 */
+	public function handle_unauthorized() {
+		if ( ! $this->get_site_token() ) {
+			return;
+		}
+		delete_option( $this->prefix . self::OPTION_SITE_TOKEN );
+		wp_clear_scheduled_hook( $this->prefix . self::CRON_PULL );
+		if ( $this->client->get_access_token() ) {
+			delete_transient( $this->prefix . self::TRANSIENT_EXCHANGE );
+			return;
+		}
+		$this->client->disconnect_site( false );
+		set_transient( $this->prefix . '_site_moved', true, MONTH_IN_SECONDS );
 	}
 
 	/* ---------- registration (pull model) ---------- */
@@ -173,6 +201,7 @@ class AyeCode_Connect_API {
 		update_option( $this->prefix . self::OPTION_SITE_TOKEN, sanitize_text_field( $data['site_token'] ) );
 		update_option( $this->prefix . self::OPTION_LOCAL, ! empty( $data['local'] ) ? 1 : 0 );
 		update_option( $this->prefix . '_licence_sync', true );
+		update_option( $this->prefix . '_post_connect_setup', 1, false ); // install WP Easy Updates and sync licences on the next admin load
 		delete_transient( $this->prefix . '_site_moved' );
 		delete_transient( $this->prefix . '_activation_secret' );
 		delete_option( $this->prefix . '_activation_secret' );
@@ -231,7 +260,7 @@ class AyeCode_Connect_API {
 		}
 		update_option( $this->prefix . self::OPTION_SITE_TOKEN, sanitize_text_field( $data['site_token'] ) );
 		update_option( $this->prefix . self::OPTION_LOCAL, ! empty( $data['local'] ) ? 1 : 0 );
-		update_option( $this->prefix . '_licence_sync', true );
+		// keep the site's own licence sync setting: a 1.4 site may have turned it off
 		delete_transient( $this->prefix . self::TRANSIENT_EXCHANGE );
 		$this->schedule_pull();
 		do_action( $this->prefix . '_registered_via_api', $data );
@@ -268,6 +297,8 @@ class AyeCode_Connect_API {
 		// Connected through the old server (1.4.x upgrade, or the ayecode.io/connect page still finishing the
 		// handshake): swap the legacy token for an API token so licences and commands come from the API.
 		$this->maybe_exchange_legacy_token();
+		// First admin load after connecting: install WP Easy Updates and sync licences, as the old server did for 1.4.
+		$this->client->maybe_finish_connection_setup();
 		// Local sites cannot be reached inbound: pull commands on admin page loads, at most once a minute. Every site
 		// pulls when its Connect page is opened, so anything queued while pushes are off arrives without the daily wait.
 		$on_connect_page = isset( $_GET['page'] ) && 'ayecode-connect' === $_GET['page'];
@@ -320,7 +351,7 @@ class AyeCode_Connect_API {
 	public function execute( array $envelope ) {
 		$action  = sanitize_title_with_dashes( $envelope['action'] );
 		update_option( $this->prefix . '_last_command', array( 'action' => $action, 'path' => 'pull', 'time' => time() ), false );
-		$payload = is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
+		$payload = isset( $envelope['payload'] ) && is_array( $envelope['payload'] ) ? $envelope['payload'] : array();
 		if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 			require_once plugin_dir_path( __FILE__ ) . 'class-ayecode-connect-remote-actions.php';
 			AyeCode_Connect_Remote_Actions::instance( $this->prefix, $this->client );
@@ -360,9 +391,6 @@ class AyeCode_Connect_API {
 	/* ---------- daily ping ---------- */
 
 	public function daily() {
-		if ( ! $this->get_site_token() ) {
-			$this->exchange_legacy_token();
-		}
 		if ( ! $this->get_site_token() ) {
 			return;
 		}

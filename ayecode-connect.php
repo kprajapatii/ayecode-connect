@@ -122,6 +122,8 @@ function ayecode_connect_deactivation() {
 	$args = ayecode_connect_args();
 	$prefix = $args['prefix'];
 	wp_clear_scheduled_hook( $prefix.'_callback' );
+	wp_clear_scheduled_hook( $prefix.'_pull_commands' );
+	wp_clear_scheduled_hook( $prefix.'_pending_registration' );
 
 	// destroy support user
 	$support_user = get_user_by( 'login', 'ayecode_connect_support_user' );

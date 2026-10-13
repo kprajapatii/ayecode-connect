@@ -159,6 +159,45 @@ chk( 'install allow-list accepts the API host', AyeCode_Connect_Remote_Actions::
 	chk( 'wp ayecode-connect status runs as a command', is_array( $j ) && isset( $j['site_id'] ), is_array( $j ) ? '' : substr( (string) $out, 0, 120 ) );
 }
 
+// ---- 7c. routing: demo content, plugin lists and the connection test stay on ayecode.io; the rest go to the API ----
+{
+	$legacy_base = trailingslashit( $c->api_url . $c->api_namespace );
+	chk( 'demos list stays on ayecode.io', $c->get_api_url( '/demos' ) === $legacy_base . 'demos', $c->get_api_url( '/demos' ) );
+	chk( 'demo content request stays on ayecode.io', 0 === strpos( $c->get_api_url( '/request_demo_content/dir/theme' ), $legacy_base ) );
+	chk( 'test-connection stays on ayecode.io', 0 === strpos( $c->get_api_url( '/test-connection' ), $legacy_base ) );
+	chk( 'me goes to the API without the site id', $c->get_api_url( '/me/5' ) === $c->api_base . '/v1/connect/me', $c->get_api_url( '/me/5' ) );
+	chk( 'fallback rebuilds the legacy route with the site id', $c->legacy_url_for( $c->api_base . '/v1/connect/me', 7 ) === $legacy_base . 'me/7' && $c->legacy_url_for( $c->api_base . '/v1/connect/site', 7 ) === $legacy_base . 'sites/7' );
+	chk( 'fallback keeps the query string', $c->legacy_url_for( $c->api_base . '/v1/connect/licenses?a=1&b=2', 7 ) === $legacy_base . 'licenses?a=1&b=2' );
+	$c->api->mark_api_down();
+	chk( 'a site with no legacy token never falls back to ayecode.io', ! $c->use_legacy_api() );
+	delete_option( $prefix . AyeCode_Connect_API::OPTION_LEGACY_UNTIL );
+}
+
+// ---- 7d. first admin load after connecting: WP Easy Updates active and licences synced, as 1.4 had it ----
+{
+	$wpeu = 'wp-easy-updates/external-updates.php';
+	deactivate_plugins( $wpeu, true );
+	update_option( $prefix . '_licence_sync', false );
+	update_option( $prefix . '_post_connect_setup', 1, false );
+	delete_transient( $prefix . '_post_connect_running' );
+	$c->maybe_finish_connection_setup();
+	chk( 'post-connect setup activates WP Easy Updates', is_plugin_active( $wpeu ) );
+	chk( 'post-connect setup turns licence sync on and clears its flag', get_option( $prefix . '_licence_sync' ) && ! get_option( $prefix . '_post_connect_setup' ) );
+	$c->maybe_finish_connection_setup();
+	chk( 'post-connect setup runs once', ! get_option( $prefix . '_post_connect_setup' ) );
+	chk( 'install_updates_plugin is true when already active', $c->install_updates_plugin() === true );
+}
+
+// ---- 7e. the API refuses the site token ----
+{
+	$tok = $c->api->get_site_token();
+	update_option( $prefix . '_blog_token', 'legacy-test-token' );
+	$c->api->handle_unauthorized();
+	chk( 'refused token with a legacy token: token dropped, site stays connected for a re-exchange', ! $c->api->get_site_token() && $c->get_blog_id() && false === get_transient( $prefix . AyeCode_Connect_API::TRANSIENT_EXCHANGE ) );
+	update_option( $prefix . AyeCode_Connect_API::OPTION_SITE_TOKEN, $tok );
+	delete_option( $prefix . '_blog_token' );
+}
+
 // ---- 8. disconnect ----
 $c->disconnect_site( true );
 chk( 'disconnect clears token and keys', ! $c->api->get_site_token() && ! get_option( 'exup_keys' ) && ! $c->is_registered() );
