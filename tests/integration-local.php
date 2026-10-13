@@ -105,6 +105,27 @@ $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); u
 	$c->api->execute( array( 'action' => 'install_plugin', 'payload' => array( 'name' => 'Download test', 'slug' => 'ac-download-test', 'file-slug' => 'ac-download-test', 'download_link' => $signed ) ) );
 	remove_filter( 'upgrader_pre_download', $catch, 10 );
 	chk( 'installer downloads the signed link unchanged', $signed && $seen === $signed, (string) $seen );
+	chk( 'queued WPEU install carries min_version so a 1.x copy is replaced', isset( $env['payload']['min_version'] ) && $env['payload']['min_version'] === '2.0.0', wp_json_encode( $env['payload'] ?? null ) );
+	// min_version: an installed copy older than it is replaced from the download link; a current one is left alone
+	$udir = WP_PLUGIN_DIR . '/ac-upgrade-test';
+	$mk = function ( $dir, $v ) { wp_mkdir_p( $dir ); file_put_contents( $dir . '/ac-upgrade-test.php', "<?php\n/*\nPlugin Name: AC upgrade test\nVersion: $v\n*/\n" ); };
+	$mk( $udir, '1.0.0' );
+	$zdir = get_temp_dir() . 'ac-upgrade-src-' . wp_generate_password( 6, false ); $mk( $zdir . '/ac-upgrade-test', '2.0.0' );
+	$zip = $zdir . '.zip'; $za = new ZipArchive(); $za->open( $zip, ZipArchive::CREATE ); $za->addFile( $zdir . '/ac-upgrade-test/ac-upgrade-test.php', 'ac-upgrade-test/ac-upgrade-test.php' ); $za->close();
+	$downloads = 0;
+	$serve = function ( $reply, $package ) use ( $zip, &$downloads ) { $downloads++; $copy = wp_tempnam( 'ac-upgrade' ); copy( $zip, $copy ); return $copy; };
+	add_filter( 'upgrader_pre_download', $serve, 10, 2 );
+	$up = array( 'action' => 'install_plugin', 'payload' => array( 'name' => 'AC upgrade test', 'slug' => 'ac-upgrade-test', 'file-slug' => 'ac-upgrade-test', 'download_link' => 'https://api.ayecode.io/dl/1/x', 'min_version' => '2.0.0' ) );
+	$c->api->execute( $up );
+	wp_clean_plugins_cache(); $pl = get_plugins();
+	chk( 'installer replaces a copy older than min_version', isset( $pl['ac-upgrade-test/ac-upgrade-test.php'] ) && $pl['ac-upgrade-test/ac-upgrade-test.php']['Version'] === '2.0.0' && $downloads === 1, $pl['ac-upgrade-test/ac-upgrade-test.php']['Version'] ?? 'missing' );
+	$c->api->execute( $up );
+	chk( 'installer leaves a current copy alone', $downloads === 1 );
+	unset( $up['payload']['min_version'] ); $mk( $udir, '1.0.0' ); $c->api->execute( $up );
+	chk( 'without min_version an installed copy is never replaced', $downloads === 1 );
+	remove_filter( 'upgrader_pre_download', $serve, 10 );
+	deactivate_plugins( 'ac-upgrade-test/ac-upgrade-test.php', true );
+	$GLOBALS['wp_filesystem']->delete( $udir, true ); $GLOBALS['wp_filesystem']->delete( $zdir, true ); @unlink( $zip );
 	if ( ! empty( $env['jti'] ) ) { api( 'POST', '/v1/connect/commands/' . rawurlencode( $env['jti'] ) . '/result', array( 'success' => true, 'note' => 'test: not installed' ), array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) ); }
 	list( $s, $q2 ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
 	chk( 'queue empty after reporting the result', is_array( $q2 ) && empty( $q2['commands'] ) );

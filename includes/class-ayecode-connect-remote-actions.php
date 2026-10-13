@@ -1533,6 +1533,8 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				'download_link'    => isset( $params['download_link'] ) ? esc_url_raw( $params['download_link'] ) : '',
 				'activate'         => isset( $params['activate'] ) && $params['activate'] ? true : false,
 				'network_activate' => isset( $params['network_activate'] ) && $params['network_activate'] ? true : false,
+				// 2.0: replace an installed copy older than this (the API sends it for WP Easy Updates 1.x -> 2.x).
+				'min_version'      => isset( $params['min_version'] ) ? preg_replace( '/[^0-9A-Za-z.\-]/', '', (string) $params['min_version'] ) : '',
 			);
 
 			if ( empty( $plugin['repo-slug'] ) ) {
@@ -1618,6 +1620,16 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 				// See if the plugin is installed already
 				if ( in_array( $plugin_to_install['repo-slug'], $installed_plugins ) ) {
 					$installed = true;
+				}
+
+				// An installed copy older than min_version is replaced, which needs a download link (never wordpress.org).
+				$upgrade = false;
+				if ( $installed && ! empty( $plugin_to_install['min_version'] ) && ! empty( $plugin_to_install['download_link'] ) ) {
+					$all_plugins = get_plugins();
+					if ( isset( $all_plugins[ $plugin ]['Version'] ) && version_compare( $all_plugins[ $plugin ]['Version'], $plugin_to_install['min_version'], '<' ) ) {
+						$installed = false;
+						$upgrade   = true;
+					}
 				}
 
 				$this->debug_log( $plugin, __METHOD__ . ':plugin', __FILE__, __LINE__ );
@@ -1709,12 +1721,12 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 						$result = $upgrader->install_package( array(
 							'source'                      => $working_dir,
 							'destination'                 => WP_PLUGIN_DIR,
-							'clear_destination'           => false,
+							'clear_destination'           => $upgrade,
 							'abort_if_destination_exists' => false,
 							'clear_working'               => true,
 							'hook_extra'                  => array(
 								'type'   => 'plugin',
-								'action' => 'install'
+								'action' => $upgrade ? 'update' : 'install'
 							)
 						) );
 

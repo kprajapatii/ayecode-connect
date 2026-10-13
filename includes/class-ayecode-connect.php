@@ -885,6 +885,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * queue its install and collect that at once (pushes are off), or ask the old server, which pushes it. True only
 		 * when the plugin really is active afterwards, so the settings page never shows a switch that did nothing.
 		 *
+		 * The old server installs 1.x as soon as a site connects. On the 2.0 API that copy is replaced with 2.x the same
+		 * way (the API's install command carries a min_version); if that fails 1.x is kept, it still works.
+		 *
 		 * @since 2.0.0
 		 *
 		 * @return bool
@@ -895,6 +898,16 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 			$network = is_multisite();
+
+			$plugins = get_plugins();
+			$outdated = isset( $plugins[ $plugin ]['Version'] ) && version_compare( $plugins[ $plugin ]['Version'], '2.0.0', '<' );
+			if ( $outdated && ! $this->use_legacy_api() ) {
+				$result = $this->request_updates();
+				if ( ! is_wp_error( $result ) ) {
+					$this->api->pull_commands();
+					wp_clean_plugins_cache();
+				}
+			}
 
 			if ( ! array_key_exists( $plugin, get_plugins() ) ) {
 				$result = $this->request_updates();
