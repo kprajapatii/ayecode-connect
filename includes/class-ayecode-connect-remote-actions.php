@@ -1641,7 +1641,7 @@ if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) {
 							$plugin_information = (object) array(
 								'name'          => esc_attr( $plugin_to_install['name'] ),
 								'slug'          => esc_attr( $plugin_to_install['repo-slug'] ),
-								'download_link' => esc_url( $plugin_to_install['download_link'] ),
+								'download_link' => esc_url_raw( $plugin_to_install['download_link'] ), // raw: esc_url would turn & into &#038; and break signed links
 							);
 						} else {
 							$this->debug_log( $plugin_to_install['repo-slug'], __METHOD__ . ':plugin-slug', __FILE__, __LINE__ );

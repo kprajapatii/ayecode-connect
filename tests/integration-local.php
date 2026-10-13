@@ -97,6 +97,14 @@ $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); u
 	chk( 'queued command installs wp-easy-updates from a signed API download', isset( $env['action'] ) && $env['action'] === 'install_plugin' && strpos( $link, '/dl/9000001/' ) !== false, $link ? $link : wp_json_encode( $q ) );
 	if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) { require_once WP_PLUGIN_DIR . '/ayecode-connect/includes/class-ayecode-connect-remote-actions.php'; }
 	chk( 'that download passes the client allow-list', $link && AyeCode_Connect_Remote_Actions::validate_download_url( str_replace( 'http://127.0.0.1:8787', 'https://api.ayecode.io', $link ) ) );
+	// the installer must hand WordPress the signed link byte for byte (esc_url turned & into &#038; and the API refused it)
+	$signed = str_replace( 'http://127.0.0.1:8787', 'https://api.ayecode.io', $link );
+	$seen   = null;
+	$catch  = function ( $reply, $package ) use ( &$seen ) { $seen = $package; return new WP_Error( 'test_stop', 'stopped before download' ); };
+	add_filter( 'upgrader_pre_download', $catch, 10, 2 );
+	$c->api->execute( array( 'action' => 'install_plugin', 'payload' => array( 'name' => 'Download test', 'slug' => 'ac-download-test', 'file-slug' => 'ac-download-test', 'download_link' => $signed ) ) );
+	remove_filter( 'upgrader_pre_download', $catch, 10 );
+	chk( 'installer downloads the signed link unchanged', $signed && $seen === $signed, (string) $seen );
 	if ( ! empty( $env['jti'] ) ) { api( 'POST', '/v1/connect/commands/' . rawurlencode( $env['jti'] ) . '/result', array( 'success' => true, 'note' => 'test: not installed' ), array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) ); }
 	list( $s, $q2 ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
 	chk( 'queue empty after reporting the result', is_array( $q2 ) && empty( $q2['commands'] ) );
