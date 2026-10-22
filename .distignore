@@ -31,3 +31,5 @@ node_modules
 *.sql
 *.tar.gz
 *.zip
+# Composer plugin used only while running composer install; not loaded by the plugin
+vendor/composer/installers
