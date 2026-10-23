@@ -85,6 +85,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 					}
 
 					add_action( 'admin_menu', array( self::$instance, 'menu_item' ) );
+					add_action( 'admin_init', array( self::$instance, 'page_actions' ) );
 
 
 					self::$instance->base_url = str_replace( "/includes/../", "/", plugins_url( '../', __FILE__ ) );
@@ -405,6 +406,11 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 			$success = true;
 			$state   = isset( $_POST['state'] ) && $_POST['state'] ? true : false;
 
+			// Our support team logs in from the help desk, which cannot reach a local site.
+			if ( $state && $this->client->api->is_local() ) {
+				wp_send_json_error( __( 'Not available for local sites: our support team cannot reach this site.', 'ayecode-connect' ) );
+			}
+
 			if ( $state ) { // enable
 				// Sync support user info
 				$this->client->set_remote_support_user( true );
@@ -537,6 +543,114 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		/**
 		 * Settings page HTML.
 		 */
+		/**
+		 * Connect screen actions that redirect, so they run before any output:
+		 * - Connect Site, and ac-connect=1 (the AyeCode account's "connect a site" link): remember that connecting
+		 *   started, so the screen can say it is waiting for approval, then go to the AyeCode account to approve.
+		 * - Try again for a WP Easy Updates install that could not be pushed.
+		 *
+		 * @since 2.0.1
+		 */
+		public function page_actions() {
+			if ( ! isset( $_GET['page'] ) || 'ayecode-connect' !== $_GET['page'] || ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+			$page = admin_url( 'admin.php?page=ayecode-connect' );
+
+			$start = ! empty( $_GET['ac-connect'] ) || ( ! empty( $_GET['ac-start'] ) && check_admin_referer( 'ayecode-connect-start' ) );
+			if ( $start && ! $this->client->is_registered() ) {
+				set_transient( $this->client->prefix . '_connect_started', time(), 3 * HOUR_IN_SECONDS );
+				wp_redirect( $this->client->build_connect_url() );
+				exit;
+			}
+
+			if ( ! empty( $_GET['ac-retry-updates'] ) && check_admin_referer( 'ayecode-connect-retry-updates' ) && $this->client->is_registered() ) {
+				delete_option( $this->client->prefix . '_wpeu_install' );
+				$this->client->install_updates_plugin();
+				wp_safe_redirect( $page );
+				exit;
+			}
+		}
+
+		/**
+		 * Not connected yet: say that the site is waiting for approval in the AyeCode account, or that it cannot reach
+		 * the AyeCode API at all.
+		 *
+		 * @since 2.0.1
+		 */
+		protected function registration_status_notice() {
+			global $aui_bs5;
+			$status  = $this->client->api->get_register_status();
+			// Waiting only while a connection request is open: started from this screen and its secret not used or expired.
+			$started = get_transient( $this->client->prefix . '_connect_started' ) && $this->client->get_activation_secret( false );
+			$badge   = $aui_bs5 ? 'rounded-pill me-1' : 'badge-pill mr-1';
+
+			if ( is_array( $status ) && 'unreachable' === $status['status'] ) {
+				echo '<div class="alert alert-danger w-50 mx-auto text-left text-start" role="alert"><span class="badge ' . esc_attr( $badge . ( $aui_bs5 ? ' bg-danger text-light' : ' badge-light' ) ) . '">!</span>';
+				echo esc_html( '' !== (string) $status['message']
+					/* translators: %s: connection error message */
+					? sprintf( __( 'This site cannot reach the AyeCode API (%s). Your host or a firewall may be blocking outgoing connections to api.ayecode.io.', 'ayecode-connect' ), $status['message'] )
+					: __( 'This site cannot reach the AyeCode API. Your host or a firewall may be blocking outgoing connections to api.ayecode.io.', 'ayecode-connect' ) );
+				echo ' <a href="https://wpgeodirectory.com/documentation/article/troubleshooting/ayecode-connect-connection-troubleshooting/" target="_blank" class="alert-link">' . esc_html__( 'Connection troubleshooting', 'ayecode-connect' ) . '</a>';
+				echo '</div>';
+			} elseif ( $started ) {
+				echo '<div class="alert alert-info w-50 mx-auto text-left text-start" role="alert">';
+				echo '<span class="spinner-border spinner-border-sm ' . ( $aui_bs5 ? 'me-2' : 'mr-2' ) . '" role="status" aria-hidden="true"></span>';
+				echo '<b>' . esc_html__( 'Waiting for approval...', 'ayecode-connect' ) . '</b> ';
+				esc_html_e( 'Approve this site in your AyeCode account, on the page that opened when you clicked Connect Site. This page then shows the site as connected.', 'ayecode-connect' );
+				echo ' <a href="' . esc_url( admin_url( 'admin.php?page=ayecode-connect' ) ) . '" class="alert-link">' . esc_html__( 'Check again', 'ayecode-connect' ) . '</a>';
+				echo '</div>';
+			}
+		}
+
+		/**
+		 * Connected, but WP Easy Updates could not be installed for the site: why, and how to install it by hand.
+		 *
+		 * @since 2.0.1
+		 */
+		protected function updates_install_notice() {
+			global $aui_bs5;
+			$failure = $this->client->get_updates_install_failure();
+			if ( ! $failure ) {
+				return;
+			}
+			$detail  = ! empty( $failure['detail'] ) ? $failure['detail'] : '';
+			$reasons = array(
+				'local'          => __( 'This is a local site, so our server cannot reach it to install WP Easy Updates for you.', 'ayecode-connect' ),
+				'cloudflare'     => __( 'A Cloudflare security challenge stopped our server from reaching this site to install WP Easy Updates.', 'ayecode-connect' ),
+				'blocked'        => __( 'A firewall or security plugin on this site refused our server, so WP Easy Updates could not be installed.', 'ayecode-connect' ),
+				'not_found'      => __( 'Our server could not find this site\'s REST API (a security plugin may be turning it off), so WP Easy Updates could not be installed.', 'ayecode-connect' ),
+				'unreachable'    => __( 'Our server could not reach this site to install WP Easy Updates.', 'ayecode-connect' ),
+				/* translators: %s: error message from the plugin installer */
+				'install_failed' => sprintf( __( 'WP Easy Updates could not be installed: %s', 'ayecode-connect' ), $detail ),
+				/* translators: %s: error message */
+				'api'            => sprintf( __( 'This site could not ask the AyeCode API to install WP Easy Updates: %s', 'ayecode-connect' ), $detail ),
+			);
+			$other  = trim( $failure['reason'] . ' ' . $detail );
+			$reason = isset( $reasons[ $failure['reason'] ] ) ? $reasons[ $failure['reason'] ] : ( $other
+				/* translators: %s: reason code and detail from the API */
+				? sprintf( __( 'WP Easy Updates could not be installed for you (%s).', 'ayecode-connect' ), $other )
+				: __( 'WP Easy Updates could not be installed for you.', 'ayecode-connect' ) );
+			$docs   = in_array( $failure['reason'], array( 'cloudflare', 'blocked', 'not_found' ), true )
+				? 'https://wpgeodirectory.com/documentation/article/how-tos/how-to-use-ayecode-connect-with-waf-or-other-firewall/'
+				: 'https://wpgeodirectory.com/documentation/article/troubleshooting/ayecode-connect-connection-troubleshooting/';
+
+			echo '<div class="alert alert-warning w-50 mx-auto text-left text-start" role="alert">';
+			echo '<b class="d-block mb-1">' . esc_html__( 'WP Easy Updates is needed for updates and one click add-on installs', 'ayecode-connect' ) . '</b>';
+			echo '<p class="mb-2">' . esc_html( $reason ) . '</p>';
+			echo '<p class="mb-1">' . esc_html__( 'Install it by hand:', 'ayecode-connect' ) . '</p>';
+			echo '<ol class="mb-2">';
+			echo '<li><a href="https://api.ayecode.io/v1/download/wp-easy-updates" class="alert-link">' . esc_html__( 'Download WP Easy Updates', 'ayecode-connect' ) . '</a></li>';
+			echo '<li>' . sprintf( esc_html__( 'Go to %s and upload the zip file.', 'ayecode-connect' ), '<a href="' . esc_url( admin_url( 'plugin-install.php?tab=upload' ) ) . '" class="alert-link">' . esc_html__( 'Plugins > Add New > Upload Plugin', 'ayecode-connect' ) . '</a>' ) . '</li>';
+			echo '<li>' . esc_html__( 'Activate it, then come back to this page.', 'ayecode-connect' ) . '</li>';
+			echo '</ol>';
+			echo '<a href="' . esc_url( $docs ) . '" target="_blank" class="alert-link">' . esc_html__( 'Help with this', 'ayecode-connect' ) . '</a>';
+			if ( 'local' !== $failure['reason'] ) {
+				echo ' &middot; <a href="' . esc_url( wp_nonce_url( admin_url( 'admin.php?page=ayecode-connect&ac-retry-updates=1' ), 'ayecode-connect-retry-updates' ) ) . '" class="alert-link">' . esc_html__( 'Try again', 'ayecode-connect' ) . '</a>';
+			}
+			echo '</div>';
+		}
+
 		public function settings_page() {
             global $aui_bs5;
 
@@ -581,6 +695,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								<div class="alert alert-success  w-50 mx-auto text-left" role="alert">
 									<?php echo sprintf( __( "You are connected to AyeCode Connect as user: %s", "ayecode-connect" ), '<b>' . esc_html( $connected_username ) . '</b>' ); ?>
 								</div>
+
+								<?php $this->updates_install_notice(); ?>
 
 								<ul class="list-group w-50 mx-auto">
 
@@ -650,6 +766,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									if ( $expires = get_option( $this->client->prefix . "_support_user", 0 ) ) {
 										$status_text_class = '';
 									}
+									// Local sites cannot be reached by our support team, so it cannot be switched on there; one that is
+									// already on (switched on before the site counted as local) keeps its switch so it can be turned off.
+									$support_user_unavailable = $this->client->api->is_local() && ! $expires;
 									?>
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
@@ -664,6 +783,9 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
+										<?php if ( $support_user_unavailable ) { ?>
+										<small class="text-muted text-nowrap" title="<?php esc_attr_e( "Our support team cannot reach a local site.", "ayecode-connect" ); ?>"><?php _e( "Not available on local sites", "ayecode-connect" ); ?></small>
+										<?php } else { ?>
 										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
 											<input type="checkbox" class="custom-control-input form-check-input"
 											       id="ac-setting-support-user"
@@ -674,6 +796,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 											>
 											<label class="custom-control-label form-check-label" for="ac-setting-support-user"></label>
 										</div>
+										<?php } ?>
 									</li>
 
 								</ul>
@@ -703,7 +826,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 									}
 								}
 							} else {
-								$connect_url = esc_url( $this->client->build_connect_url() );
+								$connect_url = esc_url( wp_nonce_url( admin_url( 'admin.php?page=ayecode-connect&ac-start=1' ), 'ayecode-connect-start' ) );
+								$this->registration_status_notice();
 
 								// check if alert message
 								if ( ! empty( $_REQUEST['alert'] ) && $_REQUEST['alert'] == 'connect' ) {
@@ -749,7 +873,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 								$localhost = $this->client->is_usable_domain( $host );
 								if ( is_wp_error( $localhost ) ) {
 									echo '<div class="alert alert-warning w-50 mx-auto" role="alert"><span class="badge ' . ( $aui_bs5 ? 'rounded-pill bg-warning text-dark me-1' : 'badge-pill badge-light mr-1' ) . '">!</span>';
-									_e( "This looks like a local or private site. Connecting works, but remote actions arrive when you open the admin or every few minutes, not instantly.", "ayecode-connect" );
+									_e( "This looks like a local or private site. Connecting works, but remote actions arrive when you open the admin or every few minutes, not instantly, and WP Easy Updates has to be installed by hand.", "ayecode-connect" );
 									echo "</div>";
 								}
 							}

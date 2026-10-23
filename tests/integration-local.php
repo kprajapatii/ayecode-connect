@@ -85,16 +85,39 @@ chk( 'install lookup went to the API only', in_array( '127.0.0.1', $GLOBALS['see
 chk( 'install lookup returns a signed API package with name and version', is_object( $api_info ) && strpos( (string) $api_info->download_link, '/dl/65056/' ) !== false && ! empty( $api_info->name ) && ! empty( $api_info->version ), is_object( $api_info ) ? 'v' . $api_info->version : ( is_wp_error( $api_info ) ? $api_info->get_error_message() : 'none' ) );
 $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); update_option( 'exup_keys', $keys );
 
-// ---- 4c. enabling updates queues a WPEU install from the API (not the legacy zip host) ----
+// ---- 4c. installs are push only (2.0.1, wp.org guideline 8): a local site gets no WPEU install, a pulled install is refused ----
 {
 	// the local dev database may not carry the WPEU product row the live one has; make it so (idempotent)
 	api( 'POST', '/v1/sync', array( 'ops' => array( array( 'entity' => 'product', 'op' => 'upsert', 'data' => array( 'id' => 9000001, 'slug' => 'wp-easy-updates', 'brand' => 'geodirectory', 'name' => 'WP Easy Updates', 'status' => 'publish', 'current_version' => '2.0.0', 'r2_key' => 'packages/wp-easy-updates/wp-easy-updates-2.0.0.zip', 'free' => 1 ) ) ) ), array( 'authorization' => 'Bearer ' . $SYNC ) );
 	$r = $c->request_updates();
-	chk( 'enable-updates accepted by the API', is_object( $r ) && ! empty( $r->success ), wp_json_encode( $r ) );
+	chk( 'enable-updates does not queue an install for a local site', is_object( $r ) && isset( $r->status ) && 'local' === $r->status && empty( $r->success ), wp_json_encode( $r ) );
+	$c->note_updates_install( $r );
+	$failure = get_option( $prefix . '_wpeu_install' );
+	chk( 'the reason is kept for the Connect screen', is_array( $failure ) && 'local' === $failure['reason'], wp_json_encode( $failure ) );
+	delete_option( $prefix . '_wpeu_install' );
 	list( $s, $q ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
-	$env = is_array( $q ) && ! empty( $q['commands'] ) ? json_decode( $q['commands'][0]['envelope'], true ) : array();
-	$link = isset( $env['payload']['download_link'] ) ? $env['payload']['download_link'] : '';
-	chk( 'queued command installs wp-easy-updates from a signed API download', isset( $env['action'] ) && $env['action'] === 'install_plugin' && strpos( $link, '/dl/9000001/' ) !== false, $link ? $link : wp_json_encode( $q ) );
+	chk( 'nothing queued for pull', is_array( $q ) && empty( $q['commands'] ), wp_json_encode( $q ) );
+	list( $s, $cmd ) = api( 'POST', '/v1/commands', array( 'site_id' => $c->get_blog_id(), 'action' => 'install_plugin', 'payload' => array( 'slug' => 'x' ) ), array( 'authorization' => 'Bearer ' . $FS ) );
+	chk( 'the API refuses to queue an install for a local site', $s === 200 && isset( $cmd['status'] ) && 'refused' === $cmd['status'], wp_json_encode( $cmd ) );
+	// the client refuses a pulled install even if one arrives (signature check stubbed: the API never signs one now)
+	$env_prop = new ReflectionProperty( $c->api, 'envelope' ); $env_prop->setAccessible( true ); $real_env = $env_prop->getValue( $c->api );
+	$env_prop->setValue( $c->api, new class { public function verify() { return true; } } );
+	$reported = array(); $installs = 0;
+	$count_install = function ( $x ) use ( &$installs ) { $installs++; return array( 'success' => true ); };
+	add_filter( 'ayecode_connect_remote_action_install_plugin', $count_install, 1 );
+	$fake = function ( $pre, $args, $url ) use ( &$reported ) {
+		if ( false === strpos( $url, '/v1/connect/commands' ) ) { return $pre; }
+		if ( false !== strpos( $url, '/result' ) ) { $reported[] = json_decode( $args['body'], true ); return array( 'response' => array( 'code' => 200, 'message' => '' ), 'body' => '{}', 'headers' => array(), 'cookies' => array() ); }
+		return array( 'response' => array( 'code' => 200, 'message' => '' ), 'headers' => array(), 'cookies' => array(), 'body' => wp_json_encode( array( 'commands' => array( array( 'envelope' => wp_json_encode( array( 'jti' => 'T1', 'action' => 'install_plugin', 'payload' => array() ) ), 'signature' => 'x' ) ) ) ) );
+	};
+	add_filter( 'pre_http_request', $fake, 1, 3 );
+	$c->api->pull_commands();
+	remove_filter( 'pre_http_request', $fake, 1 ); remove_filter( 'ayecode_connect_remote_action_install_plugin', $count_install, 1 ); $env_prop->setValue( $c->api, $real_env );
+	chk( 'a pulled install_plugin is refused and reported as pull_not_allowed', 0 === $installs && isset( $reported[0]['error'] ) && 'pull_not_allowed' === $reported[0]['error'], wp_json_encode( $reported ) );
+	// a signed WPEU link, as the push and the manual download use
+	$dl   = wp_remote_get( $W . '/v1/download/wp-easy-updates', array( 'redirection' => 0 ) );
+	$link = (string) wp_remote_retrieve_header( $dl, 'location' );
+	chk( 'the public download redirects to a signed WPEU link', strpos( $link, '/dl/9000001/' ) !== false, $link );
 	if ( ! class_exists( 'AyeCode_Connect_Remote_Actions' ) ) { require_once WP_PLUGIN_DIR . '/ayecode-connect/includes/class-ayecode-connect-remote-actions.php'; }
 	chk( 'that download passes the client allow-list', $link && AyeCode_Connect_Remote_Actions::validate_download_url( str_replace( 'http://127.0.0.1:8787', 'https://api.ayecode.io', $link ) ) );
 	// the installer must hand WordPress the signed link byte for byte (esc_url turned & into &#038; and the API refused it)
@@ -105,7 +128,6 @@ $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); u
 	$c->api->execute( array( 'action' => 'install_plugin', 'payload' => array( 'name' => 'Download test', 'slug' => 'ac-download-test', 'file-slug' => 'ac-download-test', 'download_link' => $signed ) ) );
 	remove_filter( 'upgrader_pre_download', $catch, 10 );
 	chk( 'installer downloads the signed link unchanged', $signed && $seen === $signed, (string) $seen );
-	chk( 'queued WPEU install carries min_version so a 1.x copy is replaced', isset( $env['payload']['min_version'] ) && $env['payload']['min_version'] === '2.0.0', wp_json_encode( $env['payload'] ?? null ) );
 	// min_version: an installed copy older than it is replaced from the download link; a current one is left alone
 	$udir = WP_PLUGIN_DIR . '/ac-upgrade-test';
 	$mk = function ( $dir, $v ) { wp_mkdir_p( $dir ); file_put_contents( $dir . '/ac-upgrade-test.php', "<?php\n/*\nPlugin Name: AC upgrade test\nVersion: $v\n*/\n" ); };
@@ -126,9 +148,6 @@ $keys = get_option( 'exup_keys', array() ); unset( $keys['gd-install-test'] ); u
 	remove_filter( 'upgrader_pre_download', $serve, 10 );
 	deactivate_plugins( 'ac-upgrade-test/ac-upgrade-test.php', true );
 	$GLOBALS['wp_filesystem']->delete( $udir, true ); $GLOBALS['wp_filesystem']->delete( $zdir, true ); @unlink( $zip );
-	if ( ! empty( $env['jti'] ) ) { api( 'POST', '/v1/connect/commands/' . rawurlencode( $env['jti'] ) . '/result', array( 'success' => true, 'note' => 'test: not installed' ), array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) ); }
-	list( $s, $q2 ) = api( 'GET', '/v1/connect/commands', null, array( 'authorization' => 'Bearer ' . $c->api->get_site_token() ) );
-	chk( 'queue empty after reporting the result', is_array( $q2 ) && empty( $q2['commands'] ) );
 }
 
 // ---- 5. command pull: FreeScout queues update_licences, the site pulls, verifies and applies it ----
