@@ -96,7 +96,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 
 == Changelog ==
 
-= 2.0.1 - 2026-10-TBD =
+= 2.0.1 - 2026-10-23 =
 * Plugins and themes are only installed when AyeCode sends the command to the site, never from commands the site fetches itself - CHANGED
 * When WP Easy Updates cannot be installed for the site (local site, firewall or Cloudflare challenge), the Connect screen says why and how to install it by hand - ADDED
 * Activating WP Easy Updates on a connected site syncs its licences straight away, instead of at the next daily check - ADDED
