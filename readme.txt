@@ -23,6 +23,8 @@ After connecting your site you can install our update plugin which will give you
 
 You will be able to remotely manage your activated sites and licences all from your account area on our site.
 
+Works on local sites too: you can connect a site running on localhost or a private network. It collects our updates (such as licence changes) itself when you open the admin, so nothing needs to reach it from outside. On a local site our update plugin is installed by hand (the Connect screen gives you a download link and the steps), and temporary support user access is not available.
+
 You can also use our one click demo importer.
 
 NEW: Cloudflare Turnstile Captcha feature. You can now activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
@@ -61,6 +63,14 @@ Automatic updates should seamlessly work. We always suggest you backup up your w
 = Do you have T&C's and a Privacy Policy? =
 
 Yes, please see our [terms & conditions](https://ayecode.io/terms-and-conditions/) and [privacy policy.](https://ayecode.io/privacy-policy/)
+
+= What does a connected site send to AyeCode? =
+
+When your site is connected it checks in with us once a day, to keep your licences, updates and support working and to warn you about problems. It sends the site address and name, the plugins installed (with their versions and whether they are active), the active theme, the WordPress, PHP and MySQL versions, whether it is a multisite, its language, and whether Turnstile protection is on. We keep only the most recent copy and delete it when you disconnect the site. We do not collect your site's content or your visitors' data. See our [terms & conditions](https://ayecode.io/terms-and-conditions/).
+
+= Can I connect a local or staging site? =
+
+Yes. A staging site on a public address works like any other site. A site on localhost or a private network connects the same way and collects updates from us itself, because our server cannot reach it. Install our update plugin by hand on it (the Connect screen shows how). Temporary support user access is not available there.
 
 = Do i need to pay to use this? =
 

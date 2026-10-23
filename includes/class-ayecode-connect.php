@@ -980,7 +980,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				$failure = array( 'reason' => 'api', 'detail' => $result->get_error_message() );
 			} elseif ( is_object( $result ) && isset( $result->status ) && 'ok' !== $result->status ) {
 				$failure = array(
-					'reason' => 'local' === $result->status ? 'local' : ( isset( $result->reason ) ? sanitize_key( $result->reason ) : '' ),
+					'reason' => 'local' === $result->status ? 'local' : ( ! empty( $result->reason ) ? sanitize_key( $result->reason ) : 'unreachable' ),
 					'detail' => isset( $result->detail ) ? sanitize_text_field( $result->detail ) : '',
 				);
 			} else {

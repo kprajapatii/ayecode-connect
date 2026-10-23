@@ -408,7 +408,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			// Our support team logs in from the help desk, which cannot reach a local site.
 			if ( $state && $this->client->api->is_local() ) {
-				wp_send_json_error( array( 'message' => __( 'Not available for local sites: our support team cannot reach this site.', 'ayecode-connect' ) ) );
+				wp_send_json_error( __( 'Not available for local sites: our support team cannot reach this site.', 'ayecode-connect' ) );
 			}
 
 			if ( $state ) { // enable
@@ -623,7 +623,11 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 				/* translators: %s: error message */
 				'api'            => sprintf( __( 'This site could not ask the AyeCode API to install WP Easy Updates: %s', 'ayecode-connect' ), $detail ),
 			);
-			$reason = isset( $reasons[ $failure['reason'] ] ) ? $reasons[ $failure['reason'] ] : sprintf( __( 'WP Easy Updates could not be installed for you (%s).', 'ayecode-connect' ), trim( $failure['reason'] . ' ' . $detail ) );
+			$other  = trim( $failure['reason'] . ' ' . $detail );
+			$reason = isset( $reasons[ $failure['reason'] ] ) ? $reasons[ $failure['reason'] ] : ( $other
+				/* translators: %s: reason code and detail from the API */
+				? sprintf( __( 'WP Easy Updates could not be installed for you (%s).', 'ayecode-connect' ), $other )
+				: __( 'WP Easy Updates could not be installed for you.', 'ayecode-connect' ) );
 			$docs   = in_array( $failure['reason'], array( 'cloudflare', 'blocked', 'not_found' ), true )
 				? 'https://wpgeodirectory.com/documentation/article/how-tos/how-to-use-ayecode-connect-with-waf-or-other-firewall/'
 				: 'https://wpgeodirectory.com/documentation/article/troubleshooting/ayecode-connect-connection-troubleshooting/';
@@ -756,9 +760,12 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 									<?php
 									$status_text_class = 'd-none';
-									if ( ( $expires = get_option( $this->client->prefix . "_support_user", 0 ) ) && ! $this->client->api->is_local() ) {
+									if ( $expires = get_option( $this->client->prefix . "_support_user", 0 ) ) {
 										$status_text_class = '';
 									}
+									// Local sites cannot be reached by our support team, so it cannot be switched on there; one that is
+									// already on (switched on before the site counted as local) keeps its switch so it can be turned off.
+									$support_user_unavailable = $this->client->api->is_local() && ! $expires;
 									?>
 									<li class="list-group-item d-flex justify-content-between align-items-center">
 										<span
@@ -773,7 +780,7 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 										     role="status">
 											<span class="sr-only"><?php _e( "Loading...", "ayecode-connect" ); ?></span>
 										</div>
-										<?php if ( $this->client->api->is_local() ) { ?>
+										<?php if ( $support_user_unavailable ) { ?>
 										<small class="text-muted text-nowrap" title="<?php esc_attr_e( "Our support team cannot reach a local site.", "ayecode-connect" ); ?>"><?php _e( "Not available on local sites", "ayecode-connect" ); ?></small>
 										<?php } else { ?>
 										<div class="<?php echo $aui_bs5 ? 'form-check form-switch' : 'custom-control custom-switch'; ?>">
