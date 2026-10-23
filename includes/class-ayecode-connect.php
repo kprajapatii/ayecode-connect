@@ -113,6 +113,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
 				add_action( 'admin_init', array( $this, 'check_for_url_change') );
 				add_filter( 'upgrader_post_install',array( $this, 'maybe_sync_licenses'),10,3);
+				add_action( 'activated_plugin', array( $this, 'updates_plugin_activated' ) );
 
 				// Support Widget
 				if ( is_admin() ) {
@@ -943,6 +944,27 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$this->api->check_in(); // tells the API WP Easy Updates is installed, which clears its failure record
 
 			return true;
+		}
+
+		/**
+		 * WP Easy Updates activated on a connected site (most often installed by hand after the push could not reach
+		 * the site): sync the licences and check in now, so add-ons are licensed straight away rather than after the
+		 * next daily cron, and the install failure is cleared here and in the AyeCode account.
+		 *
+		 * @since 2.0.1
+		 *
+		 * @param string $plugin The plugin file that was activated.
+		 */
+		public function updates_plugin_activated( $plugin ) {
+			static $done = false;
+			if ( $done || 'wp-easy-updates/external-updates.php' !== $plugin || ! $this->is_registered() ) {
+				return;
+			}
+			$done = true;
+			delete_option( $this->prefix . '_wpeu_install' );
+			update_option( $this->prefix . '_licence_sync', true );
+			$this->sync_licences();
+			$this->api->check_in();
 		}
 
 		/**

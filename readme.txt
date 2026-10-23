@@ -88,6 +88,7 @@ If your host runs "mod security" on your hosting and has some specific additiona
 = 2.0.1 - 2026-10-TBD =
 * Plugins and themes are only installed when AyeCode sends the command to the site, never from commands the site fetches itself - CHANGED
 * When WP Easy Updates cannot be installed for the site (local site, firewall or Cloudflare challenge), the Connect screen says why and how to install it by hand - ADDED
+* Activating WP Easy Updates on a connected site syncs its licences straight away, instead of at the next daily check - ADDED
 * The Connect screen shows "Waiting for approval" after you click Connect Site, and an error when the site cannot reach the AyeCode API - ADDED
 * Arriving from the AyeCode account's "connect a site" link goes straight on to connecting after the plugin is activated - ADDED
 * Temporary support user access is not offered on local sites, which our support team cannot reach - CHANGED
