@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 6.0
 Requires PHP: 7.2
 Tested up to: 7.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -84,6 +84,13 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 2.0.1 - 2026-10-TBD =
+* Plugins and themes are only installed when AyeCode sends the command to the site, never from commands the site fetches itself - CHANGED
+* When WP Easy Updates cannot be installed for the site (local site, firewall or Cloudflare challenge), the Connect screen says why and how to install it by hand - ADDED
+* The Connect screen shows "Waiting for approval" after you click Connect Site, and an error when the site cannot reach the AyeCode API - ADDED
+* Arriving from the AyeCode account's "connect a site" link goes straight on to connecting after the plugin is activated - ADDED
+* Temporary support user access is not offered on local sites, which our support team cannot reach - CHANGED
 
 = 2.0.0 - 2026-10-13 =
 * New API: the plugin now talks to api.ayecode.io, with the old ayecode.io endpoints kept as a fallback during the move - CHANGED
