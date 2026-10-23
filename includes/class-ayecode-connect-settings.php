@@ -587,7 +587,10 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 
 			if ( is_array( $status ) && 'unreachable' === $status['status'] ) {
 				echo '<div class="alert alert-danger w-50 mx-auto text-left text-start" role="alert"><span class="badge ' . esc_attr( $badge . ( $aui_bs5 ? ' bg-danger text-light' : ' badge-light' ) ) . '">!</span>';
-				echo esc_html( sprintf( __( 'This site cannot reach the AyeCode API (%s). Your host or a firewall may be blocking outgoing connections to api.ayecode.io.', 'ayecode-connect' ), $status['message'] ) );
+				echo esc_html( '' !== (string) $status['message']
+					/* translators: %s: connection error message */
+					? sprintf( __( 'This site cannot reach the AyeCode API (%s). Your host or a firewall may be blocking outgoing connections to api.ayecode.io.', 'ayecode-connect' ), $status['message'] )
+					: __( 'This site cannot reach the AyeCode API. Your host or a firewall may be blocking outgoing connections to api.ayecode.io.', 'ayecode-connect' ) );
 				echo ' <a href="https://wpgeodirectory.com/documentation/article/troubleshooting/ayecode-connect-connection-troubleshooting/" target="_blank" class="alert-link">' . esc_html__( 'Connection troubleshooting', 'ayecode-connect' ) . '</a>';
 				echo '</div>';
 			} elseif ( $started ) {

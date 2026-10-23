@@ -90,6 +90,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		/** @var AyeCode_Connect_API */
 		public $api;
 
+		/**
+		 * Set once WP Easy Updates activation has synced licences and checked in during this request, so the connect
+		 * setup that activated it does not do both again (static: the settings screen has its own instance).
+		 *
+		 * @var bool
+		 */
+		public static $updates_synced = false;
+
 		public function __construct( array $args = array() ) {
 			foreach ( $args as $key => $value ) {
 				$this->{$key} = $value;
@@ -941,7 +949,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 
 			delete_option( $this->prefix . '_wpeu_install' );
-			$this->api->check_in(); // tells the API WP Easy Updates is installed, which clears its failure record
+			if ( ! self::$updates_synced ) {
+				$this->api->check_in(); // tells the API WP Easy Updates is installed, which clears its failure record
+			}
 
 			return true;
 		}
@@ -956,11 +966,10 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * @param string $plugin The plugin file that was activated.
 		 */
 		public function updates_plugin_activated( $plugin ) {
-			static $done = false;
-			if ( $done || 'wp-easy-updates/external-updates.php' !== $plugin || ! $this->is_registered() ) {
+			if ( self::$updates_synced || 'wp-easy-updates/external-updates.php' !== $plugin || ! $this->is_registered() ) {
 				return;
 			}
-			$done = true;
+			self::$updates_synced = true;
 			delete_option( $this->prefix . '_wpeu_install' );
 			update_option( $this->prefix . '_licence_sync', true );
 			$this->sync_licences();
@@ -1032,7 +1041,9 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 			if ( $installed ) {
 				update_option( $this->prefix . '_licence_sync', true );
-				$this->sync_licences();
+				if ( ! self::$updates_synced ) { // activating it just now already synced
+					$this->sync_licences();
+				}
 			} else {
 				$this->api->check_in(); // the first check-in, without waiting a day for the cron
 			}
