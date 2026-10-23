@@ -90,6 +90,14 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		/** @var AyeCode_Connect_API */
 		public $api;
 
+		/**
+		 * Set once WP Easy Updates activation has synced licences and checked in during this request, so the connect
+		 * setup that activated it does not do both again (static: the settings screen has its own instance).
+		 *
+		 * @var bool
+		 */
+		public static $updates_synced = false;
+
 		public function __construct( array $args = array() ) {
 			foreach ( $args as $key => $value ) {
 				$this->{$key} = $value;
@@ -113,6 +121,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				add_action( 'edd_api_button_args', array( $this, 'edd_api_button_args' ), 8 );
 				add_action( 'admin_init', array( $this, 'check_for_url_change') );
 				add_filter( 'upgrader_post_install',array( $this, 'maybe_sync_licenses'),10,3);
+				add_action( 'activated_plugin', array( $this, 'updates_plugin_activated' ) );
 
 				// Support Widget
 				if ( is_admin() ) {
@@ -217,6 +226,12 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 					$demo = sanitize_title_with_dashes($_REQUEST['ac-demo-import']);
 					wp_redirect(admin_url( "admin.php?page=ayecode-demo-content&ac-demo-import=" . $demo ));
 				}
+			}
+
+			// The AyeCode account's "connect a site" link when AyeCode Connect is already installed and active.
+			if ( $currentScreen->id === "plugin-install" && ! empty( $_REQUEST['ac-connect'] ) ) {
+				wp_redirect( admin_url( 'admin.php?page=ayecode-connect' . ( $this->is_registered() ? '' : '&ac-connect=1' ) ) );
+				exit;
 			}
 		}
 
@@ -494,6 +509,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * Deletes secret tokens in case they, for example, have expired.
 		 */
 		public function delete_secrets() {
+			delete_transient( $this->prefix . '_connect_started' );
+			delete_transient( $this->prefix . '_register_status' );
 			delete_option( $this->prefix . '_blog_id' );
 			delete_option( $this->prefix . '_blog_token' );
 			delete_option( $this->prefix . '_connected_username' );
@@ -546,6 +563,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			// if using object cache clear secret if not used
 			if ( wp_using_ext_object_cache() ) {
 				delete_option( $this->prefix . '_activation_secret' );
+				delete_transient( $this->prefix . '_connect_started' );
 			}
 
 			// Make the licence sync run on next load
@@ -690,6 +708,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			delete_option( $this->prefix . AyeCode_Connect_API::OPTION_SITE_TOKEN );
 			delete_option( $this->prefix . AyeCode_Connect_API::OPTION_LOCAL );
 			delete_option( $this->prefix . '_post_connect_setup' );
+			delete_option( $this->prefix . '_wpeu_install' );
 			delete_option( 'exup_site_token' );
 			wp_clear_scheduled_hook( $this->prefix . AyeCode_Connect_API::CRON_PULL );
 			wp_clear_scheduled_hook( $this->prefix . AyeCode_Connect_API::CRON_REGISTER );
@@ -881,9 +900,13 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		}
 
 		/**
-		 * Make sure WP Easy Updates is installed and active: activate it if it is already there, otherwise ask the API to
-		 * queue its install and collect that at once (pushes are off), or ask the old server, which pushes it. True only
-		 * when the plugin really is active afterwards, so the settings page never shows a switch that did nothing.
+		 * Make sure WP Easy Updates is installed and active: activate it if it is already there, otherwise ask the API (or
+		 * the old server) to push its install to this site. True only when the plugin really is active afterwards, so the
+		 * settings page never shows a switch that did nothing.
+		 *
+		 * Since 2.0.1 the install is only ever pushed: the site does not fetch install commands itself (wp.org plugin
+		 * guideline 8). When the push cannot reach the site (a local site, a firewall or Cloudflare challenge) the reason
+		 * is kept in the _wpeu_install option and the Connect screen shows how to install it by hand.
 		 *
 		 * The old server installs 1.x as soon as a site connects. On the 2.0 API that copy is replaced with 2.x the same
 		 * way (the API's install command carries a min_version); if that fails 1.x is kept, it still works.
@@ -902,20 +925,15 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			$plugins = get_plugins();
 			$outdated = isset( $plugins[ $plugin ]['Version'] ) && version_compare( $plugins[ $plugin ]['Version'], '2.0.0', '<' );
 			if ( $outdated && ! $this->use_legacy_api() ) {
-				$result = $this->request_updates();
-				if ( ! is_wp_error( $result ) ) {
-					$this->api->pull_commands();
-					wp_clean_plugins_cache();
-				}
+				$this->note_updates_install( $this->request_updates() );
+				wp_clean_plugins_cache();
 			}
 
 			if ( ! array_key_exists( $plugin, get_plugins() ) ) {
 				$result = $this->request_updates();
+				$this->note_updates_install( $result );
 				if ( is_wp_error( $result ) ) {
 					return false;
-				}
-				if ( ! $this->use_legacy_api() ) {
-					$this->api->pull_commands();
 				}
 				wp_clean_plugins_cache();
 				if ( ! array_key_exists( $plugin, get_plugins() ) ) {
@@ -930,7 +948,74 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 				}
 			}
 
+			delete_option( $this->prefix . '_wpeu_install' );
+			if ( ! self::$updates_synced ) {
+				$this->api->check_in(); // tells the API WP Easy Updates is installed, which clears its failure record
+			}
+
 			return true;
+		}
+
+		/**
+		 * WP Easy Updates activated on a connected site (most often installed by hand after the push could not reach
+		 * the site): sync the licences and check in now, so add-ons are licensed straight away rather than after the
+		 * next daily cron, and the install failure is cleared here and in the AyeCode account.
+		 *
+		 * @since 2.0.1
+		 *
+		 * @param string $plugin The plugin file that was activated.
+		 */
+		public function updates_plugin_activated( $plugin ) {
+			if ( self::$updates_synced || 'wp-easy-updates/external-updates.php' !== $plugin || ! $this->is_registered() ) {
+				return;
+			}
+			self::$updates_synced = true;
+			delete_option( $this->prefix . '_wpeu_install' );
+			update_option( $this->prefix . '_licence_sync', true );
+			$this->sync_licences();
+			$this->api->check_in();
+		}
+
+		/**
+		 * Keep why the WP Easy Updates install push did not work, for the Connect screen. The 2.0 API answers
+		 * {success, status: ok|failed|local, reason, detail}; the old server only says whether it pushed.
+		 *
+		 * @since 2.0.1
+		 *
+		 * @param object|WP_Error|null $result request_updates() result.
+		 */
+		public function note_updates_install( $result ) {
+			if ( is_wp_error( $result ) ) {
+				$failure = array( 'reason' => 'api', 'detail' => $result->get_error_message() );
+			} elseif ( is_object( $result ) && isset( $result->status ) && 'ok' !== $result->status ) {
+				$failure = array(
+					'reason' => 'local' === $result->status ? 'local' : ( ! empty( $result->reason ) ? sanitize_key( $result->reason ) : 'unreachable' ),
+					'detail' => isset( $result->detail ) ? sanitize_text_field( $result->detail ) : '',
+				);
+			} else {
+				return;
+			}
+			$failure['time'] = time();
+			update_option( $this->prefix . '_wpeu_install', $failure, false );
+		}
+
+		/**
+		 * Why WP Easy Updates could not be installed for this site, if it is not active.
+		 *
+		 * @since 2.0.1
+		 *
+		 * @return array{reason:string,detail:string,time:int}|false
+		 */
+		public function get_updates_install_failure() {
+			if ( defined( 'WP_EASY_UPDATES_ACTIVE' ) ) {
+				return false;
+			}
+			$failure = get_option( $this->prefix . '_wpeu_install' );
+			if ( ! $failure && $this->api->is_local() ) {
+				$failure = array( 'reason' => 'local', 'detail' => '', 'time' => 0 ); // nothing can be pushed to a local site
+			}
+
+			return is_array( $failure ) ? $failure : false;
 		}
 
 		/**
@@ -956,7 +1041,11 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			}
 			if ( $installed ) {
 				update_option( $this->prefix . '_licence_sync', true );
-				$this->sync_licences();
+				if ( ! self::$updates_synced ) { // activating it just now already synced
+					$this->sync_licences();
+				}
+			} else {
+				$this->api->check_in(); // the first check-in, without waiting a day for the cron
 			}
 
 			delete_transient( $this->prefix . '_post_connect_running' );

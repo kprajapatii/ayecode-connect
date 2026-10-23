@@ -20,6 +20,7 @@ class AyeCode_Connect_API {
 	const OPTION_AUTH_LOG     = '_auth_paths';
 	const TRANSIENT_PULL      = '_commands_pulled';
 	const CRON_PULL           = '_pull_commands';
+	const TRANSIENT_REGISTER  = '_register_status';
 	const CRON_REGISTER       = '_pending_registration';
 	const TRANSIENT_EXCHANGE  = '_token_exchange_tried';
 
@@ -181,10 +182,16 @@ class AyeCode_Connect_API {
 			) ),
 		) );
 		if ( is_wp_error( $response ) ) {
+			$this->set_register_status( 'unreachable', $response->get_error_message() );
 			return false;
 		}
 		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( $code >= 500 ) {
+			$this->set_register_status( 'unreachable', sprintf( 'HTTP %d', $code ) );
+			return false;
+		}
 		if ( 200 !== $code ) {
+			$this->set_register_status( 'pending' );
 			return false; // 403 = store has not authorised yet; keep polling until the secret expires
 		}
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -205,6 +212,8 @@ class AyeCode_Connect_API {
 		delete_transient( $this->prefix . '_site_moved' );
 		delete_transient( $this->prefix . '_activation_secret' );
 		delete_option( $this->prefix . '_activation_secret' );
+		delete_transient( $this->prefix . self::TRANSIENT_REGISTER );
+		delete_transient( $this->prefix . '_connect_started' );
 		wp_clear_scheduled_hook( $this->prefix . self::CRON_REGISTER );
 		wp_clear_scheduled_hook( $this->prefix . '_callback' );
 		wp_schedule_event( time(), 'daily', $this->prefix . '_callback' );
@@ -212,6 +221,19 @@ class AyeCode_Connect_API {
 		do_action( $this->prefix . '_registered_via_api', $data );
 
 		return true;
+	}
+
+	/**
+	 * Why the last registration attempt did not connect: 'pending' (the site is not approved in the AyeCode account
+	 * yet) or 'unreachable' (the API could not be reached), for the Connect screen.
+	 */
+	protected function set_register_status( $status, $message = '' ) {
+		set_transient( $this->prefix . self::TRANSIENT_REGISTER, array( 'status' => $status, 'message' => $message, 'time' => time() ), HOUR_IN_SECONDS );
+	}
+
+	/** @return array{status:string,message:string,time:int}|false */
+	public function get_register_status() {
+		return get_transient( $this->prefix . self::TRANSIENT_REGISTER );
 	}
 
 	/** Exchange at most once an hour while it keeps failing (API down, token unknown yet). */
@@ -333,6 +355,15 @@ class AyeCode_Connect_API {
 				}
 				continue;
 			}
+			// Plugins and themes are only installed when AyeCode pushes the command to the site, never from a command
+			// the site fetched itself (wp.org plugin guideline 8).
+			if ( isset( $envelope['action'] ) && in_array( $envelope['action'], array( 'install_plugin', 'install_theme' ), true ) ) {
+				$this->log_auth( 'pull_install_refused' );
+				if ( $id ) {
+					$this->request( 'POST', '/commands/' . rawurlencode( $id ) . '/result', array( 'success' => false, 'error' => 'pull_not_allowed' ) );
+				}
+				continue;
+			}
 			$this->log_auth( 'envelope' );
 			$result = $this->execute( $envelope );
 			$ran ++;
@@ -402,9 +433,55 @@ class AyeCode_Connect_API {
 				}
 			}
 		}
-		$this->request( 'POST', '/ping', array( 'versions' => $versions, 'local' => $this->is_local(), 'auth_paths' => get_option( $this->prefix . self::OPTION_AUTH_LOG, array() ) ) );
+		$this->request( 'POST', '/ping', array_merge(
+			array( 'versions' => $versions, 'local' => $this->is_local(), 'auth_paths' => get_option( $this->prefix . self::OPTION_AUTH_LOG, array() ) ),
+			$this->site_environment()
+		) );
 		// Safety net for every site: pull once a day in case a push was missed.
 		$this->pull_commands();
+	}
+
+	/**
+	 * The site's environment for the check-in, so AyeCode can spot problems (old plugins, PHP, conflicts) and support
+	 * can see the setup. The API keeps only the latest copy and deletes it when the site disconnects.
+	 */
+	public function site_environment() {
+		global $wpdb;
+		$plugins = array();
+		if ( function_exists( 'get_plugins' ) || ( defined( 'ABSPATH' ) && @include_once ABSPATH . 'wp-admin/includes/plugin.php' ) ) {
+			$network = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
+			foreach ( array_slice( get_plugins(), 0, 300, true ) as $file => $plugin ) {
+				$plugins[ $file ] = array(
+					'v' => isset( $plugin['Version'] ) ? (string) $plugin['Version'] : '',
+					'a' => is_plugin_active( $file ) || isset( $network[ $file ] ) ? 1 : 0,
+				);
+			}
+		}
+		$theme     = wp_get_theme();
+		$turnstile = (array) get_option( 'ayecode_turnstile_options', array() );
+
+		return array(
+			'plugins'   => $plugins,
+			'theme'     => array(
+				'stylesheet' => get_stylesheet(),
+				'v'          => (string) $theme->get( 'Version' ),
+				'parent'     => get_stylesheet() !== get_template() ? get_template() : '',
+			),
+			'wp'        => get_bloginfo( 'version' ),
+			'php'       => PHP_VERSION,
+			'mysql'     => is_object( $wpdb ) && method_exists( $wpdb, 'db_version' ) ? (string) $wpdb->db_version() : '',
+			'multisite' => is_multisite(),
+			'locale'    => get_locale(),
+			'turnstile' => ( defined( 'AYECODE_TURNSTILE_SITE_KEY' ) || ! empty( $turnstile['site_key'] ) ) && ( defined( 'AYECODE_TURNSTILE_SECRET_KEY' ) || ! empty( $turnstile['secret_key'] ) ),
+			'wpeu'      => defined( 'WP_EASY_UPDATES_VERSION' ) ? WP_EASY_UPDATES_VERSION : '',
+		);
+	}
+
+	/** Check in now (after connecting, or once WP Easy Updates is installed), not only on the daily cron. */
+	public function check_in() {
+		if ( $this->get_site_token() ) {
+			$this->request( 'POST', '/ping', $this->site_environment(), 10 );
+		}
 	}
 
 	/** Count which permission path accepted commands, so support and the daily ping can see 1.4.x vs 2.0 traffic. */

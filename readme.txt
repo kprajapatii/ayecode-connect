@@ -7,7 +7,7 @@ Tags:  ayecode, service, geodirectory, userswp, getpaid
 Requires at least: 6.0
 Requires PHP: 7.2
 Tested up to: 7.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 
 
 Use this service plugin to easily activate any of our products, open a support ticket and view documentation all from your wp-admin!
@@ -23,10 +23,12 @@ After connecting your site you can install our update plugin which will give you
 
 You will be able to remotely manage your activated sites and licences all from your account area on our site.
 
+Works on local sites too: you can connect a site running on localhost or a private network. It collects our updates (such as licence changes) itself when you open the admin, so nothing needs to reach it from outside. On a local site our update plugin is installed by hand (the Connect screen gives you a download link and the steps), and temporary support user access is not available.
+
 You can also use our one click demo importer.
 
-NEW: Cloudflare Turnstile Captcha feature. You can now activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
-Our implementation of Turnstile is loaded only when the field is show on the screen which helps with speed and SEO of your site.
+Cloudflare Turnstile Captcha: you can activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
+Our implementation of Turnstile is loaded only when the field is shown on the screen which helps with speed and SEO of your site.
 NOTE: Your site does NOT have to be using Cloudflare to be able to use Cloudflare Turnstile.
 
 == Security ==
@@ -39,7 +41,7 @@ To report a security vulnerability, please review our [vulnerability disclosure 
 
 * WordPress 6.0 or greater
 * PHP version 7.2 or greater
-* MySQL version 8.0 or greater
+* MySQL 5.7 or MariaDB 10.4 or greater
 
 = Automatic installation =
 
@@ -49,7 +51,7 @@ In the search field type "AyeCode Connect" and click Search Plugins. Once you've
 
 = Manual installation =
 
-The manual installation method involves downloading our AyeCode Connect plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex will tell you more [here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+The manual installation method involves downloading our AyeCode Connect plugin and uploading it to your webserver via your favourite FTP application. The WordPress documentation will tell you more [here](https://wordpress.org/documentation/article/manage-plugins/#manual-upload-via-wordpress-admin).
 
 = Updating =
 
@@ -62,13 +64,22 @@ Automatic updates should seamlessly work. We always suggest you backup up your w
 
 Yes, please see our [terms & conditions](https://ayecode.io/terms-and-conditions/) and [privacy policy.](https://ayecode.io/privacy-policy/)
 
-= Do i need to pay to use this? =
+= What does a connected site send to AyeCode? =
+
+When your site is connected it checks in with us once a day, to keep your licences, updates and support working and to warn you about problems. It sends the site address and name, the plugins installed (with their versions and whether they are active), the active theme, the WordPress, PHP and MySQL versions, whether it is a multisite, its language, and whether Turnstile protection is on. We keep only the most recent copy and delete it when you disconnect the site. We do not collect your site's content or your visitors' data. See our [terms & conditions](https://ayecode.io/terms-and-conditions/).
+
+= Can I connect a local or staging site? =
+
+Yes. A staging site on a public address works like any other site. A site on localhost or a private network connects the same way and collects updates from us itself, because our server cannot reach it. Install our update plugin by hand on it (the Connect screen shows how). Temporary support user access is not available there.
+
+= Do I need to pay to use this? =
 
 No, you can register a free account on our site which will provide you with live documentation search and the ability to get support directly from your wp-admin area.
 
 = Is my connection to your site safe? =
 
 Yes, our system will only connect via HTTPS ensuring all passed data is encrypted.
+Every command we send to your site is signed by us, only accepted for your site, and expires, so it cannot be forged or replayed.
 Additionally, we built our systems in such a way that;
 Should your database or our database (or both) be compromised, this would not result in access to your site.
 Should your files or our files (or both) be compromised, this would not result in access to your site.
@@ -84,6 +95,14 @@ If your host runs "mod security" on your hosting and has some specific additiona
 3. Connected.
 
 == Changelog ==
+
+= 2.0.1 - 2026-10-23 =
+* Plugins and themes are only installed when AyeCode sends the command to the site, never from commands the site fetches itself - CHANGED
+* When WP Easy Updates cannot be installed for the site (local site, firewall or Cloudflare challenge), the Connect screen says why and how to install it by hand - ADDED
+* Activating WP Easy Updates on a connected site syncs its licences straight away, instead of at the next daily check - ADDED
+* The Connect screen shows "Waiting for approval" after you click Connect Site, and an error when the site cannot reach the AyeCode API - ADDED
+* Arriving from the AyeCode account's "connect a site" link goes straight on to connecting after the plugin is activated - ADDED
+* Temporary support user access is not offered on local sites, which our support team cannot reach - CHANGED
 
 = 2.0.0 - 2026-10-13 =
 * New API: the plugin now talks to api.ayecode.io, with the old ayecode.io endpoints kept as a fallback during the move - CHANGED
