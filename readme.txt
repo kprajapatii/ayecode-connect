@@ -27,8 +27,8 @@ Works on local sites too: you can connect a site running on localhost or a priva
 
 You can also use our one click demo importer.
 
-NEW: Cloudflare Turnstile Captcha feature. You can now activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
-Our implementation of Turnstile is loaded only when the field is show on the screen which helps with speed and SEO of your site.
+Cloudflare Turnstile Captcha: you can activate Cloudflare turnstile on your site which will add a captcha to all AyeCode Ltd products ( GeoDirectory, UsersWP, GetPaid, BlockStrap ).
+Our implementation of Turnstile is loaded only when the field is shown on the screen which helps with speed and SEO of your site.
 NOTE: Your site does NOT have to be using Cloudflare to be able to use Cloudflare Turnstile.
 
 == Security ==
@@ -41,7 +41,7 @@ To report a security vulnerability, please review our [vulnerability disclosure 
 
 * WordPress 6.0 or greater
 * PHP version 7.2 or greater
-* MySQL version 8.0 or greater
+* MySQL 5.7 or MariaDB 10.4 or greater
 
 = Automatic installation =
 
@@ -51,7 +51,7 @@ In the search field type "AyeCode Connect" and click Search Plugins. Once you've
 
 = Manual installation =
 
-The manual installation method involves downloading our AyeCode Connect plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex will tell you more [here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+The manual installation method involves downloading our AyeCode Connect plugin and uploading it to your webserver via your favourite FTP application. The WordPress documentation will tell you more [here](https://wordpress.org/documentation/article/manage-plugins/#manual-upload-via-wordpress-admin).
 
 = Updating =
 
@@ -72,13 +72,14 @@ When your site is connected it checks in with us once a day, to keep your licenc
 
 Yes. A staging site on a public address works like any other site. A site on localhost or a private network connects the same way and collects updates from us itself, because our server cannot reach it. Install our update plugin by hand on it (the Connect screen shows how). Temporary support user access is not available there.
 
-= Do i need to pay to use this? =
+= Do I need to pay to use this? =
 
 No, you can register a free account on our site which will provide you with live documentation search and the ability to get support directly from your wp-admin area.
 
 = Is my connection to your site safe? =
 
 Yes, our system will only connect via HTTPS ensuring all passed data is encrypted.
+Every command we send to your site is signed by us, only accepted for your site, and expires, so it cannot be forged or replayed.
 Additionally, we built our systems in such a way that;
 Should your database or our database (or both) be compromised, this would not result in access to your site.
 Should your files or our files (or both) be compromised, this would not result in access to your site.
