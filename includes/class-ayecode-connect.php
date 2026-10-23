@@ -500,6 +500,8 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 		 * Deletes secret tokens in case they, for example, have expired.
 		 */
 		public function delete_secrets() {
+			delete_transient( $this->prefix . '_connect_started' );
+			delete_transient( $this->prefix . '_register_status' );
 			delete_option( $this->prefix . '_blog_id' );
 			delete_option( $this->prefix . '_blog_token' );
 			delete_option( $this->prefix . '_connected_username' );
@@ -552,6 +554,7 @@ if ( ! class_exists( 'AyeCode_Connect' ) ) :
 			// if using object cache clear secret if not used
 			if ( wp_using_ext_object_cache() ) {
 				delete_option( $this->prefix . '_activation_secret' );
+				delete_transient( $this->prefix . '_connect_started' );
 			}
 
 			// Make the licence sync run on next load

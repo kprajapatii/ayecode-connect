@@ -581,7 +581,8 @@ if ( ! class_exists( 'AyeCode_Connect_Settings' ) ) {
 		protected function registration_status_notice() {
 			global $aui_bs5;
 			$status  = $this->client->api->get_register_status();
-			$started = get_transient( $this->client->prefix . '_connect_started' );
+			// Waiting only while a connection request is open: started from this screen and its secret not used or expired.
+			$started = get_transient( $this->client->prefix . '_connect_started' ) && $this->client->get_activation_secret( false );
 			$badge   = $aui_bs5 ? 'rounded-pill me-1' : 'badge-pill mr-1';
 
 			if ( is_array( $status ) && 'unreachable' === $status['status'] ) {

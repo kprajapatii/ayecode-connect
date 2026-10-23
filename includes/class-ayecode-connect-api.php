@@ -213,6 +213,7 @@ class AyeCode_Connect_API {
 		delete_transient( $this->prefix . '_activation_secret' );
 		delete_option( $this->prefix . '_activation_secret' );
 		delete_transient( $this->prefix . self::TRANSIENT_REGISTER );
+		delete_transient( $this->prefix . '_connect_started' );
 		wp_clear_scheduled_hook( $this->prefix . self::CRON_REGISTER );
 		wp_clear_scheduled_hook( $this->prefix . '_callback' );
 		wp_schedule_event( time(), 'daily', $this->prefix . '_callback' );
